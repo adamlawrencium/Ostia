@@ -10,6 +10,8 @@
     "ejs": "2.5.2",
     "morgan": "~1.6.1",
     "ws": "1.1.1",
-    "autobahn":"0.10.0"
+    "autobahn":"0.10.0",
+    "socket.io": "1.2.0",
+    "mongoose":"4.3.0"
   }
 }
