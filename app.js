@@ -5,12 +5,12 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var routes = require('./routes/index');
 
-var mongoose = require('mongoose');
-var configDB = require('./config/database');
-var Data     = require('./mongoose/pol_schema');
-mongoose.connect(configDB.url); // connect to our database
+
+//var mongoose = require('mongoose');
+//var configDB = require('./config/database');
+//var Data     = require('./mongoose/pol_schema');
+//mongoose.connect(configDB.url); // connect to our database
 
 
 var stream = require('./websockets/auto');
@@ -44,7 +44,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 
-app.use('/', routes);
+app.get('/', function (req, res) {
+  res.sendfile(__dirname + '/views/socket.html');
+});
 
 
 
@@ -71,20 +73,6 @@ var server = http.createServer(app);
 server.listen(port);
 
 stream.open();
-
-var counter = 0;
- setInterval(function () {
-
-
-   Data.find(function (err, dataplur) {
-     if (err) return console.error(err);
-     console.log(dataplur);
-   })
-
-
-    counter += 1;
- }, 1000);
-
 
 
 module.exports = app;
