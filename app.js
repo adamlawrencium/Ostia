@@ -1,78 +1,86 @@
-var express = require('express');
-var path = require('path');
-var ejs = require('ejs');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-
-
-
-//var mongoose = require('mongoose');
-//var configDB = require('./config/database');
-//var Data     = require('./mongoose/pol_schema');
-//mongoose.connect(configDB.url); // connect to our database
-
-
-var stream = require('./websockets/auto');
-
-
-var http = require('http');
-
-var app = express();
-
-
-
-var port = normalizePort(process.env.PORT || '3000');
-
-
-
-
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-app.set('port', port);
-
-
-
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-
-
-
-
-
-app.get('/', function (req, res) {
-  res.sendfile(__dirname + '/views/socket.html');
+// Autobahn Connection Setup
+var autobahn = require('autobahn');
+var wsuri = "wss://api.poloniex.com";
+var connection = new autobahn.Connection({
+  url: wsuri,
+  realm: "realm1"
 });
 
+// Setting up basic Express server
+var app = require('express')();
+var server = require('http').Server(app);
+var io = require('socket.io')(server);
 
+// Rendering index.html
+app.get('/', function (req, res) {
+  res.sendfile(__dirname + '/index.html');
+});
 
+// Function for Autobahn websocket feed
+function on_recieve(args, kwargs){
 
+  if (args[0]=='BTC_ETH'){ // Filtering Ticker results for BTC_ETH
 
-function normalizePort(val) {
-  var port = parseInt(val, 10);
+    // Creating Timestamp for Updated Stock prices
+    var m = new Date();
+    var dateString =
+      m.getUTCFullYear() +"/"+
+      ("0" + (m.getUTCMonth()+1)).slice(-2) +"/"+
+      ("0" + m.getUTCDate()).slice(-2) + " " +
+      ("0" + m.getUTCHours()).slice(-2) + ":" +
+      ("0" + m.getUTCMinutes()).slice(-2) + ":" +
+      ("0" + m.getUTCSeconds()).slice(-2);
 
-  if (isNaN(port)) {
-    // named pipe
-    return val;
+    // Emitting messages to connected clients through socket.io
+    io.emit('message',{message: args[2]+", "+args[3]+", "+ m});
+
+  }
+};
+
+// Sample Order Book Parsing
+
+/*
+function on_recieve2(args, kwargs){
+
+  for (var i=0;i<args.length;i++){
+    if(args[i].type=="orderBookModify"){
+      console.log("type:" + args[i].data.type);
+      console.log("rate:" + args[i].data.rate);
+      console.log("amount:" + args[i].data.amount);
+
+    }
   }
 
-  if (port >= 0) {
-    // port number
-    return port;
-  }
+};
+*/
+/*
+connection.onopen = function (session) {
 
-  return false;
-}
+session.subscribe('BTC_XMR', on_recieve2).then(
+   function (subscription) {
+      // subscription succeeded, subscription is an instance of autobahn.Subscription
+   },
+   function (error) {
+      // subscription failed, error is an instance of autobahn.Error
+   }
+)
+};
+*/
 
-var server = http.createServer(app);
 
-server.listen(port);
+connection.onopen = function (session) {
+session.subscribe('ticker', on_recieve).then(
+   function (subscription) {
+      // subscription succeeded, subscription is an instance of autobahn.Subscription
+   },
+   function (error) {
+      // subscription failed, error is an instance of autobahn.Error
+   }
+)
+};
 
-stream.open();
+// Opening Autobahn connection
+connection.open();
 
-
-module.exports = app;
+// Creating Express server
+server.listen(3000);
