@@ -4,6 +4,7 @@
     "dependencies": {
         "express": "~3.3.4",
         "socket.io": "~1.2.1",
-        "autobahn":"0.10.0"
+        "autobahn":"0.10.0",
+        "ws":"1.1.1"
     }
 }
