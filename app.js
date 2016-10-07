@@ -30,10 +30,91 @@ ws.on('open',function() {
   ws.send(JSON.stringify(heartbeat));
 });
 
+
+var GDAX_highbid = 0;
+var GDAX_lowask = 0;
+var Polo_highbid = 0;
+var Polo_lowask = 0;
+
+var GDAX_highbid_amt = 0;
+var GDAX_lowask_amt = 0;
+var Polo_highbid_amt = 0;
+var Polo_lowask_amt = 0;
+
+
+//========SAMPLE GDAX PARSING WITH MAPS=========
+var highbid_GDAX = new Map();
+var lowask_GDAX = new Map();
+
 // When a message is recieved, log it to the console
 ws.on('message', function(data, flags) {
-  //var data2 = JSON.parse(data)
-  //console.log(data);
+
+  var tmp_GDAX_highbid = 0;
+  var tmp_GDAX_lowask = 1000000000000000;
+  var tmp_GDAX_amt_highbid = 0;
+  var tmp_GDAX_amt_lowask = 0;
+
+
+  var data2 = JSON.parse(data)
+  if(data2.type == "open" && data2.side == "buy"){
+    highbid_GDAX.set(data2.order_id, {rate:data2.price, amount:data2.remaining_size});
+  }
+  else if(data2.type == "done" && data2.side == "buy"){
+    highbid_GDAX.delete(data2.order_id);
+  }
+  else if(data2.type == "change" && data2.side == "buy"){
+    highbid_GDAX(data2.order_id).rate = data2.price;
+    highbid_GDAX(data2.order_id).amount = data2.remaining_size;
+  }
+  else if(data2.type == "open" && data2.side == "sell"){
+    lowask_GDAX.set(data2.order_id, {rate:data2.price, amount:data2.remaining_size});
+  }
+  else if(data2.type == "done" && data2.side == "sell"){
+    lowask_GDAX.delete(data2.order_id);
+  }
+  else if(data2.type == "change" && data2.side == "sell"){
+    lowask_GDAX.set(data2.order_id, {rate:data2.price, amount:data2.remaining_size});
+  }
+
+  // Sorting out the highest bid
+  for (var [key, value] of highbid_GDAX) {
+    if (value.rate > tmp_GDAX_highbid){
+      tmp_GDAX_highbid = value.rate;
+      tmp_GDAX_amt_highbid = parseFloat(value.amount);
+    }
+    else if (value.rate == tmp_GDAX_highbid){
+      tmp_GDAX_amt_highbid += parseFloat(value.amount);
+    }
+  }
+
+  // Sorting out the lowest ask
+  for (var [key, value] of lowask_GDAX) {
+    if (value.rate < tmp_GDAX_lowask){
+      tmp_GDAX_lowask = value.rate;
+      tmp_GDAX_amt_lowask = parseFloat(value.amount);
+    }
+    else if (value.rate == tmp_GDAX_lowask){
+      tmp_GDAX_amt_highbid += parseFloat(value.amount);
+    }
+  }
+/*
+  if (tmp_GDAX_highbid != GDAX_highbid || tmp_GDAX_amt_highbid != GDAX_highbid_amt){
+    GDAX_highbid = tmp_GDAX_highbid;
+    GDAX_highbid_amt = tmp_GDAX_amt_highbid;
+  }
+
+  if (tmp_GDAX_lowask != GDAX_lowask || tmp_GDAX_amt_lowask != GDAX_lowask_amt){
+    GDAX_lowask = tmp_GDAX_lowask;
+    GDAX_lowask_amt = tmp_GDAX_amt_lowask;
+  }
+  */
+
+  // Printing out the highest bid and lowest ask
+  console.log("High Bid GDAX: " + tmp_GDAX_highbid + "BTC , Amount: " + tmp_GDAX_amt_highbid + " ETH");
+  console.log("Low Ask GDAX: " + tmp_GDAX_lowask + "BTC , Amount: " + tmp_GDAX_amt_lowask + " ETH");
+  console.log("\n");
+
+
 });
 
 
@@ -80,7 +161,7 @@ function on_recieve2(args, kwargs){
 
   // Initializing temporary variables for sorting through the maps
   var tmp_highbid = 0;
-  var tmp_lowask = 1;
+  var tmp_lowask = 1000000000000;
   var tmp_amt_highbid = 0;
   var tmp_amt_lowask = 0;
 
@@ -115,92 +196,24 @@ function on_recieve2(args, kwargs){
     }
   }
 
-  // Printing out the highest bid and lowest ask
-  console.log("High Bid: " + tmp_highbid + "BTC , Amount: " + tmp_amt_highbid + " ETH");
-  console.log("Low Ask: " + tmp_lowask + "BTC , Amount: " + tmp_amt_lowask + " ETH");
-  console.log("\n");
+/*
+if (tmp_highbid != Polo_highbid || tmp_amt_highbid != Polo_highbid_amt){
+  Polo_highbid = tmp_highbid;
+  Polo_highbid_amt = tmp_amt_highbid;
 }
 
-/*
-//================== POLONIEX DATA PARSING (ARRAY METHOD) ======================
-var highbid = [{rate:0, amount:0},{rate:0, amount:0},{rate:0, amount:0}]
-var lowask = [{rate:1, amount:0},{rate:1, amount:0},{rate:1, amount:0}]
-
-
-
-function on_recieve2(args, kwargs){
-
-  for (var i=0;i<args.length;i++){
-    if(args[i].type=="orderBookModify"){
-
-      if(args[i].data.type == "bid"){
-
-        for (var j=0;j<2;j++){
-          if (args[i].data.rate>highbid[j].rate){
-
-            highbid[j+1].rate = highbid[j].rate;
-            highbid[j+1].amount = highbid[j].amount;
-
-            highbid[j].rate=args[i].data.rate;
-            highbid[j].amount=args[i].data.amount;
-            break;
-          }
-          else if (args[i].data.rate==highbid[j].rate){
-
-            highbid[j].amount=args[i].data.amount;
-          }
-
-        }
-      }
-      else if (args[i].data.type == "ask"){
-        for (var j=0;j<2;j++){
-          if (args[i].data.rate<lowask[j].rate){
-            lowask[j+1].rate = lowask[j].rate;
-            lowask[j+1].amount = lowask[j].amount;
-
-            lowask[j].rate=args[i].data.rate;
-            lowask[j].amount=args[i].data.amount;
-            break;
-          }
-          else if (args[i].data.rate==lowask[j].rate){
-            lowask[j].amount=args[i].data.amount;
-          }
-        }
-      }
-    }
-    else if(args[i].type=="orderBookRemove"){
-      if(args[i].data.type == "bid"){
-        for (var j=0;j<2;j++){
-          if (args[i].data.rate==highbid[j].rate){
-            highbid[j].rate = highbid[j+1].rate;
-            highbid[j].amount = highbid[j+1].amount;
-            highbid[j+1].rate = 0;
-            highbid[j+1].amount = 0;
-            break;
-          }
-        }
-      }
-      if(args[i].data.type == "ask"){
-        for (var j=0;j<2;j++){
-          if (args[i].data.rate==lowask[j].rate){
-            lowask[j].rate = lowask[j+1].rate;
-            lowask[j].amount = lowask[j+1].amount;
-            lowask[j+1].rate = 0;
-            lowask[j+1].amount = 0;
-            break;
-          }
-        }
-      }
-    }
-  }
-  console.log("High Bid: " + highbid[0].rate + "BTC , Amount: " + highbid[0].amount + " ETH");
-
-  console.log("Low Ask: " + lowask[0].rate + "BTC , Amount: " + lowask[0].amount + " ETH");
-
-  console.log("\n");
-};
-
+if (tmp_lowask != Polo_lowask || tmp_amt_lowask != Polo_lowask_amt){
+  Polo_lowask = tmp_lowask;
+  Polo_lowask_amt = tmp_amt_lowask;
+}
 */
+
+  // Printing out the highest bid and lowest ask
+  console.log("High Bid Poloniex : " + tmp_highbid + "BTC , Amount: " + tmp_amt_highbid + " ETH");
+  console.log("Low Ask Poloniex : " + tmp_lowask + "BTC , Amount: " + tmp_amt_lowask + " ETH");
+  console.log("\n");
+
+}
 
 // Subscribing to BTC_ETH order book and general ticker updates
 connection.onopen = function (session) {
