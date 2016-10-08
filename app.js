@@ -64,7 +64,7 @@ ws.on('message', function(data, flags) {
   }
   else if(data2.type == "change" && data2.side == "buy"){
     highbid_GDAX(data2.order_id).rate = data2.price;
-    highbid_GDAX(data2.order_id).amount = data2.remaining_size;
+    highbid_GDAX(data2.order_id).amount = data2.new_size;
   }
   else if(data2.type == "open" && data2.side == "sell"){
     lowask_GDAX.set(data2.order_id, {rate:data2.price, amount:data2.remaining_size});
@@ -73,7 +73,8 @@ ws.on('message', function(data, flags) {
     lowask_GDAX.delete(data2.order_id);
   }
   else if(data2.type == "change" && data2.side == "sell"){
-    lowask_GDAX.set(data2.order_id, {rate:data2.price, amount:data2.remaining_size});
+    lowask_GDAX(data2.order_id).rate = data2.price;
+    lowask_GDAX(data2.order_id).amount = data2.new_size;
   }
 
   // Sorting out the highest bid
@@ -196,7 +197,7 @@ function on_recieve2(args, kwargs){
     }
   }
 
-/*
+
 if (tmp_highbid != Polo_highbid || tmp_amt_highbid != Polo_highbid_amt){
   Polo_highbid = tmp_highbid;
   Polo_highbid_amt = tmp_amt_highbid;
@@ -206,13 +207,13 @@ if (tmp_lowask != Polo_lowask || tmp_amt_lowask != Polo_lowask_amt){
   Polo_lowask = tmp_lowask;
   Polo_lowask_amt = tmp_amt_lowask;
 }
-*/
 
+/*
   // Printing out the highest bid and lowest ask
   console.log("High Bid Poloniex : " + tmp_highbid + "BTC , Amount: " + tmp_amt_highbid + " ETH");
   console.log("Low Ask Poloniex : " + tmp_lowask + "BTC , Amount: " + tmp_amt_lowask + " ETH");
   console.log("\n");
-
+*/
 }
 
 // Subscribing to BTC_ETH order book and general ticker updates
