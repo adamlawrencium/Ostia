@@ -20,6 +20,10 @@ connection.onopen = function (session) {
     parse_polo(args, highbid_polo, lowask_polo);
   }
   session.subscribe('BTC_ETH', on_recieve2);
+
+  session.subscribe('ticker', on_recieve);
+
+
 }
 
 // Setting up WS Connection
@@ -69,9 +73,9 @@ app.get('/', function (req, res) {
 });
 
 // Function for Autobahn websocket feed
-function on_recieve(args, kwargs){
+function on_recieve(args, kwargs) {
 
-  if (args[0]=='BTC_ETH'){ // Filtering Ticker results for BTC_ETH
+  if (args[0]=='BTC_ETH') { // Filtering Ticker results for BTC_ETH
 
     // Creating Timestamp for Updated Stock prices
     var m = new Date();
