@@ -1,4 +1,4 @@
-
+// Initializing skipped lists for storing Poloniex orders
 var SkipList = require("dsjslib").SkipList
 var skl_highbid_polo = new SkipList();
 var skl_lowask_polo = new SkipList();
@@ -10,10 +10,6 @@ var connection = new autobahn.Connection({
   url: wsuri,
   realm: "realm1"
 });
-
-// Initializing maps for storing Poloniex orders
-//var highbid_polo = new Map();
-//var lowask_polo = new Map();
 
 // Passing in parsing method from poloniex.js
 var parse_polo = require("./data-parsing/poloniex.js").parse;
