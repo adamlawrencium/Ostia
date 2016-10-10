@@ -1,40 +1,77 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8" />
-        <style>
-            #stock_zone strong {
-                color: white;
-                background-color: black;
-                padding: 2px;
-            }
-        </style>
-    </head>
-
-    <body>
-        <h1>BTC_ETH Updated Low/High Prices</h1>
-
-        <section id="stock_zone">
-
-        </section>
+<head>
+    <meta charset="utf-8" />
+    <style>
+    #stock_zone strong {
+        color: white;
+        background-color: black;
+        padding: 2px;
+    }
+    </style>
 
 
-        <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-        <script src="/socket.io/socket.io.js"></script>
-        <script>
 
-            // Connecting to socket.io
-            var socket = io.connect('http://localhost:3000');
+</head>
 
-            // When a stock update is received it's inserted in the page
-            socket.on('message', function(data) {
-                insertStock(data.message);
-            })
+<body>
+    <h1>Live stock chart using HighchartsJS</h1>
+    <div id="container" style="height: 400px; min-width: 310px"></div>
 
-            // Adds a stock update to the page
-            function insertStock(message) {
-                $('#stock_zone').prepend('</strong> ' + message + '</p>');
-            }
-        </script>
-    </body>
+    <h1>BTC_ETH Updated Low/High Prices</h1>
+    <section id="stock_zone">
+
+    </section>
+
+
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+
+    <script>
+
+    // Connecting to socket.io
+    var socket = io.connect('http://localhost:3000');
+
+    // When a stock update is received it's inserted in the page
+    socket.on('message', function(data) {
+        insertStock(data.message);
+    })
+
+    // Adds a stock update to the page
+    function insertStock(message) {
+        $('#stock_zone').prepend('</strong> ' + message + '</p>');
+    }
+    </script>
+    <script>
+    $(function () {
+
+        $.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=aapl-c.json&callback=?', function (data) {
+            // Create the chart
+            $('#container').highcharts('StockChart', {
+
+                rangeSelector: {
+                    selected: 1
+                },
+
+                title: {
+                    text: 'AAPL Stock Price'
+                },
+
+                series: [{
+                    name: 'AAPL',
+                    data: data,
+                    tooltip: {
+                        valueDecimals: 2
+                    }
+                }]
+            });
+        });
+
+    });
+    </script>
+
+
+</body>
 </html>
