@@ -1,3 +1,8 @@
+
+var SkipList = require("dsjslib").SkipList
+var skl_highbid_polo = new SkipList();
+var skl_lowask_polo = new SkipList();
+
 // Autobahn Connection Setup
 var autobahn = require('autobahn');
 var wsuri = "wss://api.poloniex.com";
@@ -7,8 +12,8 @@ var connection = new autobahn.Connection({
 });
 
 // Initializing maps for storing Poloniex orders
-var highbid_polo = new Map();
-var lowask_polo = new Map();
+//var highbid_polo = new Map();
+//var lowask_polo = new Map();
 
 // Passing in parsing method from poloniex.js
 var parse_polo = require("./data-parsing/poloniex.js").parse;
@@ -17,7 +22,7 @@ var parse_polo = require("./data-parsing/poloniex.js").parse;
 connection.onopen = function (session) {
 
   function on_recieve2 (args, kwargs){
-    parse_polo(args, highbid_polo, lowask_polo);
+    parse_polo(args, skl_highbid_polo, skl_lowask_polo);
   }
   session.subscribe('BTC_ETH', on_recieve2);
 

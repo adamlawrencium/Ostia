@@ -1,4 +1,5 @@
 {
+<<<<<<< Updated upstream
   "name": "Ostia",
   "version": "0.0.0",
   "dependencies": {
@@ -8,4 +9,15 @@
     "socket.io": "~1.2.1",
     "ws": "1.1.1"
   }
+=======
+    "name": "Ostia",
+    "version": "0.0.0",
+    "dependencies": {
+        "express": "~3.3.4",
+        "socket.io": "~1.2.1",
+        "autobahn":"0.10.0",
+        "ws":"1.1.1",
+        "dsjslib":"0.6.14"
+    }
+>>>>>>> Stashed changes
 }
