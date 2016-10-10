@@ -73,6 +73,11 @@ app.get('/', function (req, res) {
   res.sendfile(__dirname + '/index.html');
 });
 
+// Rendering dashboard.html
+app.get('/dashboard', function (req, res) {
+  res.sendfile(__dirname + '/dashboard.html');
+});
+
 // Function for Autobahn websocket feed
 function on_recieve(args, kwargs) {
 
