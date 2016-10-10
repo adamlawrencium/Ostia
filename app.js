@@ -13,17 +13,14 @@ var lowask_polo = new Map();
 // Passing in parsing method from poloniex.js
 var parse_polo = require("./data-parsing/poloniex.js").parse;
 
-// Subscribing to BTC_ETH order book updates
+// Subscribing to BTC_ETH order book updates and parsing data
 connection.onopen = function (session) {
 
   function on_recieve2 (args, kwargs){
     parse_polo(args, highbid_polo, lowask_polo);
   }
   session.subscribe('BTC_ETH', on_recieve2);
-
 }
-
-
 
 // Setting up WS Connection
 var WebSocket = require('ws');
@@ -56,14 +53,10 @@ var lowask_GDAX = new Map();
 // Passing in parsing method from poloniex.js
 var parse_GDAX = require("./data-parsing/GDAX.js").parse;
 
-
-// When a message is recieved, log it to the console
+// When a message is recieved, parse it given the maps
 ws.on('message', function(data, flags) {
-
   parse_GDAX(data, highbid_GDAX, lowask_GDAX);
-
 });
-
 
 // Setting up basic Express server
 var app = require('express')();
@@ -74,7 +67,6 @@ var io = require('socket.io')(server);
 app.get('/', function (req, res) {
   res.sendfile(__dirname + '/index.html');
 });
-
 
 // Function for Autobahn websocket feed
 function on_recieve(args, kwargs){
@@ -97,6 +89,51 @@ function on_recieve(args, kwargs){
   }
 };
 
+/*
+var t = setInterval(GDAX_output,1000);
+
+function GDAX_output (){
+
+
+var tmp_GDAX_highbid = 0;
+var tmp_GDAX_lowask = 1000000000000000;
+var tmp_GDAX_amt_highbid = 0;
+var tmp_GDAX_amt_lowask = 0;
+
+// Sorting out the highest bid
+for (var [key, value] of highbid_GDAX) {
+  if (value.rate > tmp_GDAX_highbid){
+    tmp_GDAX_highbid = value.rate;
+    tmp_GDAX_amt_highbid = parseFloat(value.amount);
+  }
+  else if (value.rate == tmp_GDAX_highbid){
+    tmp_GDAX_amt_highbid += parseFloat(value.amount);
+  }
+}
+
+for (var [key, value] of lowask_GDAX) {
+  if (value.rate < tmp_GDAX_lowask){
+    tmp_GDAX_lowask = value.rate;
+    tmp_GDAX_amt_lowask = parseFloat(value.amount);
+  }
+  else if (value.rate == tmp_GDAX_lowask){
+    tmp_GDAX_amt_highbid += parseFloat(value.amount);
+  }
+}
+
+
+
+
+// Printing out the highest bid and lowest ask
+console.log("High Bid GDAX: " + tmp_GDAX_highbid + "BTC , Amount: " + tmp_GDAX_amt_highbid + " ETH");
+console.log("Low Ask GDAX: " + tmp_GDAX_lowask + "BTC , Amount: " + tmp_GDAX_amt_lowask + " ETH");
+console.log("\n");
+
+
+
+}
+
+*/
 
 connection.open();
 
