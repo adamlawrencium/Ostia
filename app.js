@@ -20,6 +20,7 @@ connection.onopen = function (session) {
     parse_polo(args, highbid_polo, lowask_polo);
   }
   session.subscribe('BTC_ETH', on_recieve2);
+  session.subscribe('ticker', on_recieve);
 
 }
 
