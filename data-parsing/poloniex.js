@@ -25,13 +25,6 @@ exports.parse = function (args, highbid, lowask){
   }
 
   // Sorting out the highest bid
-  for (var [key, value] of highbid) {
-    if (key>tmp_highbid){
-      tmp_highbid = key;
-      tmp_amt_highbid = value;
-    }
-  }
-
 highbid.forEach(function(value,key){
   if (key>tmp_highbid){
     tmp_highbid = key;
@@ -41,12 +34,13 @@ highbid.forEach(function(value,key){
 
 
   // Sorting out the lowest ask
-  for (var [key, value] of lowask) {
-    if (key<tmp_lowask){
+  lowask.forEach(function(value,key){
+    if (key>tmp_highbid){
       tmp_lowask = key;
       tmp_amt_lowask = value;
     }
-  }
+  }, lowask)
+
 
   // Printing out the highest bid and lowest ask
   console.log("High Bid Poloniex : " + tmp_highbid + "BTC , Amount: " + tmp_amt_highbid + " ETH");
