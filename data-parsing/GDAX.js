@@ -51,10 +51,10 @@ lowask_GDAX.forEach(function(value,key){
     tmp_GDAX_amt_highbid += parseFloat(value.amount);
   }
 }, lowask_GDAX)
-
+/*
 // Printing out the highest bid and lowest ask
 console.log("High Bid GDAX: " + tmp_GDAX_highbid + "BTC , Amount: " + tmp_GDAX_amt_highbid + " ETH");
 console.log("Low Ask GDAX: " + tmp_GDAX_lowask + "BTC , Amount: " + tmp_GDAX_amt_lowask + " ETH");
 console.log("\n");
-
+*/
 }

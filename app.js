@@ -31,6 +31,28 @@ connection.onopen = function (session) {
 var WebSocket = require('ws');
 var ws = new WebSocket('wss://ws-feed.gdax.com');
 
+
+var ws_bit = new Websocket('wss://api2.bitfinex.com:3000/ws');
+
+
+// Bittrex request
+var subscribe_bit =
+{
+    "event": "subscribe",
+    "channel": "book",
+    "pair": "BTCUSD",
+    "prec": "R0",
+    "len":"<LENGTH>"
+};
+
+ws_bit.on('open',function(){
+  ws_bit.send(JSON.stringify(subscribe_bit));
+})
+
+ws_bit.on('message', function(data, flags){
+  console.log(data);
+})
+
 // Setting up the subscribe message
 var subscribeBTC = {
     "type": "subscribe",
