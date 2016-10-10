@@ -32,6 +32,14 @@ exports.parse = function (args, highbid, lowask){
     }
   }
 
+highbid.forEach(function(value,key){
+  if (key>tmp_highbid){
+    tmp_highbid = key;
+    tmp_amt_highbid = value;
+  }
+}, highbid)
+
+
   // Sorting out the lowest ask
   for (var [key, value] of lowask) {
     if (key<tmp_lowask){

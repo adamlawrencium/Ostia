@@ -30,7 +30,7 @@ else if(data2.type == "change" && data2.side == "sell"){
 }
 
 // Sorting out the highest bid
-for (var [key, value] of highbid_GDAX) {
+highbid_GDAX.forEach(function(value,key){
   if (value.rate > tmp_GDAX_highbid){
     tmp_GDAX_highbid = value.rate;
     tmp_GDAX_amt_highbid = parseFloat(value.amount);
@@ -38,10 +38,11 @@ for (var [key, value] of highbid_GDAX) {
   else if (value.rate == tmp_GDAX_highbid){
     tmp_GDAX_amt_highbid += parseFloat(value.amount);
   }
-}
+}, highbid_GDAX)
+
 
 // Sorting out the lowest ask
-for (var [key, value] of lowask_GDAX) {
+lowask_GDAX.forEach(function(value,key){
   if (value.rate < tmp_GDAX_lowask){
     tmp_GDAX_lowask = value.rate;
     tmp_GDAX_amt_lowask = parseFloat(value.amount);
@@ -49,7 +50,7 @@ for (var [key, value] of lowask_GDAX) {
   else if (value.rate == tmp_GDAX_lowask){
     tmp_GDAX_amt_highbid += parseFloat(value.amount);
   }
-}
+}, lowask_GDAX)
 
 // Printing out the highest bid and lowest ask
 console.log("High Bid GDAX: " + tmp_GDAX_highbid + "BTC , Amount: " + tmp_GDAX_amt_highbid + " ETH");
