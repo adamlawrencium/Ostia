@@ -48,10 +48,10 @@ exports.output = function (data){
 
 
     //if (lel > 0){
-    console.log("Polo: " + Polo_Info[0] + ", " + Polo_Info[1] + "|\t|" + Polo_Info[2] + ", " + Polo_Info[3]);
-    console.log("GDAX: " + GDAX_Info[0] + ", " + GDAX_Info[1] + "|\t|" + GDAX_Info[2] + ", " + GDAX_Info[3]);
-    console.log("Bitf: " + Bitf_Info[0] + ", " + Bitf_Info[1] + "|\t|" + Bitf_Info[2] + ", " + Bitf_Info[3]);
-    console.log("Krak: " + Krak_Info[0] + ", " + Krak_Info[1] + "|\t|" + Krak_Info[2] + ", " + Krak_Info[3]);
+    console.log("Polo:\t" + Polo_Info[0] + ", " + Polo_Info[1] + "\t|\t" + Polo_Info[2] + ", " + Polo_Info[3]);
+    console.log("GDAX:\t" + GDAX_Info[0] + ", " + GDAX_Info[1] + "\t|\t" + GDAX_Info[2] + ", " + GDAX_Info[3]);
+    console.log("Bitf:\t" + Bitf_Info[0] + ", " + Bitf_Info[1] + "\t|\t" + Bitf_Info[2] + ", " + Bitf_Info[3]);
+    console.log("Krak:\t" + Krak_Info[0] + ", " + Krak_Info[1] + "\t|\t" + Krak_Info[2] + ", " + Krak_Info[3]);
     console.log();
     console.log(lel);
     console.log();
