@@ -1,3 +1,28 @@
+var request = require('request');
+var options =
+  {
+    url : 'https://api.kraken.com/0/public/Depth',
+    form : {
+      "pair" : "XETHXXBT",
+      "count": 10
+    }
+};
+highbid_krak = new Map();
+lowask_krak = new Map();
+
+var parse_krak = require("./data-parsing/kraken.js").parse;
+
+var t = setInterval(krak_call, 1000);
+function krak_call(){
+  request.post(options, function(error, response, body){
+    if (body[0]!='<'){
+      var data = JSON.parse(body);
+      parse_krak(data, highbid_krak, lowask_krak);
+      output();
+    }
+  });
+}
+
 // Autobahn Connection Setup
 var autobahn = require('autobahn');
 var wsuri = "wss://api.poloniex.com";
@@ -165,7 +190,7 @@ function on_recieve(args, kwargs) {
 };
 
 
-var data_all = [highbid, lowask, highbid_GDAX, lowask_GDAX, highbid_Bit, lowask_Bit];
+var data_all = [highbid, lowask, highbid_GDAX, lowask_GDAX, highbid_Bit, lowask_Bit, highbid_krak, lowask_krak];
 function output (){
   arbitrage(data_all);
 }

@@ -11,9 +11,10 @@ var low_amt;
 var Polo_Info = large_polo(data[0],data[1]);
 var GDAX_Info = large_GDAX_Bit(data[2], data[3]);
 var Bitf_Info = large_GDAX_Bit(data[4], data[5]);
+var Krak_Info = large_polo(data[6], data[7]);
 
 // Creating a overall array to store highest bids and lowest asks
-var overall = [Polo_Info, GDAX_Info, Bitf_Info];
+var overall = [Polo_Info, GDAX_Info, Bitf_Info, Krak_Info];
 
 // Finding the absolute highest bid and lowest ask
 for (var i=0; i<overall.length; i++){
@@ -50,9 +51,9 @@ var lel = (sell_profit-buy_loss);
     console.log("Polo: " + Polo_Info[0] + ", " + Polo_Info[1] + "|\t|" + Polo_Info[2] + ", " + Polo_Info[3]);
     console.log("GDAX: " + GDAX_Info[0] + ", " + GDAX_Info[1] + "|\t|" + GDAX_Info[2] + ", " + GDAX_Info[3]);
     console.log("Bitf: " + Bitf_Info[0] + ", " + Bitf_Info[1] + "|\t|" + Bitf_Info[2] + ", " + Bitf_Info[3]);
+    console.log("Krak: " + Krak_Info[0] + ", " + Krak_Info[1] + "|\t|" + Krak_Info[2] + ", " + Krak_Info[3]);
     console.log();
     console.log(lel);
-    //console.log(tmp1 + ","+tmp2+","+tmp33+","+tmp3000+","+tmp4000);
     console.log();
 //}
 
