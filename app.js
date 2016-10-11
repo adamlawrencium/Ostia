@@ -1,8 +1,3 @@
-// Initializing skipped lists for storing Poloniex orders
-var SkipList = require("dsjslib").SkipList
-var skl_highbid_polo = new SkipList();
-var skl_lowask_polo = new SkipList();
-
 // Autobahn Connection Setup
 var autobahn = require('autobahn');
 var wsuri = "wss://api.poloniex.com";
@@ -11,6 +6,12 @@ var connection = new autobahn.Connection({
   realm: "realm1"
 });
 
+
+var highbid = new Map();
+var lowask = new Map();
+
+var arbitrage = require("./algorithms/simple_arbitrage.js").output;
+
 // Passing in parsing method from poloniex.js
 var parse_polo = require("./data-parsing/poloniex.js").parse;
 
@@ -18,8 +19,10 @@ var parse_polo = require("./data-parsing/poloniex.js").parse;
 connection.onopen = function (session) {
 
   function on_recieve2 (args, kwargs){
-    parse_polo(args, skl_highbid_polo, skl_lowask_polo);
+    parse_polo(args, highbid, lowask);
+    output();
   }
+  //session.subscribe('USDT_BTC', on_recieve2);
   session.subscribe('BTC_ETH', on_recieve2);
 
   session.subscribe('ticker', on_recieve);
@@ -29,35 +32,72 @@ connection.onopen = function (session) {
 
 // Setting up WS Connection
 var WebSocket = require('ws');
+
 var ws = new WebSocket('wss://ws-feed.gdax.com');
 
-
-var ws_bit = new Websocket('wss://api2.bitfinex.com:3000/ws');
+var ws_bit = new WebSocket('wss://api2.bitfinex.com:3000/ws');
 
 
 // Bittrex request
+/*
 var subscribe_bit =
 {
     "event": "subscribe",
     "channel": "book",
     "pair": "BTCUSD",
     "prec": "R0",
-    "len":"<LENGTH>"
+    "len":"25"
+};
+*/
+var subscribe_bit =
+{
+    "event": "subscribe",
+    "channel": "book",
+    "pair": "ETHBTC",
+    "prec": "R0",
+    "len":"25"
 };
 
 ws_bit.on('open',function(){
   ws_bit.send(JSON.stringify(subscribe_bit));
-})
+});
+
+var highbid_Bit = new Map();
+var lowask_Bit = new Map();
+
+// Passing in parsing method from poloniex.js
+var parse_Bit = require("./data-parsing/bitfinex.js").parse;
+var parse_Bit_snap = require("./data-parsing/bitfinex_snap.js").parse;
+
+var il = 0;
 
 ws_bit.on('message', function(data, flags){
-  console.log(data);
-})
+if(il == 2 ) {
+  parse_Bit_snap(JSON.parse(data), highbid_Bit, lowask_Bit);
+}
+else if (il > 2){
+
+  parse_Bit(JSON.parse(data), highbid_Bit, lowask_Bit);
+  output();
+}
+  il++;
+});
+
 
 // Setting up the subscribe message
+/*
 var subscribeBTC = {
     "type": "subscribe",
     "product_ids": [
         "BTC-USD",
+    ]
+};
+*/
+
+var subscribeBTC = {
+    "type": "subscribe",
+    "product_ids": [
+        "ETH-BTC",
     ]
 };
 
@@ -66,6 +106,8 @@ var heartbeat = {
     "type": "heartbeat",
     "on": true
 };
+
+
 
 // On websocket connection, send the subscribe and heartbeat JSON strings
 ws.on('open',function() {
@@ -83,6 +125,7 @@ var parse_GDAX = require("./data-parsing/GDAX.js").parse;
 // When a message is recieved, parse it given the maps
 ws.on('message', function(data, flags) {
   parse_GDAX(data, highbid_GDAX, lowask_GDAX);
+  output();
 });
 
 // Setting up basic Express server
@@ -121,51 +164,11 @@ function on_recieve(args, kwargs) {
   }
 };
 
-/*
-var t = setInterval(GDAX_output,1000);
 
-function GDAX_output (){
-
-
-var tmp_GDAX_highbid = 0;
-var tmp_GDAX_lowask = 1000000000000000;
-var tmp_GDAX_amt_highbid = 0;
-var tmp_GDAX_amt_lowask = 0;
-
-// Sorting out the highest bid
-for (var [key, value] of highbid_GDAX) {
-  if (value.rate > tmp_GDAX_highbid){
-    tmp_GDAX_highbid = value.rate;
-    tmp_GDAX_amt_highbid = parseFloat(value.amount);
-  }
-  else if (value.rate == tmp_GDAX_highbid){
-    tmp_GDAX_amt_highbid += parseFloat(value.amount);
-  }
+var data_all = [highbid, lowask, highbid_GDAX, lowask_GDAX, highbid_Bit, lowask_Bit];
+function output (){
+  arbitrage(data_all);
 }
-
-for (var [key, value] of lowask_GDAX) {
-  if (value.rate < tmp_GDAX_lowask){
-    tmp_GDAX_lowask = value.rate;
-    tmp_GDAX_amt_lowask = parseFloat(value.amount);
-  }
-  else if (value.rate == tmp_GDAX_lowask){
-    tmp_GDAX_amt_highbid += parseFloat(value.amount);
-  }
-}
-
-
-
-
-// Printing out the highest bid and lowest ask
-console.log("High Bid GDAX: " + tmp_GDAX_highbid + "BTC , Amount: " + tmp_GDAX_amt_highbid + " ETH");
-console.log("Low Ask GDAX: " + tmp_GDAX_lowask + "BTC , Amount: " + tmp_GDAX_amt_lowask + " ETH");
-console.log("\n");
-
-
-
-}
-
-*/
 
 connection.open();
 
