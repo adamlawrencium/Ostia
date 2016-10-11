@@ -1,10 +1,20 @@
 var request = require('request');
+/*
 var options =
 {
     url : 'https://api.kraken.com/0/public/Depth',
     form : {
         "pair" : "XETHXXBT",
         "count": 10
+    }
+};
+*/
+var options =
+  {
+    url : 'https://api.kraken.com/0/public/Depth',
+    form : {
+      "pair" : "XXBTZUSD",
+      "count": 10
     }
 };
 highbid_krak = new Map();
@@ -14,13 +24,15 @@ var parse_krak = require("./data-parsing/kraken.js").parse;
 
 var t = setInterval(krak_call, 1000);
 function krak_call(){
-    request.post(options, function(error, response, body){
-        if (body[0]!='<'){
-            var data = JSON.parse(body);
-            parse_krak(data, highbid_krak, lowask_krak);
-            output();
-        }
-    });
+  request.post(options, function(error, response, body){
+    if (body!=undefined){
+     if (body[0]!='<'){
+      var data = JSON.parse(body);
+      parse_krak(data, highbid_krak, lowask_krak);
+      output();
+    }
+  }
+  });
 }
 
 // Autobahn Connection Setup
@@ -43,12 +55,21 @@ var parse_polo = require("./data-parsing/poloniex.js").parse;
 // Subscribing to BTC_ETH order book updates and parsing data
 connection.onopen = function (session) {
 
+<<<<<<< Updated upstream
     function on_recieve2 (args, kwargs){
         parse_polo(args, highbid, lowask);
         output();
     }
     //session.subscribe('USDT_BTC', on_recieve2);
     session.subscribe('BTC_ETH', on_recieve2);
+=======
+  function on_recieve2 (args, kwargs){
+    parse_polo(args, highbid, lowask);
+    output();
+  }
+  session.subscribe('USDT_BTC', on_recieve2);
+  //session.subscribe('BTC_ETH', on_recieve2);
+>>>>>>> Stashed changes
 
     session.subscribe('ticker', on_recieve);
 
@@ -64,7 +85,7 @@ var ws_bit = new WebSocket('wss://api2.bitfinex.com:3000/ws');
 
 
 // Bittrex request
-/*
+
 var subscribe_bit =
 {
 "event": "subscribe",
@@ -73,7 +94,7 @@ var subscribe_bit =
 "prec": "R0",
 "len":"25"
 };
-*/
+/*
 var subscribe_bit =
 {
     "event": "subscribe",
@@ -82,7 +103,7 @@ var subscribe_bit =
     "prec": "R0",
     "len":"25"
 };
-
+*/
 ws_bit.on('open',function(){
     ws_bit.send(JSON.stringify(subscribe_bit));
 });
@@ -110,22 +131,22 @@ ws_bit.on('message', function(data, flags){
 
 
 // Setting up the subscribe message
-/*
+
 var subscribeBTC = {
 "type": "subscribe",
 "product_ids": [
 "BTC-USD",
 ]
 };
-*/
 
+/*
 var subscribeBTC = {
     "type": "subscribe",
     "product_ids": [
         "ETH-BTC",
     ]
 };
-
+*/
 // Subscribing to heartbeat messages
 var heartbeat = {
     "type": "heartbeat",
