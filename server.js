@@ -10,7 +10,7 @@ var options = {
 highbid_krak = new Map();
 lowask_krak = new Map();
 
-var parse_krak = require("./data-parsing/kraken.js").parse;
+var parse_krak = require("./js/data-parsing/kraken.js").parse;
 
 var t = setInterval(krak_call, 1000);
 function krak_call(){
@@ -36,10 +36,10 @@ var connection = new autobahn.Connection({
 var highbid = new Map();
 var lowask = new Map();
 
-var arbitrage = require("./algorithms/simple_arbitrage.js").output;
+var arbitrage = require("./js/algorithms/simple_arbitrage.js").output;
 
 // Passing in parsing method from poloniex.js
-var parse_polo = require("./data-parsing/poloniex.js").parse;
+var parse_polo = require("./js/data-parsing/poloniex.js").parse;
 
 // Subscribing to BTC_ETH order book updates and parsing data
 connection.onopen = function (session) {
@@ -76,8 +76,8 @@ var highbid_Bit = new Map();
 var lowask_Bit = new Map();
 
 // Passing in parsing method from poloniex.js
-var parse_Bit = require("./data-parsing/bitfinex.js").parse;
-var parse_Bit_snap = require("./data-parsing/bitfinex_snap.js").parse;
+var parse_Bit = require("./js/data-parsing/bitfinex.js").parse;
+var parse_Bit_snap = require("./js/data-parsing/bitfinex_snap.js").parse;
 
 var il = 0;
 
@@ -118,7 +118,7 @@ var highbid_GDAX = new Map();
 var lowask_GDAX = new Map();
 
 // Passing in parsing method from poloniex.js
-var parse_GDAX = require("./data-parsing/GDAX.js").parse;
+var parse_GDAX = require("./js/data-parsing/GDAX.js").parse;
 
 // When a message is recieved, parse it given the maps
 ws.on('message', function(data, flags) {
