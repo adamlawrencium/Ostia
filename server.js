@@ -1,60 +1,40 @@
 // Setting up Maps for the highest bids and lowest asks for each exchange
-var highbid_krak = new Map();
-var lowask_krak = new Map();
-
 var highbid_polo = new Map();
 var lowask_polo = new Map();
-
-var highbid_Bit = new Map();
-var lowask_Bit = new Map();
 
 var highbid_GDAX = new Map();
 var lowask_GDAX = new Map();
 
-// Passing in parsing methods for each exchange
-var parse_krak = require("./js/data-parsing/kraken.js").parse;
-var parse_polo = require("./js/data-parsing/poloniex.js").parse;
-var parse_Bit = require("./js/data-parsing/bitfinex.js").parse;
-var parse_GDAX = require("./js/data-parsing/GDAX.js").parse;
+var highbid_Bit = new Map();
+var lowask_Bit = new Map();
 
-var parse_Bit_snap = require("./js/data-parsing/bitfinex_snap.js").parse;
+// Set up array to collect all data
+// TODO: Seems messy to store in array, could store in Dictionary<exchangeName, data>
+var dataArray = [8];
+dataArray[0] = highbid_polo;
+dataArray[1] = lowask_polo;
+dataArray[2] = highbid_GDAX;
+dataArray[3] = lowask_GDAX;
+dataArray[4] = highbid_Bit;
+dataArray[5] = lowask_Bit;
+
+// Passing in parsing methods for each exchange
+var kraken = require("./js/data-parsing/kraken.js");
+var parse_polo = require("./js/data-parsing/poloniex.js").parse;
+var parse_GDAX = require("./js/data-parsing/GDAX.js").parse;
+var parse_Bit = require("./js/data-parsing/bitfinex.js").parse;
+
 // Required because Bitfinex 3rd message is a snapshot of the order book,
 //  this means it must be parsed seperately
+var parse_Bit_snap = require("./js/data-parsing/bitfinex_snap.js").parse;
 
-
-//========================KRAKEN API CALL SETUP=================================
-
-var request = require('request'); // Required to send and receive from Kraken
-var options = {
-  url : 'https://api.kraken.com/0/public/Depth',
-  form : {
-    "pair" : "XXBTZUSD",
-    //"pair" : "XETHXXBT",
-    "count": 10
-  }
-}; //Message sent to subscribe to a currency pair order book, count is number
-//    of orders sent
-
-
-// Found on Stack Exchange, essentially calls a program every 1000ms (1s)
-var repeat = setInterval(krak_call, 1000);
-
-// Calls the Kraken API, parses the Data, and runs the arbitrage algorithm
-function krak_call(){
-  request.post(options, function(error, response, body){
-
-    // Error Handling
-  if (body!=undefined){
-    if (body[0]!='<'){
-    var data = JSON.parse(body);
-    parse_krak(data, highbid_krak, lowask_krak);
-    output();
-    }
-  }
-  });
-}
-
-//========================END KRAKEN API CALL SETUP=============================
+// Calls the Kraken API every 1000ms (1s)
+setInterval(function() {
+    kraken.call(function(highbid, lowask) {
+      dataArray[6] = highbid;
+      dataArray[7] = lowask;
+    });
+}, 1000);
 
 //========================POLONIEX WEBSOCKET SETUP==============================
 
@@ -69,8 +49,7 @@ var connection = new autobahn.Connection({
 
 // Subscribing to order book updates, parsing data and calling algorithm
 connection.onopen = function (session) {
-
-  function on_recieve2 (args, kwargs){
+  function on_recieve2 (args, kwargs) {
     parse_polo(args, highbid_polo, lowask_polo);
     output();
   }
@@ -99,7 +78,7 @@ var subscribe_bit = {
 };
 
 // When opening the websocket, send subscription message
-ws_bit.on('open',function(){
+ws_bit.on('open',function() {
   ws_bit.send(JSON.stringify(subscribe_bit));
 });
 
@@ -107,11 +86,11 @@ ws_bit.on('open',function(){
 var counter_Bit = 0;
 
 // When receiving a message, parse the data, then call the algorithm
-ws_bit.on('message', function(data, flags){
+ws_bit.on('message', function(data, flags) {
   if(counter_Bit == 2 ) {
     parse_Bit_snap(JSON.parse(data), highbid_Bit, lowask_Bit);
   }
-  else if (counter_Bit > 2){
+  else if (counter_Bit > 2) {
     parse_Bit(JSON.parse(data), highbid_Bit, lowask_Bit);
     output();
   }
@@ -167,9 +146,7 @@ app.get('/dashboard', function (req, res) {
 
 // Function for websocket feed for live updating data
 function on_recieve(args, kwargs) {
-
   if (args[0]=='BTC_ETH') { // Filtering Ticker results for BTC_ETH
-
     // Creating Timestamp for Updated Stock prices
     var m = new Date();
     var dateString =
@@ -186,11 +163,16 @@ function on_recieve(args, kwargs) {
 };
 
 // Passing in algorithm
-var arbitrage = require("./js/algorithms/simple_arbitrage.js").output;
-
-var data_all = [highbid_polo, lowask_polo, highbid_GDAX, lowask_GDAX, highbid_Bit, lowask_Bit, highbid_krak, lowask_krak];
-function output (){
-  arbitrage(data_all);
+var arbitrage = require("./js/algorithms/simple_arbitrage.js");
+function output () {
+  // Don't pass to arbitrage unless all data is initialized. Put in because
+  // Kraken data isn't initialized the first time this is called.
+  for (map in dataArray) {
+    if (!map) {
+      return;
+    }
+  }
+  arbitrage(dataArray);
 }
 
 connection.open();

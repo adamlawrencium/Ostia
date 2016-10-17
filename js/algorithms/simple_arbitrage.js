@@ -1,4 +1,4 @@
-exports.output = function (data) {
+function outputExchangeData(data) {
   // Temporary variables for algorithm
   var highest_bid = 0;
   var highest_bid_amt = 0;
@@ -56,6 +56,10 @@ exports.output = function (data) {
 }
 
 function large_polo(highbid, lowask) {
+  if (!highbid || !lowask) {
+    return;
+  }
+
   // Initializing temporary variables for sorting through the maps
   var tmp_highbid = 0,
   tmp_lowask = 1000000000000000,
@@ -82,7 +86,6 @@ function large_polo(highbid, lowask) {
 }
 
 function large_GDAX_Bit(highbid, lowask) {
-
   // Initializing temporary variables for sorting through the maps
   var tmp_highbid = 0,
   tmp_lowask = 1000000000000000,
@@ -113,3 +116,6 @@ function large_GDAX_Bit(highbid, lowask) {
 
   return [tmp_highbid, tmp_amt_highbid, tmp_lowask, tmp_amt_lowask];
 }
+
+// Export
+module.exports = outputExchangeData;
