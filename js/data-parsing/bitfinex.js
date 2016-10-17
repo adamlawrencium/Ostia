@@ -1,4 +1,4 @@
-exports.parse = function (data, highbid, lowask){
+function parse(data, highbid, lowask){
   if(data[2] == 0 && data[3] == -1){
     lowask.delete(data[1]);
   }
@@ -12,3 +12,5 @@ exports.parse = function (data, highbid, lowask){
     lowask.set(data[1], {rate:data[2], amount:data[3]});
   }
 }
+
+module.exports = parse;

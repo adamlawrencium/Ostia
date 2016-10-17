@@ -1,4 +1,4 @@
-exports.parse = function (data, highbid_GDAX, lowask_GDAX){
+function parse(data, highbid_GDAX, lowask_GDAX){
   var data2 = JSON.parse(data)
   if(data2.type == "open" && data2.side == "buy"){
     highbid_GDAX.set(data2.order_id, {rate:data2.price, amount:data2.remaining_size});
@@ -21,3 +21,5 @@ exports.parse = function (data, highbid_GDAX, lowask_GDAX){
     lowask_GDAX(data2.order_id).amount = data2.new_size;
   }
 }
+
+module.exports = parse;

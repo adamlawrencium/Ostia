@@ -1,4 +1,4 @@
-exports.parse = function (data, highbid, lowask){
+function parse(data, highbid, lowask){
   for (var i = 0;i<data[1].length;i++){
   
     if(data[1][i][2] < 0){
@@ -9,3 +9,4 @@ exports.parse = function (data, highbid, lowask){
     }
   }
 }
+ module.exports = parse;

@@ -20,13 +20,13 @@ dataArray[5] = lowask_Bit;
 
 // Passing in parsing methods for each exchange
 var kraken = require("./js/data-parsing/kraken.js");
-var parse_polo = require("./js/data-parsing/poloniex.js").parse;
-var parse_GDAX = require("./js/data-parsing/GDAX.js").parse;
-var parse_Bit = require("./js/data-parsing/bitfinex.js").parse;
+var poloniex = require("./js/data-parsing/poloniex.js");
+var GDAX = require("./js/data-parsing/GDAX.js");
+var bitfinex = require("./js/data-parsing/bitfinex.js");
 
 // Required because Bitfinex 3rd message is a snapshot of the order book,
 //  this means it must be parsed seperately
-var parse_Bit_snap = require("./js/data-parsing/bitfinex_snap.js").parse;
+var bitfinex_snap = require("./js/data-parsing/bitfinex_snap.js");
 
 // Calls the Kraken API every 1000ms (1s)
 setInterval(function() {
@@ -50,7 +50,7 @@ var connection = new autobahn.Connection({
 // Subscribing to order book updates, parsing data and calling algorithm
 connection.onopen = function (session) {
   function on_recieve2 (args, kwargs) {
-    parse_polo(args, highbid_polo, lowask_polo);
+    poloniex(args, highbid_polo, lowask_polo);
     output();
   }
   session.subscribe('USDT_BTC', on_recieve2);
@@ -88,10 +88,10 @@ var counter_Bit = 0;
 // When receiving a message, parse the data, then call the algorithm
 ws_bit.on('message', function(data, flags) {
   if(counter_Bit == 2 ) {
-    parse_Bit_snap(JSON.parse(data), highbid_Bit, lowask_Bit);
+    bitfinex_snap(JSON.parse(data), highbid_Bit, lowask_Bit);
   }
   else if (counter_Bit > 2) {
-    parse_Bit(JSON.parse(data), highbid_Bit, lowask_Bit);
+    bitfinex(JSON.parse(data), highbid_Bit, lowask_Bit);
     output();
   }
   counter_Bit++;
@@ -123,7 +123,7 @@ ws.on('open',function() {
 
 // When a message is recieved, parse the data and call the algorithm
 ws.on('message', function(data, flags) {
-  parse_GDAX(data, highbid_GDAX, lowask_GDAX);
+  GDAX(data, highbid_GDAX, lowask_GDAX);
   output();
 });
 
@@ -167,8 +167,8 @@ var arbitrage = require("./js/algorithms/simple_arbitrage.js");
 function output () {
   // Don't pass to arbitrage unless all data is initialized. Put in because
   // Kraken data isn't initialized the first time this is called.
-  for (map in dataArray) {
-    if (!map) {
+  for (let i = 0; i < 8; i++) {
+    if (!dataArray[i]) {
       return;
     }
   }

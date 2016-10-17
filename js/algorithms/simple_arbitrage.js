@@ -56,10 +56,6 @@ function outputExchangeData(data) {
 }
 
 function large_polo(highbid, lowask) {
-  if (!highbid || !lowask) {
-    return;
-  }
-
   // Initializing temporary variables for sorting through the maps
   var tmp_highbid = 0,
   tmp_lowask = 1000000000000000,
