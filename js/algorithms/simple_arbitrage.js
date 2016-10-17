@@ -1,4 +1,4 @@
-function outputExchangeData(data) {
+function outputExchangeData(allExchangeData) {
   // Temporary variables for algorithm
   var highest_bid = 0;
   var highest_bid_amt = 0;
@@ -7,10 +7,10 @@ function outputExchangeData(data) {
   var low_amt;
 
   // Condensing maps into the highest bid and lowest ask
-  var Polo_Info = large_polo(data[0],data[1]);
-  var GDAX_Info = large_GDAX_Bit(data[2], data[3]);
-  var Bitf_Info = large_GDAX_Bit(data[4], data[5]);
-  var Krak_Info = large_polo(data[6], data[7]);
+  var Krak_Info = large(allExchangeData.kraken, "kraken");
+  var Polo_Info = large(allExchangeData.poloniex, "poloniex");
+  var GDAX_Info = large(allExchangeData.gdax, "gdax");
+  var Bitf_Info = large(allExchangeData.bitfinex, "bitfinex");
 
   // Creating a overall array to store highest bids and lowest asks
   var overall = [Polo_Info, GDAX_Info, Bitf_Info, Krak_Info];
@@ -42,6 +42,7 @@ function outputExchangeData(data) {
   // Calculating Profit
   var sell_profit = (highest_bid*low_amt*fee);
   var buy_loss = ((lowest_ask*low_amt)/fee2);
+  // TODO: Why is this named "lel"? Rename to something more easily understood.
   var lel = (sell_profit-buy_loss);
 
   //if (lel > 0) {
@@ -55,7 +56,11 @@ function outputExchangeData(data) {
   //}
 }
 
-function large_polo(highbid, lowask) {
+// TODO: Describe what function does and name it better
+function large(exchangeData, exchangeType) {
+  var highbids = exchangeData.highbids;
+  var lowasks = exchangeData.lowasks;
+
   // Initializing temporary variables for sorting through the maps
   var tmp_highbid = 0,
   tmp_lowask = 1000000000000000,
@@ -63,52 +68,46 @@ function large_polo(highbid, lowask) {
   tmp_amt_lowask = 0;
 
   // Sorting out the highest bid
-  highbid.forEach(function(value,key) {
-    if (key > tmp_highbid) {
-      tmp_highbid = key;
-      tmp_amt_highbid = value;
+  highbids.forEach(function(value, key) {
+    // GDAX or Bit
+    if (exchangeType === "gdax" || exchangeType === "bitfinex") {
+      if (value.rate > tmp_highbid) {
+        tmp_highbid = value.rate;
+        tmp_amt_highbid = parseFloat(value.amount);
+      }
+      else if (value.rate == tmp_highbid) {
+        tmp_amt_highbid += parseFloat(value.amount);
+      }
     }
-  }, highbid)
+    // Kraken or Polo
+    else if (exchangeType === "kraken" || exchangeType === "poloniex") {
+      if (key > tmp_highbid) {
+        tmp_highbid = key;
+        tmp_amt_highbid = value;
+      }
+    }
+  })
 
   // Sorting out the lowest ask
-  lowask.forEach(function(value,key) {
-    if (key < tmp_lowask) {
-      tmp_lowask = key;
-      tmp_amt_lowask = value;
+  lowasks.forEach(function(value, key) {
+    // GDAX or Bit
+    if (exchangeType === "gdax" || exchangeType === "bitfinex") {
+      if (value.rate < tmp_lowask) {
+        tmp_lowask = value.rate;
+        tmp_amt_lowask = parseFloat(value.amount);
+      }
+      else if (value.rate == tmp_lowask) {
+        tmp_amt_lowask += parseFloat(value.amount);
+      }
     }
-  }, lowask)
-
-  return [tmp_highbid, tmp_amt_highbid, tmp_lowask, tmp_amt_lowask];
-}
-
-function large_GDAX_Bit(highbid, lowask) {
-  // Initializing temporary variables for sorting through the maps
-  var tmp_highbid = 0,
-  tmp_lowask = 1000000000000000,
-  tmp_amt_highbid = 0,
-  tmp_amt_lowask = 0;
-
-  // Sorting out the highest bid
-  highbid.forEach(function(value,key) {
-    if (value.rate > tmp_highbid) {
-      tmp_highbid = value.rate;
-      tmp_amt_highbid = parseFloat(value.amount);
+    // Kraken or Polo
+    else if (exchangeType === "kraken" || exchangeType === "poloniex") {
+      if (key < tmp_lowask) {
+        tmp_lowask = key;
+        tmp_amt_lowask = value;
+      }
     }
-    else if (value.rate == tmp_highbid) {
-      tmp_amt_highbid += parseFloat(value.amount);
-    }
-  }, highbid);
-
-  // Sorting out the lowest ask
-  lowask.forEach(function(value,key) {
-    if (value.rate < tmp_lowask) {
-      tmp_lowask = value.rate;
-      tmp_amt_lowask = parseFloat(value.amount);
-    }
-    else if (value.rate == tmp_lowask) {
-      tmp_amt_lowask += parseFloat(value.amount);
-    }
-  }, lowask)
+  })
 
   return [tmp_highbid, tmp_amt_highbid, tmp_lowask, tmp_amt_lowask];
 }
