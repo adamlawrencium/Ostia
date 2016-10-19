@@ -1,15 +1,14 @@
-// Setting up Maps for the highest bids and lowest asks for each exchange
-var highbid_krak = new Map();
-var lowask_krak = new Map();
+// Passing in orderbook class
+var orderbook = require("./js/classes/orderbook.js");
 
-var highbid_polo = new Map();
-var lowask_polo = new Map();
+// Setting up orderbooks for all exchanges
+var KRAK = new orderbook("Kraken", new Map(), new Map());
+var POLO = new orderbook("Poloniex", new Map(), new Map());
+var BITF = new orderbook("Bitfinex", new Map(), new Map());
+var GDAX = new orderbook("GDAX", new Map(), new Map());
 
-var highbid_Bit = new Map();
-var lowask_Bit = new Map();
-
-var highbid_GDAX = new Map();
-var lowask_GDAX = new Map();
+// Creating Javascipt object to hold all orderbooks
+var Orderbook_All = {"krak" : KRAK, "polo" : POLO, "bitf" : BITF, "gdax" : GDAX}
 
 // Passing in parsing methods for each exchange
 var parse_krak = require("./js/data-parsing/kraken.js").parse;
@@ -21,6 +20,8 @@ var parse_Bit_snap = require("./js/data-parsing/bitfinex_snap.js").parse;
 // Required because Bitfinex 3rd message is a snapshot of the order book,
 //  this means it must be parsed seperately
 
+// TODO: parse_polo_snap implemetation through poloniex API order book call
+
 
 //========================KRAKEN API CALL SETUP=================================
 
@@ -30,6 +31,7 @@ var options = {
   form : {
     "pair" : "XXBTZUSD",
     //"pair" : "XETHXXBT",
+    //"pair" : "XLTCXXBT",
     "count": 10
   }
 }; //Message sent to subscribe to a currency pair order book, count is number
@@ -40,17 +42,16 @@ var options = {
 var repeat = setInterval(krak_call, 1000);
 
 // Calls the Kraken API, parses the Data, and runs the arbitrage algorithm
-function krak_call(){
+function krak_call() {
   request.post(options, function(error, response, body){
 
     // Error Handling
-  if (body!=undefined){
-    if (body[0]!='<'){
-    var data = JSON.parse(body);
-    parse_krak(data, highbid_krak, lowask_krak);
-    output();
+    if (body != undefined){
+      if (body[0] != '<'){
+        var data = JSON.parse(body);
+          parse_krak(data, Orderbook_All.krak.highbid, Orderbook_All.krak.lowask);
+      }
     }
-  }
   });
 }
 
@@ -71,11 +72,11 @@ var connection = new autobahn.Connection({
 connection.onopen = function (session) {
 
   function on_recieve2 (args, kwargs){
-    parse_polo(args, highbid_polo, lowask_polo);
-    output();
+    parse_polo(args, Orderbook_All.polo.highbid, Orderbook_All.polo.lowask);
   }
   session.subscribe('USDT_BTC', on_recieve2);
   //session.subscribe('BTC_ETH', on_recieve2);
+  //session.subscribe('BTC_LTC', on_recieve2);
   //session.subscribe('ticker', on_recieve2);
 }
 
@@ -93,13 +94,14 @@ var subscribe_bit = {
   "event": "subscribe",
   "channel": "book",
   "pair": "BTCUSD",
+  //"pair": "LTCBTC",
   //"pair": "ETHBTC",
   "prec": "R0",
   "len":"25"
 };
 
 // When opening the websocket, send subscription message
-ws_bit.on('open',function(){
+ws_bit.on('open', function() {
   ws_bit.send(JSON.stringify(subscribe_bit));
 });
 
@@ -109,11 +111,10 @@ var counter_Bit = 0;
 // When receiving a message, parse the data, then call the algorithm
 ws_bit.on('message', function(data, flags){
   if(counter_Bit == 2 ) {
-    parse_Bit_snap(JSON.parse(data), highbid_Bit, lowask_Bit);
+    parse_Bit_snap(JSON.parse(data), Orderbook_All.bitf.highbid, Orderbook_All.bitf.lowask);
   }
   else if (counter_Bit > 2){
-    parse_Bit(JSON.parse(data), highbid_Bit, lowask_Bit);
-    output();
+    parse_Bit(JSON.parse(data), Orderbook_All.bitf.highbid, Orderbook_All.bitf.lowask);
   }
   counter_Bit++;
 });
@@ -127,6 +128,7 @@ var subscribeBTC = {
   "product_ids": [
     "BTC-USD",
     //"ETH-BTC",
+    //"LTC-BTC",
   ]
 };
 
@@ -144,8 +146,7 @@ ws.on('open',function() {
 
 // When a message is recieved, parse the data and call the algorithm
 ws.on('message', function(data, flags) {
-  parse_GDAX(data, highbid_GDAX, lowask_GDAX);
-  output();
+  parse_GDAX(data, Orderbook_All.gdax.highbid, Orderbook_All.gdax.lowask);
 });
 
 //========================END GDAX WEBSOCKET SETUP==============================
@@ -188,9 +189,11 @@ function on_recieve(args, kwargs) {
 // Passing in algorithm
 var arbitrage = require("./js/algorithms/simple_arbitrage.js").output;
 
-var data_all = [highbid_polo, lowask_polo, highbid_GDAX, lowask_GDAX, highbid_Bit, lowask_Bit, highbid_krak, lowask_krak];
-function output (){
-  arbitrage(data_all);
+// Calling Arbitrage algorithm on Orderbook_All every second
+var Arbitrage_Interval = setInterval(arbitrage_call, 1000);
+
+function arbitrage_call (){
+  arbitrage(Orderbook_All);
 }
 
 connection.open();

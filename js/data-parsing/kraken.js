@@ -1,4 +1,6 @@
 exports.parse = function (data, highbid, lowask){
+  //var bids = data.result.XLTCXXBT.bids;
+  //var asks = data.result.XLTCXXBT.asks;
   //var bids = data.result.XETHXXBT.bids;
   //var asks = data.result.XETHXXBT.asks;
   var bids = data.result.XXBTZUSD.bids;

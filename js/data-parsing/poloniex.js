@@ -1,4 +1,3 @@
-//================== POLONIEX DATA PARSING (MAP METHOD) ========================
 exports.parse = function (args, highbid, lowask){
   for (var i=0;i<args.length;i++){
     if(args[i].type=="orderBookModify" && args[i].data.type == "bid") {
