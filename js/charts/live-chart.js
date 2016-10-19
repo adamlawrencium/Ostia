@@ -41,6 +41,10 @@ $( document ).ready(function() {
           type: 'minute',
           text: '5M'
         }, {
+          count: 10,
+          type: 'minute',
+          text: '10M'
+        }, {
           type: 'all',
           text: 'All'
         }],
@@ -57,36 +61,17 @@ $( document ).ready(function() {
           load: function() {
 
             var self = this;
-            var n = 0;
             var socket = io.connect('http://localhost:3000');
 
             socket.on('message', function(data) {
-              //console.log([data.message[0],data.message[1]]);
-
-              var tim = (new Date()).getTime()
-              var y   = Math.random();
-              //self.series[0].addPoint([tim, y]);
 
               var time    = data.message[0];
               var highbid = parseFloat(data.message[1]);
               var lowask  = parseFloat(data.message[2]);
 
-              self.series[0].addPoint([tim, highbid]);
-              self.series[1].addPoint([tim, lowask]);
+              self.series[0].addPoint([time, highbid]);
+              self.series[1].addPoint([time, lowask]);
 
-              console.log('highbid' + typeof(highbid));
-              //self.redraw();
-              // for (var entry in self.series.data) {
-              //   if (self.series[0].hasOwnProperty(entry)) {
-              //     console.log(entry);
-              //   }
-              // }
-
-              //console.log(self.series[0].setData([time,lowask]));
-
-              //self.series.addPoint([data.message[0],data.message[1]]);
-              //self.series[0].setData([data.message[0],n]);
-              n = n * (1.01);
             })
           }
         }
@@ -104,13 +89,13 @@ $( document ).ready(function() {
         name: 'Highest Bid',
         data: [],
         marker:   { enabled: true, radius: 3},
-        tooltip:  { valueDecimals: 2 }
+        tooltip:  { valueDecimals: 5 }
       },
       {
         name: 'Lowest Ask',
         data: [],
         marker:   { enabled: true, radius: 3},
-        tooltip: { valueDecimals: 2},
+        tooltip: { valueDecimals: 5 },
 
       }]
     });
