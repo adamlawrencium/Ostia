@@ -75,6 +75,7 @@ connection.onopen = function (session) {
     output();
   }
   session.subscribe('USDT_BTC', on_recieve2);
+  session.subscribe('ticker', on_recieve);
   //session.subscribe('BTC_ETH', on_recieve2);
   //session.subscribe('ticker', on_recieve2);
 }
@@ -188,8 +189,10 @@ function on_recieve(args, kwargs) {
     ("0" + m.getUTCMinutes()).slice(-2) + ":" +
     ("0" + m.getUTCSeconds()).slice(-2);
 
+
+
     // Emitting messages to connected clients through socket.io
-    io.emit('message',{message: args[2]+", "+args[3]+", "+ m});
+    io.emit('message',{message: [m.getTime(), args[2], args[3]]});
   }
 };
 
