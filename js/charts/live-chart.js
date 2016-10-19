@@ -49,10 +49,10 @@ $( document ).ready(function() {
       },
 
       title: {
-        text: 'fasdfas Stock Price'
+        text: 'Stock Price'
       },
       chart: {
-        type: 'spline',
+        //type: 'spline',
         events: {
           load: function() {
 
@@ -65,11 +65,16 @@ $( document ).ready(function() {
 
               var tim = (new Date()).getTime()
               var y   = Math.random();
-              self.series[0].addPoint([tim, y]);
+              //self.series[0].addPoint([tim, y]);
 
               var time    = data.message[0];
-              var highbid = data.message[1];
-              var lowask  = data.message[2];
+              var highbid = parseFloat(data.message[1]);
+              var lowask  = parseFloat(data.message[2]);
+
+              self.series[0].addPoint([tim, highbid]);
+              self.series[1].addPoint([tim, lowask]);
+
+              console.log('highbid' + typeof(highbid));
               //self.redraw();
               // for (var entry in self.series.data) {
               //   if (self.series[0].hasOwnProperty(entry)) {
@@ -96,26 +101,18 @@ $( document ).ready(function() {
       },
 
       series: [{
-        name: 'BANANA',
+        name: 'Highest Bid',
         data: [],
-        /*data: [
-        [1475452800000,112.52],
-        [1475539200000,113.00],
-        [1475625600000,113.05],
-        [1475712000000,113.89],
-        [1475798400000,114.06],
-        [1476057600000,116.05],
-        [1476144000000,116.30],
-        [1476230400000,117.34],
-        [1476316800000,116.98],
-        [1476403200000,117.63],
-        [1476662400000,117.55],
-        [1476748800000,117.47]
-      ],*/
-      tooltip: {
-        valueDecimals: 2
-      }
-    }]
+        marker:   { enabled: true, radius: 3},
+        tooltip:  { valueDecimals: 2 }
+      },
+      {
+        name: 'Lowest Ask',
+        data: [],
+        marker:   { enabled: true, radius: 3},
+        tooltip: { valueDecimals: 2},
+
+      }]
+    });
   });
-});
 });
