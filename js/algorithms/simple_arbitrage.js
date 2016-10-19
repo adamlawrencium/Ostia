@@ -1,4 +1,4 @@
-exports.output = function (ob_all) {
+exports.output = function (Orderbook_All) {
 
   // Temporary variables for algorithm
   var highest_bid = 0;
@@ -7,40 +7,41 @@ exports.output = function (ob_all) {
   var key_ask = 'polo';
   var key_bid= 'polo';
 
-  // Iterating through each exchange orderbook and creating updated info
-  for (var key in ob_all) {
-    if (ob_all.hasOwnProperty(key)) {
-      ob_all[key].sortMap();
+  // Iterating through each exchange orderbook and creating updated info for each orderbook
+  //   when update_curr_bid_ask is called, the current_bid_ask variable is updated
+  //   with the most recent info from each exchanges Maps
+  for (var key in Orderbook_All) {
+    if (Orderbook_All.hasOwnProperty(key)) {
+      Orderbook_All[key].update_curr_bid_ask();
     }
   }
 
-  // Iterating through each exchange and finding the highest bid/ lowest ask and
+  // Iterating through each exchange and finding the overall highest bid/lowest ask and
   //  the corresponding key
-  for (var key in ob_all) {
-    if (ob_all.hasOwnProperty(key)) {
-      if (ob_all[key].info.highest_bid > highest_bid){
-        highest_bid = ob_all[key].info.highest_bid;
-        key_bid = key;
+  for (var key in Orderbook_All) {
+    if (Orderbook_All.hasOwnProperty(key)) {
+      if (Orderbook_All[key].curr_bid_ask.highest_bid > highest_bid){
+        highest_bid = Orderbook_All[key].curr_bid_ask.highest_bid;
+        key_bid = key; // Saving the key of the highest bid
       }
-      if (ob_all[key].info.lowest_ask < lowest_ask){
-        lowest_ask = ob_all[key].info.lowest_ask;
+      if (Orderbook_All[key].curr_bid_ask.lowest_ask < lowest_ask){
+        lowest_ask = Orderbook_All[key].curr_bid_ask.lowest_ask;
         key_ask = key;
       }
     }
   }
 
   // Finding the volume available to be traded
-  if (ob_all[key_bid].info.highest_bid_amt < Math.abs(ob_all[key_ask].info.lowest_ask_amt)) {
-    low_amt = ob_all[key_bid].info.highest_bid_amt;
+  if (Orderbook_All[key_bid].curr_bid_ask.highest_bid_amt < Math.abs(Orderbook_All[key_ask].curr_bid_ask.lowest_ask_amt)) {
+    low_amt = Orderbook_All[key_bid].curr_bid_ask.highest_bid_amt;
   }
   else {
-    low_amt = Math.abs(ob_all[key_ask].info.lowest_ask_amt)
+    low_amt = Math.abs(Orderbook_All[key_ask].curr_bid_ask.lowest_ask_amt)
   }
 
   // Entering fees
   var fee = .9975;
   var fee2 = .9975;
-
 
   // Calculating Profit
   var sell_profit = (highest_bid*low_amt*fee);
@@ -49,16 +50,14 @@ exports.output = function (ob_all) {
 
  //if (profit>0){
   // Printing out exchange info and profit
-/*
-  for (var key in ob_all) {
-    if (ob_all.hasOwnProperty(key)) {
-      console.log(ob_all[key].name + ":\t" + ob_all[key].info.highest_bid + ", " + ob_all[key].info.highest_bid_amt + "|\t|" + ob_all[key].info.lowest_ask + ", " + ob_all[key].info.lowest_ask_amt);
+
+  for (var key in Orderbook_All) {
+    if (Orderbook_All.hasOwnProperty(key)) {
+      console.log(Orderbook_All[key].name + ":\t" + Orderbook_All[key].curr_bid_ask.highest_bid + ", " + Orderbook_All[key].curr_bid_ask.highest_bid_amt + "|\t|" + Orderbook_All[key].curr_bid_ask.lowest_ask + ", " + Orderbook_All[key].curr_bid_ask.lowest_ask_amt);
     }
   }
-
-*/
-  //console.log();
-  console.log(profit + "," + ob_all[key_bid].name + "," + ob_all[key_ask].name + ",");
-  //console.log();
+  console.log();
+  console.log(profit + "," + Orderbook_All[key_bid].name + "," + Orderbook_All[key_ask].name + ",");
+  console.log();
 //}
 }

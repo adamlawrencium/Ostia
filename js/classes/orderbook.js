@@ -5,12 +5,12 @@ function orderbook (name, highbid, lowask) {
   this.name = name
   this.highbid = highbid
   this.lowask = lowask
-  this.info = {"highest_bid":0, "highest_bid_amt":0, "lowest_ask":0, "lowest_ask_amt":0}
+  this.curr_bid_ask = {"highest_bid":0, "highest_bid_amt":0, "lowest_ask":0, "lowest_ask_amt":0}
 
 }
 
 // Sorting function
-orderbook.prototype.sortMap = function() {
+orderbook.prototype.update_curr_bid_ask = function() {
 
     var highbid = this.highbid;
     var lowask = this.lowask;
@@ -70,7 +70,7 @@ orderbook.prototype.sortMap = function() {
 
     // Returning summarized data
     var info = {"highest_bid":tmp_highbid, "highest_bid_amt":tmp_amt_highbid, "lowest_ask":tmp_lowask, "lowest_ask_amt":tmp_amt_lowask};
-    this.info = info;
+    this.curr_bid_ask = info;
 }
 
 module.exports = orderbook;
