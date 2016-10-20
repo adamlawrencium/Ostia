@@ -49,12 +49,20 @@ function call() {
   request.post(options, parse);
 }
 
+function openCall(){
+  // Calls the Kraken API every 1000ms (1s)
+  setInterval(call, 1000);
+}
+
 // Export constructor that populates highbids and lowasks, setting an interval
 // call to kraken to update
 module.exports = function(exchangeData) {
   highbids = exchangeData.highbids;
   lowasks = exchangeData.lowasks;
 
-  // Calls the Kraken API every 1000ms (1s)
-  setInterval(call, 1000);
+
+
+  return {
+    openCall: openCall
+  }
 }

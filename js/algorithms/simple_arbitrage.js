@@ -56,7 +56,7 @@ function outputExchangeData(allExchangeData) {
   console.log("Bitf:\t" + parseFloat(Bitf_Info[0]).toPrecision(4) + ", " + parseFloat(Bitf_Info[1]).toPrecision(4) + "\t|| " + parseFloat(Bitf_Info[2]).toPrecision(4) + ", " + parseFloat(Bitf_Info[3]).toPrecision(4));
   console.log("Krak:\t" + parseFloat(Krak_Info[0]).toPrecision(4) + ", " + parseFloat(Krak_Info[1]).toPrecision(4) + "\t|| " + parseFloat(Krak_Info[2]).toPrecision(4) + ", " + parseFloat(Krak_Info[3]).toPrecision(4));
   console.log();
-  console.log(totalProfit.toPrecision(4) + ", " + volumeNeeded.toPrecision(4) + "  =>  " + percentProfit.toPrecision(4) + "%");
+  console.log("Profit: $" + totalProfit.toPrecision(4) + ", Investment: $" + volumeNeeded.toPrecision(4) + ", Percent Return: " + percentProfit.toPrecision(4) + "%");
   console.log();
 }
 

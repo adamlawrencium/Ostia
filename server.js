@@ -27,6 +27,7 @@ var bitfinex = require("./js/data-parsing/bitfinex.js")(allExchangeData.bitfinex
 poloniex.openWebSocket();
 bitfinex.openWebSocket();
 gdax.openWebSocket();
+kraken.openCall();
 
 // Setting up map parsing to get info from exchanges for live chart
 var mapParse = require("./js/data-parsing/map_parsing.js");
