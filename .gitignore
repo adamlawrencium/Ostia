@@ -1,3 +1,10 @@
-.DS_Store
+# Node
 node_modules/
+
+# Vim
+*.swp
+*~
+
+# Temp files
+.DS_Store
 npm-debug.log
