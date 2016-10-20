@@ -14,6 +14,7 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.highcharts.com/stock/highstock.js"></script>
     <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+    <script src="js/charts/live-chart.js"></script>
     <script>
 
     // Connecting to socket.io
@@ -29,36 +30,6 @@
         $('#stock_zone').prepend('</strong> ' + message + '</p>');
     }
     </script>
-
-
-    <script>
-    // HighStocks Demo chart
-    $(function () {
-
-        $.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=aapl-c.json&callback=?', function (data) {
-            // Create the chart
-            $('#container').highcharts('StockChart', {
-
-                rangeSelector: {
-                    selected: 1
-                },
-
-                title: {
-                    text: 'AAPL Stock Price'
-                },
-
-                series: [{
-                    name: 'AAPL',
-                    data: data,
-                    tooltip: {
-                        valueDecimals: 2
-                    }
-                }]
-            });
-        });
-    });
-    </script>
-
 
 
 </head>

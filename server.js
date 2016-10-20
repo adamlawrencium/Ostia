@@ -15,6 +15,7 @@ for (var name in allExchangeData) {
       lowasks: new Map(),
     }
   }
+
 }
 
 // Parsing/Setup methods for each exchange
@@ -43,9 +44,13 @@ setInterval(function() {
 }, 1000);
 
 // Setting up basic Express server
-var app = require('express')();
+
+var express = require('express');
+var app = express();
+
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
+var path = require('path');
 
 // Rendering index.html
 app.get('/', function (req, res) {
@@ -56,6 +61,10 @@ app.get('/', function (req, res) {
 app.get('/dashboard', function (req, res) {
   res.sendfile(__dirname + '/html/dashboard.html');
 });
+
+app.use('/js', express.static('js'));
+
+
 
 // Function for websocket feed for live updating data
 // TODO: Why is this unused anywhere? Is it for future use? If so, explain.
@@ -73,8 +82,10 @@ function on_recieve(args, kwargs) {
     ("0" + m.getUTCMinutes()).slice(-2) + ":" +
     ("0" + m.getUTCSeconds()).slice(-2);
 
+
+
     // Emitting messages to connected clients through socket.io
-    io.emit('message',{message: args[2]+", "+args[3]+", "+ m});
+    io.emit('message',{message: [m.getTime(), args[2], args[3]]});
   }
 };
 */
