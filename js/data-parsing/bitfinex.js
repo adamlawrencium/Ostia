@@ -54,6 +54,7 @@ function openWebSocket() {
 
   // Counter to parse each message seperately, ignoring first two messages
   // TODO: Explain in here why we ignore the first two?
+
   var counter = 3;
 
   // TODO: Can we use the flags parameter instead of this counting system?
@@ -61,6 +62,8 @@ function openWebSocket() {
     data = JSON.parse(data);
 
     // TODO: Why do we skip first two messages?
+    // Birch: First two messages are JSON responses unrelated to the data,
+    //  my first look deemed them unimportant
     if (counter > 1) {
       counter--;
     } else if (counter == 1) {

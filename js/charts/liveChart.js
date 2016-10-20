@@ -1,3 +1,5 @@
+// Temporary until we can pass in the exchange needed when rendering a chart
+var exch = "test";
 $( document ).ready(function() {
 
   /*
@@ -14,8 +16,7 @@ $( document ).ready(function() {
   * TODO:  Add functions (like updateChart()) before $() call that would show
   *         or display different data to user. [frontend]
   *
-  * TODO:  Add Exchange name to websockets feed so app knows what title to
-  *        display.
+  * TODO:  Find a way to pass the required exchange in when a button is pressed
   */
 
   $('#container').highcharts('StockChart', {
@@ -42,13 +43,11 @@ $( document ).ready(function() {
       selected: 0
     },
 
-    // TODO: Change title based on current data feed.
-    //        "Data from X, Y, and Z exchanges"
     title: {
-      text: 'Stock Price'
+      text: 'Stock Price From '+ exch
     },
     subtitle: {
-      text: 'Live updates for BTC'
+      text: 'Live updates'
     },
 
     xAxis: {
@@ -67,11 +66,11 @@ $( document ).ready(function() {
 
           // Separate highbid/lowask streams are fed to their own Highcharts series.
           socket.on('message', function(data) {
-
             var time    = data.message[0];
-            var highbid = parseFloat(data.message[1]);
-            var lowask  = parseFloat(data.message[2]);
+            var highbid = parseFloat(data.message[1][0]);
+            var lowask  = parseFloat(data.message[1][2]);
 
+            // Adding the new points
             self.series[0].addPoint([time, highbid]);
             self.series[1].addPoint([time, lowask]);
           })
@@ -85,17 +84,15 @@ $( document ).ready(function() {
     * to each of the Highest Bid and Lowest Ask data series.
     */
     series: [{
-      name: 'Highest Bid',
+      name: 'Highest Bid ' + exch,
       data: [],
       marker:   { enabled: true, radius: 3},
       tooltip:  { valueDecimals: 5 }
-    },
-    {
-      name: 'Lowest Ask',
+    },{
+      name: 'Lowest Ask' + exch,
       data: [],
       marker:   { enabled: true, radius: 3},
       tooltip: { valueDecimals: 5 },
-
     }]
   });
 });

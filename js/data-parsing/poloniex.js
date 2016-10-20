@@ -1,9 +1,19 @@
-// Poloniex websockets use autobahn, (by my understanding ws plus security)
+// Passing required modules
 var autobahn = require('autobahn');
+var request = require('request');
 
 // Local variables
 var highbids;
 var lowasks;
+var count = 50; // Number of orders to receive
+
+// Function to parse snapshot of order book data from Poloniex
+function snapParse(data){
+  for (var i = 0; i < count; i++){
+    highbids.set(data.bids[i][0], data.bids[i][1]);
+    lowasks.set(data.asks[i][0], data.asks[i][1]);
+  }
+}
 
 // Interpret data received
 // TODO: Explain (or link to) expected data scheme
@@ -34,16 +44,28 @@ function openWebSocket() {
     url: "wss://api.poloniex.com", //Connection address
     realm: "realm1"
     // TODO: Why realm1?
+    // Birch: This setup is not my code, not sure why this is here
   });
-  
+
   // Subscribing to order book updates, parsing data and calling algorithm
   connection.onopen = function (session) {
     session.subscribe('USDT_BTC', parse);
     //session.subscribe('BTC_ETH', parse);
-    //session.subscribe('ticker', parse);
   }
-  
+
   connection.open();
+
+  // Variables for snapshot API call
+  var pair = "USDT_BTC"; // Pair to receive snapshot for
+  var url = "https://poloniex.com/public?command=returnOrderBook&currencyPair=" + pair + "&depth="+ count;
+
+  // When opening websocket, call API for a snapshot of the order book
+  request(url, function (error, response, body) {
+
+    // Parsing snapshot of order book
+    snapParse(JSON.parse(body));
+  });
+
 }
 
 // Export constructor that populates highbids and lowasks, returning another

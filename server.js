@@ -15,7 +15,6 @@ for (var name in allExchangeData) {
       lowasks: new Map(),
     }
   }
-
 }
 
 // Parsing/Setup methods for each exchange
@@ -29,9 +28,13 @@ poloniex.openWebSocket();
 bitfinex.openWebSocket();
 gdax.openWebSocket();
 
+// Setting up map parsing to get info from exchanges for live chart
+var mapParse = require("./js/data-parsing/map_parsing.js");
+
 // Outputs the data every 1000ms (1s)
 var arbitrage = require("./js/algorithms/simple_arbitrage.js");
 setInterval(function() {
+
   // Don't pass to arbitrage unless all data is initialized. Put in because
   // Kraken data isn't initialized the first time this is called.
   for (var name in allExchangeData) {
@@ -51,6 +54,26 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var path = require('path');
+// TODO: What is this?
+
+// Created to start and stop the liveFeed of a exchange
+var liveFeed;
+
+// Handling the connection to the client through socket.io
+io.sockets.on('connection', function (socket) {
+
+  socket.on('openExchange', function(data){
+    // Creating a live feed to the client of the data requested
+    liveFeed = setInterval(function() {
+      var date = new Date();
+      socket.emit('message', {message: [date.getTime(), mapParse(allExchangeData[data.data], data.data)]})
+    }, 1000)
+  });
+  socket.on('closeExchange', function(data){
+    // Closing the current data output
+    clearInterval(liveFeed);
+  });
+});
 
 // Rendering index.html
 app.get('/', function (req, res) {
@@ -63,32 +86,6 @@ app.get('/dashboard', function (req, res) {
 });
 
 app.use('/js', express.static('js'));
-
-
-
-// Function for websocket feed for live updating data
-// TODO: Why is this unused anywhere? Is it for future use? If so, explain.
-// If not, delete.
-/*
-function on_recieve(args, kwargs) {
-  if (args[0]=='BTC_ETH') { // Filtering Ticker results for BTC_ETH
-    // Creating Timestamp for Updated Stock prices
-    var m = new Date();
-    var dateString =
-    m.getUTCFullYear() +"/"+
-    ("0" + (m.getUTCMonth()+1)).slice(-2) +"/"+
-    ("0" + m.getUTCDate()).slice(-2) + " " +
-    ("0" + m.getUTCHours()).slice(-2) + ":" +
-    ("0" + m.getUTCMinutes()).slice(-2) + ":" +
-    ("0" + m.getUTCSeconds()).slice(-2);
-
-
-
-    // Emitting messages to connected clients through socket.io
-    io.emit('message',{message: [m.getTime(), args[2], args[3]]});
-  }
-};
-*/
 
 // Creating Express server
 server.listen(3000);
