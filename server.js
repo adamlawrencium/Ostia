@@ -15,13 +15,7 @@ for (var name in allExchangeData) {
       lowasks: new Map(),
     }
   }
-<<<<<<< HEAD
-  session.subscribe('USDT_BTC', on_recieve2);
-  session.subscribe('ticker', on_recieve);
-  //session.subscribe('BTC_ETH', on_recieve2);
-  //session.subscribe('ticker', on_recieve2);
-=======
->>>>>>> master
+
 }
 
 // Parsing/Setup methods for each exchange
