@@ -27,13 +27,13 @@ var bitfinex = require("./js/data-parsing/bitfinex.js")(allExchangeData.bitfinex
 poloniex.openWebSocket();
 bitfinex.openWebSocket();
 gdax.openWebSocket();
-kraken.openCall();
+kraken.openCallInterval();
 
 // Setting up map parsing to get info from exchanges for live chart
-var mapParse = require("./js/data-parsing/map_parsing.js");
+var mapParse = require("./js/data-parsing/map-parsing.js");
 
 // Outputs the data every 1000ms (1s)
-var arbitrage = require("./js/algorithms/simple_arbitrage.js");
+var arbitrage = require("./js/algorithms/simple-arbitrage.js");
 setInterval(function() {
 
   // Don't pass to arbitrage unless all data is initialized. Put in because

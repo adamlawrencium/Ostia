@@ -1,6 +1,5 @@
 // Request library to make api calls with
 const request = require('request');
-// TODO: Explain why this is const?
 
 // Currency pair to use
 var pair = "XXBTZUSD";
@@ -34,8 +33,7 @@ function parse(error, response, body) {
   }
 }
 // Calls the Kraken API and parses the data
-// TODO: So why can't this also use a web socket? If so, link why or explain
-// Birch: Kraken does not offer websocket updates https://www.kraken.com/help/api
+// https://www.kraken.com/help/api
 function call() {
   // Message sent to subscribe to a currency pair order book, count is number of
   // orders sent
@@ -49,7 +47,7 @@ function call() {
   request.post(options, parse);
 }
 
-function openCall(){
+function openCallInterval(){
   // Calls the Kraken API every 1000ms (1s)
   setInterval(call, 1000);
 }
@@ -60,9 +58,7 @@ module.exports = function(exchangeData) {
   highbids = exchangeData.highbids;
   lowasks = exchangeData.lowasks;
 
-
-
   return {
-    openCall: openCall
+    openCallInterval: openCallInterval
   }
 }

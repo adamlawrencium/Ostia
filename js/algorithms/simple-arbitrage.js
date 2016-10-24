@@ -8,7 +8,7 @@ function outputExchangeData(allExchangeData) {
   var low_amt;
 
   // Code for parsing the maps in each exchange
-  var mapParse = require("./../data-parsing/map_parsing.js");
+  var mapParse = require("./../data-parsing/map-parsing.js");
 
   // Condensing maps into the highest bid and lowest ask
   var Krak_Info = mapParse(allExchangeData.kraken, "kraken");
@@ -44,9 +44,9 @@ function outputExchangeData(allExchangeData) {
   var fee2 = .9975;
 
   // Calculating Profit
-  var sell_profit = (highest_bid*low_amt*fee);
-  var buy_loss = ((lowest_ask*low_amt)/fee2);
-  var totalProfit = (sell_profit-buy_loss);
+  var sellProfit = (highest_bid*low_amt*fee);
+  var buyLoss = ((lowest_ask*low_amt)/fee2);
+  var totalProfit = (sellProfit - buyLoss);
   var volumeNeeded = ((parseFloat(highest_bid) + parseFloat(lowest_ask)) * low_amt);
   var percentProfit = (totalProfit/volumeNeeded)
 

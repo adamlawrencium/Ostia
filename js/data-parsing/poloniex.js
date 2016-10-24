@@ -43,8 +43,7 @@ function openWebSocket() {
   var connection = new autobahn.Connection({
     url: "wss://api.poloniex.com", //Connection address
     realm: "realm1"
-    // TODO: Why realm1?
-    // Birch: This setup is not my code, not sure why this is here
+    // http://pastebin.com/dMX7mZE0 , http://autobahn.ws/js/reference.html#connection-options
   });
 
   // Subscribing to order book updates, parsing data and calling algorithm
@@ -61,11 +60,9 @@ function openWebSocket() {
 
   // When opening websocket, call API for a snapshot of the order book
   request(url, function (error, response, body) {
-
     // Parsing snapshot of order book
     snapParse(JSON.parse(body));
   });
-
 }
 
 // Export constructor that populates highbids and lowasks, returning another

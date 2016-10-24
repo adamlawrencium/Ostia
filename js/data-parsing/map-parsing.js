@@ -9,6 +9,8 @@ function mapParse(exchangeData, exchangeType) {
   tmp_amt_highbid = 0,
   tmp_amt_lowask = 0;
 
+  // TODO parseFloat numbers when they are stored, not when now
+
   // Iterating through each entry in the map to find highest value
   highbids.forEach(function(value, key) {
     // GDAX or Bit
