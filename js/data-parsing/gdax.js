@@ -1,9 +1,25 @@
 // Imported modules
 var WebSocket = require('ws');
+var request = require('request');
 
 // Local variables
 var highbids;
 var lowasks;
+
+// Function to parse the GDAX snapshot
+function parseSnap(data){
+    var count = 50; // Number of orders to take from snapshot
+    for (var i = 0; i < count; i++){
+      highbids.set(data.bids[i][2], {
+        rate: data.bids[i][0],
+        amount: data.bids[i][1]
+      });
+      lowasks.set(data.asks[i][2], {
+        rate: data.asks[i][0],
+        amount: data.asks[i][1]
+      });
+    }
+}
 
 // Parse data from Web Socket
 // TODO: Explain (or link to) expected data scheme
@@ -32,8 +48,6 @@ function parse(data){
     case "match":
       // TODO: Why do these messages get sent? If we can't do anything with
       // them remove this TODO and comment the reason why.
-      // console.log(data.type);
-      // console.log(data);
       break;
     default:
       console.error("Unexpected data.type!", data.type);
@@ -43,7 +57,7 @@ function parse(data){
 // Setting up WS Connection for GDAX
 function openWebSocket() {
   var ws = new WebSocket('wss://ws-feed.gdax.com');
-  
+
   // Setting up the subscribe message
   var subscribeBTC = {
     "type": "subscribe",
@@ -52,19 +66,34 @@ function openWebSocket() {
       //"ETH-BTC",
     ]
   };
-  
+
   // Subscribing to heartbeat messages
   var heartbeat = {
     "type": "heartbeat",
     "on": true
   };
-  
+
+  // Variables for snapshot parsing
+  var pair = "BTC-USD"
+  var url = "https://api.gdax.com/products/"+ pair + "/book?level=3";
+  var options = {
+    url: url,
+    headers: {
+      'User-Agent': 'request'
+    }
+  };
+
+  // Calling a order book snapshot request and parsing it
+  request(options, function(error, response, body) {
+    parseSnap(JSON.parse(body));
+  });
+
   // On websocket connection, send the subscribe and heartbeat JSON strings
   ws.on('open',function() {
     ws.send(JSON.stringify(subscribeBTC));
     ws.send(JSON.stringify(heartbeat));
   });
-  
+
   // When a message is recieved, parse the data
   ws.on('message', parse);
 }

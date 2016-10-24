@@ -52,15 +52,14 @@ function openWebSocket() {
     ws.send(msg);
   });
 
-  // Counter to parse each message seperately, ignoring first two messages
-  // TODO: Explain in here why we ignore the first two?
   var counter = 3;
 
   // TODO: Can we use the flags parameter instead of this counting system?
   ws.on('message', function(data, flags) {
     data = JSON.parse(data);
 
-    // TODO: Why do we skip first two messages?
+    // http://docs.bitfinex.com/#websocket
+
     if (counter > 1) {
       counter--;
     } else if (counter == 1) {

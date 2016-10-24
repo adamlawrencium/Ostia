@@ -2,13 +2,6 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <style>
-    #stock_zone strong {
-        color: white;
-        background-color: black;
-        padding: 2px;
-    }
-    </style>
 
     <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
@@ -17,34 +10,29 @@
     <script src="js/charts/live-chart.js"></script>
     <script>
 
-    // Connecting to socket.io
+    // TODO: Create some sort of updating/reset function for highcharts,
+    //        currently the data changes, but the chart won't reset
     var socket = io.connect('http://localhost:3000');
+      function Graph(data){
+        var exchange = data;
 
-    // When a stock update is received it's inserted in the page
-    socket.on('message', function(data) {
-        insertStock(data.message);
-    })
-
-    // Adds a stock update to the page
-    function insertStock(message) {
-        $('#stock_zone').prepend('</strong> ' + message + '</p>');
-    }
+        // Closing the previous exchange feed and starting the new one
+        socket.emit('closeExchange', {data: null});
+        socket.emit('openExchange', {data: exchange});
+      }
     </script>
-
 
 </head>
 
 <body>
+
     <h1>Live stock chart using HighchartsJS</h1>
+    <button onclick="Graph('poloniex')">Polo</button>
+    <button onclick="Graph('kraken')">Krak</button>
+    <button onclick="Graph('gdax')">GDAX</button>
+    <button onclick="Graph('bitfinex')">Bitf</button>
     <div id="container" style="height: 400px; min-width: 310px; max-width: 1200px;"></div>
 
-    <h1>BTC_ETH Updated Low/High Prices</h1>
-    <section id="stock_zone">
-
-    </section>
-
-
-
-
 </body>
+
 </html>

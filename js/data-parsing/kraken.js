@@ -33,7 +33,7 @@ function parse(error, response, body) {
   }
 }
 // Calls the Kraken API and parses the data
-// TODO: So why can't this also use a web socket? If so, link why or explain
+// https://www.kraken.com/help/api
 function call() {
   // Message sent to subscribe to a currency pair order book, count is number of
   // orders sent
@@ -41,11 +41,15 @@ function call() {
     url : 'https://api.kraken.com/0/public/Depth',
     form : {
       "pair": pair,
-      "count": 10
+      "count": 20
     }
   };
-
   request.post(options, parse);
+}
+
+function openCallInterval(){
+  // Calls the Kraken API every 1000ms (1s)
+  setInterval(call, 1000);
 }
 
 // Export constructor that populates highbids and lowasks, setting an interval
@@ -54,6 +58,7 @@ module.exports = function(exchangeData) {
   highbids = exchangeData.highbids;
   lowasks = exchangeData.lowasks;
 
-  // Calls the Kraken API every 1000ms (1s)
-  setInterval(call, 1000);
+  return {
+    openCallInterval: openCallInterval
+  }
 }
