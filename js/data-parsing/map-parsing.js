@@ -17,10 +17,10 @@ function mapParse(exchangeData, exchangeType) {
     if (exchangeType === "gdax" || exchangeType === "bitfinex") {
       if (value.rate > tmp_highbid) {
         tmp_highbid = value.rate;
-        tmp_amt_highbid = parseFloat(value.amount);
+        tmp_amt_highbid = value.amount;
       }
       else if (value.rate == tmp_highbid) {
-        tmp_amt_highbid += parseFloat(value.amount);
+        tmp_amt_highbid += value.amount;
       }
     }
     // Kraken or Polo
@@ -38,10 +38,10 @@ function mapParse(exchangeData, exchangeType) {
     if (exchangeType === "gdax" || exchangeType === "bitfinex") {
       if (value.rate < tmp_lowask) {
         tmp_lowask = value.rate;
-        tmp_amt_lowask = parseFloat(value.amount);
+        tmp_amt_lowask = value.amount;
       }
       else if (value.rate == tmp_lowask) {
-        tmp_amt_lowask += parseFloat(value.amount);
+        tmp_amt_lowask += value.amount;
       }
     }
     // Kraken or Polo

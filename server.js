@@ -1,54 +1,3 @@
-// Map exchange to index number to use for rest of data structures
-var allExchangeData = {
-  kraken: null,
-  poloniex: null,
-  gdax: null,
-  bitfinex: null,
-}
-
-// Setting up Maps for the highest bids and lowest asks for each exchange
-// TODO: Why maps? Could use objects as well?
-for (var name in allExchangeData) {
-  if (allExchangeData.hasOwnProperty(name)) {
-    allExchangeData[name] = {
-      highbids: new Map(),
-      lowasks: new Map(),
-    }
-  }
-}
-
-// Parsing/Setup methods for each exchange
-var kraken = require("./js/data-parsing/kraken.js")(allExchangeData.kraken);
-var poloniex = require("./js/data-parsing/poloniex.js")(allExchangeData.poloniex);
-var gdax = require("./js/data-parsing/gdax.js")(allExchangeData.gdax);
-var bitfinex = require("./js/data-parsing/bitfinex.js")(allExchangeData.bitfinex);
-
-// Setup and open the web sockets
-poloniex.openWebSocket();
-bitfinex.openWebSocket();
-gdax.openWebSocket();
-kraken.openCallInterval();
-
-// Setting up map parsing to get info from exchanges for live chart
-var mapParse = require("./js/data-parsing/map-parsing.js");
-
-// Outputs the data every 1000ms (1s)
-var arbitrage = require("./js/algorithms/simple-arbitrage.js");
-setInterval(function() {
-
-  // Don't pass to arbitrage unless all data is initialized. Put in because
-  // Kraken data isn't initialized the first time this is called.
-  for (var name in allExchangeData) {
-    if (allExchangeData.hasOwnProperty(name) && !allExchangeData[name]) {
-      return;
-    }
-  }
-
-  arbitrage(allExchangeData);
-}, 1000);
-
-// Setting up basic Express server
-
 var express = require('express');
 var app = express();
 
@@ -56,6 +5,10 @@ var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var path = require('path');
 // TODO: What is this?
+
+// Beginning arbitrage
+var arbitrage = require("./js/algorithms/simple-arbitrage.js");
+arbitrage("BTCUSD", 1000);
 
 // Created to start and stop the liveFeed of a exchange
 var liveFeed;
