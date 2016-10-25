@@ -20,8 +20,12 @@ var info = {
   }
 }
 
-// Passing in the open function for opening websockets
-var open = require("./../classes/open.js");
+// Function which takes in a orderbook-exchange pair, and opens a feed of data
+//    to that orderbook-exchange pair
+let open = function open(orderbook, exchange, pair){
+  var exchangeOrderbook = require("./../data-parsing/" + exchange + ".js")(orderbook);
+  exchangeOrderbook.openFeed(pair);
+}
 
 // Orderbook constructor
 // TODO: Change maps to javascript objects
@@ -37,7 +41,7 @@ let orderbook = function orderbook(pair) {
 }
 
 // Overall Exchanges variable constructor
-let subSetExchs = function subSetExchs (exchanges, pairs){
+let createExchanges = function createExchanges (exchanges, pairs){
   var Exchs = {};
   // Accounting for "all" function call
   if (exchanges == 'all'){
@@ -47,11 +51,12 @@ let subSetExchs = function subSetExchs (exchanges, pairs){
   // For each exchange required, creating a Exchange object
   for (var i=0; i<exchanges.length ; i++){
     if (info[exchanges[i]]){
-        Exchs[exchanges[i]] = subSetExch(exchanges[i], pairs);
+        Exchs[exchanges[i]] = subSetExchange(exchanges[i], pairs);
     }
   }
 
-  // Function to open a feed for every exchange/pair needed
+  // Function to open a feed for every exchange/pair needed, loops through every
+  //    available key pairs and opens the websocket for that key pair
   Exchs["open"] = function () {
     for (var key in Exchs) {
       if (Exchs.hasOwnProperty(key)) {
@@ -67,7 +72,7 @@ let subSetExchs = function subSetExchs (exchanges, pairs){
 }
 
 // Single Exchange constructor
-let subSetExch = function subSetExch (exchange, pairs){
+let subSetExchange = function subSetExchange (exchange, pairs){
   var Exch = {};
 
   // Accounting for "all" call
@@ -91,4 +96,4 @@ let subSetExch = function subSetExch (exchange, pairs){
   return Exch;
 }
 
-module.exports = subSetExchs;
+module.exports = createExchanges;

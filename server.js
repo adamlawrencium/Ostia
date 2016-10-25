@@ -9,6 +9,7 @@ var path = require('path');
 // Beginning arbitrage
 var arbitrage = require("./js/algorithms/simple-arbitrage.js");
 arbitrage("BTCUSD", 1000);
+//arbitrage("ETHBTC", 1000);
 
 // Created to start and stop the liveFeed of a exchange
 var liveFeed;
