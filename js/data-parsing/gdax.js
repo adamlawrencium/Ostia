@@ -27,8 +27,6 @@ function parseSnap(data){
 function parse(data){
   var data = JSON.parse(data)
 
-  //console.log(data);
-  //console.log("test");
   // Determine relevant order map to use
   var bidsOrAsks = data.side === "buy" ? highbids : lowasks;
 
@@ -57,11 +55,7 @@ function parse(data){
       break;
     default:
       console.error("Unexpected data.type!", data.type);
-
-}
-  //console.log(data);
-  //var tst = {highbids: highbids, lowasks: lowasks}
-  //console.log(mapParse(tst, "gdax"));
+    }
 }
 
 // Setting up WS Connection for GDAX
@@ -108,6 +102,7 @@ function openWebSocket(pair) {
 
 // Export constructor that populates highbids and lowasks, returning another
 // object with exposed public functions
+// Return openFeed so there is a uniform way of accessing the open data functions
 module.exports = function(Exchs) {
   highbids = Exchs.highbids;
   lowasks = Exchs.lowasks;

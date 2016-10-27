@@ -73,6 +73,7 @@ function openWebSocket(pair) {
 
 // Export constructor that populates highbids and lowasks, returning another
 // object with exposed public functions
+// Return openFeed so there is a uniform way of accessing the open data functions
 module.exports = function(Exchs) {
   highbids = Exchs.highbids;
   lowasks = Exchs.lowasks;

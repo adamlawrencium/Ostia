@@ -22,13 +22,13 @@ var info = {
 
 // Function which takes in a orderbook-exchange pair, and opens a feed of data
 //    to that orderbook-exchange pair
-let open = function open(orderbook, exchange, pair){
+let openFeed = function open(exchange, orderbook) {
   var exchangeOrderbook = require("./../data-parsing/" + exchange + ".js")(orderbook);
-  exchangeOrderbook.openFeed(pair);
+  exchangeOrderbook.openFeed(orderbook.pair);
 }
 
 // Orderbook constructor
-// TODO: Change maps to javascript objects
+// TODO: Change maps to javascript objects/combine into one Map/Object
 let orderbook = function orderbook(pair) {
   return {
     pair : pair,
@@ -41,28 +41,28 @@ let orderbook = function orderbook(pair) {
 }
 
 // Overall Exchanges variable constructor
-let createExchanges = function createExchanges (exchanges, pairs){
+let createExchanges = function createExchanges (exchangeNames, pairs) {
   var Exchs = {};
   // Accounting for "all" function call
-  if (exchanges == 'all'){
-    exchanges = ["poloniex", "gdax", "kraken", "bitfinex"];
+  if (exchangeNames == 'all') {
+    exchangeNames = ["poloniex", "gdax", "kraken", "bitfinex"];
   }
 
   // For each exchange required, creating a Exchange object
-  for (var i=0; i<exchanges.length ; i++){
-    if (info[exchanges[i]]){
-        Exchs[exchanges[i]] = subSetExchange(exchanges[i], pairs);
+  for (var i = 0; i < exchangeNames.length ; i++) {
+    if (info[exchangeNames[i] ]) {
+        Exchs[exchangeNames[i] ] = addExchange(exchangeNames[i], pairs);
     }
   }
 
   // Function to open a feed for every exchange/pair needed, loops through every
   //    available key pairs and opens the websocket for that key pair
-  Exchs["open"] = function () {
+  Exchs.open = function () {
     for (var key in Exchs) {
       if (Exchs.hasOwnProperty(key)) {
         for (var key_2 in Exchs[key]){
           if (Exchs[key].hasOwnProperty(key_2)) {
-            open(Exchs[key][key_2], key, Exchs[key][key_2]["pair"]);
+            openFeed(key, Exchs[key][key_2]);
           }
         }
       }
@@ -72,7 +72,7 @@ let createExchanges = function createExchanges (exchanges, pairs){
 }
 
 // Single Exchange constructor
-let subSetExchange = function subSetExchange (exchange, pairs){
+let addExchange = function addExchange (exchange, pairs){
   var Exch = {};
 
   // Accounting for "all" call

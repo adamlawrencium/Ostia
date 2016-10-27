@@ -5,7 +5,7 @@ const request = require('request');
 // Local variables
 var highbids;
 var lowasks;
-var dataPair;
+var pair;
 
 function parse(error, response, body) {
   // Error Handling
@@ -17,8 +17,8 @@ function parse(error, response, body) {
     // TODO: Explain (or link to) expected data scheme
     if (body[0] != '<') {
       var data = JSON.parse(body);
-      var bids = data.result[dataPair].bids;
-      var asks = data.result[dataPair].asks;
+      var bids = data.result[pair].bids;
+      var asks = data.result[pair].asks;
 
       for (var i = 0; i < bids.length; i++){
         highbids.set(parseFloat(bids[i][0]), parseFloat(bids[i][1]));
@@ -38,21 +38,22 @@ function call() {
   var options = {
     url : 'https://api.kraken.com/0/public/Depth',
     form : {
-      "pair": dataPair,
+      "pair": pair,
       "count": 20
     }
   };
   request.post(options, parse);
 }
 
-function openCallInterval(pair){
-  dataPair = pair;
+function openCallInterval(tmpPair){
+  pair = tmpPair;
   // Calls the Kraken API every 1000ms (1s)
   setInterval(call, 1000);
 }
 
 // Export constructor that populates highbids and lowasks, setting an interval
 // call to kraken to update
+// Return openFeed so there is a uniform way of accessing the open data functions
 module.exports = function(Exchs) {
   highbids = Exchs.highbids;
   lowasks = Exchs.lowasks;
