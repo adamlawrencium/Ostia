@@ -7,7 +7,7 @@ var path = require('path');
 // TODO: What is this?
 
 // Beginning arbitrage
-var arbitrage = require("./js/algorithms/simple-arbitrage.js");
+var arbitrage = require("./lib/strategies/simple-arbitrage.js");
 arbitrage("BTCUSD", 1000);
 //arbitrage("ETHBTC", 1000);
 
