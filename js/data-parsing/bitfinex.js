@@ -10,10 +10,10 @@ var lowasks;
 function parseSnapshot(data) {
   for (var i = 0; i<data[1].length; i++) {
     if (data[1][i][2] < 0) {
-      lowasks.set(data[1][i][0], {rate:data[1][i][1], amount:data[1][i][2] })
+      lowasks.set(data[1][i][0], {rate:parseFloat(data[1][i][1]), amount:parseFloat(data[1][i][2]) })
     }
     else if (data[1][i][2] > 0) {
-      highbids.set(data[1][i][0], {rate:data[1][i][1], amount:data[1][i][2]});
+      highbids.set(data[1][i][0], {rate:parseFloat(data[1][i][1]), amount:parseFloat(data[1][i][2])});
     }
   }
 }
@@ -28,23 +28,22 @@ function parse(data) {
     highbids.delete(data[1]);
   }
   else if (data[1] != "hb" && data[3] > 0) {
-    highbids.set(data[1], {rate:data[2], amount:data[3]});
+    highbids.set(data[1], {rate:parseFloat(data[2]), amount:parseFloat(data[3])});
   }
   else if (data[1] != "hb" && data[3] < 0) {
-    lowasks.set(data[1], {rate:data[2], amount:data[3]});
+    lowasks.set(data[1], {rate:parseFloat(data[2]), amount:parseFloat(data[3])});
   }
 }
 
 // Setting up WS Connection for Bitfinex
-function openWebSocket() {
+function openWebSocket(pair) {
   var ws = new WebSocket('wss://api2.bitfinex.com:3000/ws');
 
   // When opening the websocket, send subscription message
   var msg = JSON.stringify({
     "event": "subscribe",
     "channel": "book",
-    "pair": "BTCUSD",
-    //"pair": "ETHBTC",
+    "pair": pair,
     "prec": "R0",
     "len":"25"
   });
@@ -74,10 +73,11 @@ function openWebSocket() {
 
 // Export constructor that populates highbids and lowasks, returning another
 // object with exposed public functions
-module.exports = function(exchangeData) {
-  highbids = exchangeData.highbids;
-  lowasks = exchangeData.lowasks;
+// Return openFeed so there is a uniform way of accessing the open data functions
+module.exports = function(Exchs) {
+  highbids = Exchs.highbids;
+  lowasks = Exchs.lowasks;
   return {
-    openWebSocket: openWebSocket
+    openFeed: openWebSocket
   }
 }
