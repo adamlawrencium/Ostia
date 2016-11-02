@@ -11,12 +11,19 @@ var arbitrage = require("./lib/strategies/simple-arbitrage.js");
 arbitrage("BTCUSD", 1000);
 //arbitrage("ETHBTC", 1000);
 
+// Set up Trading desk and run strategy
+var TradingDesk = require("./lib/js/TradingDesk.js");
+
+// Live trading (performance) data that will be sent to client via Socket.IO
+var TDInfo = TradingDesk.runLiveTrading;
+
 // Created to start and stop the liveFeed of a exchange
 var liveFeed;
 
+
+// This sends data to the client for visualizations with socket.io
 // Handling the connection to the client through socket.io
 io.sockets.on('connection', function (socket) {
-
   socket.on('openExchange', function(data){
     // Creating a live feed to the client of the data requested
     liveFeed = setInterval(function() {
