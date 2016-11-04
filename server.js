@@ -10,6 +10,7 @@ var path = require('path');
 var mapParse  = require("./lib/exchanges/map-parsing.js");
 var arbitrage = require("./lib/strategies/simple-arbitrage.js").outputExchangeData;
 var order     = require("./lib/strategies/simple-arbitrage.js").order;
+var allExchangeData = require("./lib/DataHub.js");
 arbitrage("BTCUSD", 1000);
 //arbitrage("ETHBTC", 1000);
 
