@@ -7,15 +7,18 @@ var path = require('path');
 // TODO: What is this?
 
 // Beginning arbitrage
-var arbitrage = require("./lib/strategies/simple-arbitrage.js");
+var mapParse  = require("./lib/exchanges/map-parsing.js");
+var arbitrage = require("./lib/strategies/simple-arbitrage.js").outputExchangeData;
+var order     = require("./lib/strategies/simple-arbitrage.js").order;
 arbitrage("BTCUSD", 1000);
 //arbitrage("ETHBTC", 1000);
 
 // Set up Trading desk and run strategy
-var TradingDesk = require("./lib/js/TradingDesk.js");
+/*var TradingDesk = require("./lib/TradingDesk.js");*/
 
+// TODO: Determine which data to send to the client for viz's
 // Live trading (performance) data that will be sent to client via Socket.IO
-var TDInfo = TradingDesk.runLiveTrading;
+//var TDInfo = TradingDesk.runLiveTrading;
 
 // Created to start and stop the liveFeed of a exchange
 var liveFeed;
@@ -28,7 +31,7 @@ io.sockets.on('connection', function (socket) {
     // Creating a live feed to the client of the data requested
     liveFeed = setInterval(function() {
       var date = new Date();
-      socket.emit('message', {message: [date.getTime(), mapParse(allExchangeData[data.data], data.data)]})
+      socket.emit('message', {message: [order,date.getTime(), mapParse(allExchangeData[data.data], data.data)]})
     }, 1000)
   });
   socket.on('closeExchange', function(data){
@@ -37,17 +40,24 @@ io.sockets.on('connection', function (socket) {
   });
 });
 
-// Rendering index.html
+
+
+
+
+//************************/
+//        ROUTES
+//************************/
+
+app.use(express.static('client'));
+
+
 app.get('/', function (req, res) {
-  res.sendfile(__dirname + '/html/index.html');
+  res.sendfile(__dirname + '/client/html/index.html');
 });
 
-// Rendering dashboard.html
 app.get('/dashboard', function (req, res) {
   res.sendfile(__dirname + '/html/dashboard.html');
 });
-
-app.use('/js', express.static('js'));
 
 // Creating Express server
 server.listen(3000);
