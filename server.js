@@ -11,7 +11,10 @@ var arbitrage       = require("./lib/strategies/simple-arbitrage.js").outputExch
 var Order           = require("./lib/strategies/simple-arbitrage.js").order;
 var allExchangeData = require("./lib/DataHub.js");
 
+
 arbitrage("BTCUSD", 1000);
+console.log("Before Order");
+console.log(Order);
 //arbitrage("ETHBTC", 1000);
 
 // Set up Trading desk and run strategy
