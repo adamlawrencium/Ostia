@@ -7,7 +7,7 @@ var path    = require('path');
 
 // Beginning arbitrage
 var mapParse        = require("./lib/exchanges/map-parsing.js");
-var arbitrage       = require("./lib/strategies/simple-arbitrage.js").outputExchangeData;
+var arbitrage       = require("./lib/strategies/simple-arbitrage.js").largestSpreadArbitrage;
 var Order           = require("./lib/strategies/simple-arbitrage.js").order;
 var allExchangeData = require("./lib/DataHub.js");
 
