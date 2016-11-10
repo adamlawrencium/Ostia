@@ -69,6 +69,8 @@ $( document ).ready(function() {
             var time    = data.message[0];
             var highbid = parseFloat(data.message[1][0]);
             var lowask  = parseFloat(data.message[1][2]);
+            //console.log(data.order.percentProfit);
+            console.log("hello\n");
 
             // Adding the new points
             self.series[0].addPoint([time, highbid]);
