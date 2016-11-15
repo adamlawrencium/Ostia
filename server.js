@@ -7,13 +7,24 @@ var server  = require('http').Server(app);
 var io      = require('socket.io')(server);
 var path    = require('path');
 
+var config = {
+  liveTrading:  true,
+  backtestMode: false,
+  strategyName: "simple-arbitrage",       // exponential moving average
+  exchanges:    "all",                 // exchanges strategy will trade
+  pair:         "BTCUSD",                 // or "none" for every pair
+  capital:      3000,                     // starting capital
+  timeFrame:    4,                        // how long to trade
+  interval:     1000,
+  API_KEYS:     {poloniex:"123XYZ", gdax:"123ABC"}
+}
 
 // TODO: Determine which data to send to the client for viz's
 //Live trading (performance) data that will be sent to client via Socket.IO
 
 // Set up Trading desk and run strategy
 var runLiveTrading = require("./lib/TradingDesk.js");
-runLiveTrading();
+runLiveTrading(config);
 
 
 // Created to start and stop the liveFeed of a exchange
