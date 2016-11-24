@@ -5,8 +5,10 @@
 var socket = io.connect('http://localhost:3000');
   function Graph(data){
     var exchange = data;
+    // var SMA = require("./lib/indicators/sma.js");
+    // var smaToChart = SMA();
 
     // Closing the previous exchange feed and starting the new one
-    socket.emit('closeExchange', {data: null});
-    socket.emit('openExchange', {data: exchange});
+    //socket.emit('closeExchange', {data: null});
+    //socket.emit('openExchange', {data: exchange});
   }

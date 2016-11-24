@@ -1,5 +1,6 @@
 // Temporary until we can pass in the exchange needed when rendering a chart
 var exch = "test";
+
 $( document ).ready(function() {
 
   /*
@@ -18,7 +19,7 @@ $( document ).ready(function() {
   *
   * TODO:  Find a way to pass the required exchange in when a button is pressed
   */
-
+  var SMA;
   $('#container').highcharts('StockChart', {
 
     // Range selectors can be used to adding time frames to the chart
@@ -67,14 +68,19 @@ $( document ).ready(function() {
           // Separate highbid/lowask streams are fed to their own Highcharts series.
           socket.on('message', function(data) {
             var time    = data.message[0];
-            var highbid = parseFloat(data.message[1][0]);
-            var lowask  = parseFloat(data.message[1][2]);
+            //var highbid = parseFloat(data.message[1][0]);
+            //var lowask  = parseFloat(data.message[1][2]);
             //console.log(data.order.percentProfit);
             console.log("hello\n");
-
+            SMA = data[0];
+            console.log(SMA);
             // Adding the new points
-            self.series[0].addPoint([time, highbid]);
-            self.series[1].addPoint([time, lowask]);
+            for (var i = 0; i < SMA.length; i++) {
+              self.series[2].addPoint(SMA[i]);
+            }
+
+            //self.series[0].addPoint([time, highbid]);
+            //self.series[1].addPoint([time, lowask]);
           })
         }
       }
@@ -90,8 +96,15 @@ $( document ).ready(function() {
       data: [],
       marker:   { enabled: true, radius: 3},
       tooltip:  { valueDecimals: 5 }
-    },{
+    },
+    {
       name: 'Lowest Ask' + exch,
+      data: [],
+      marker:   { enabled: true, radius: 3},
+      tooltip: { valueDecimals: 5 },
+    },
+    {
+      name: 'SMA',
       data: [],
       marker:   { enabled: true, radius: 3},
       tooltip: { valueDecimals: 5 },
