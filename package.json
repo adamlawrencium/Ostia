@@ -1,5 +1,4 @@
 {
-
   "name": "Ostia",
   "version": "0.0.0",
   "repository": {
@@ -15,5 +14,14 @@
     "dsjslib": "~0.6.14",
     "ws": "~1.1.1",
     "request": "~2.75.0"
+  },
+  "devDependencies": {
+    "standard": "^8.5.0"
+  },
+  "scripts": {
+    "test": "standard"
+  },
+  "standard": {
+    "globals": [ "$", "io" ]
   }
 }
