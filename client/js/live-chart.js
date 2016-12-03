@@ -1,7 +1,6 @@
 // Temporary until we can pass in the exchange needed when rendering a chart
-var exch = "test";
-$( document ).ready(function() {
-
+var exch = 'test'
+$(document).ready(function () {
   /*
   * [General Notes]
   * Dynamic charts are created using websockets.
@@ -44,7 +43,7 @@ $( document ).ready(function() {
     },
 
     title: {
-      text: 'Stock Price From '+ exch
+      text: 'Stock Price From ' + exch
     },
     subtitle: {
       text: 'Live updates'
@@ -55,26 +54,25 @@ $( document ).ready(function() {
     },
 
     chart: {
-      //type: 'spline',
+      // type: 'spline',
 
       // Event listener is used to capture data from websocket
       events: {
-        load: function() {
-
-          var self = this;
-          var socket = io.connect('http://localhost:3000');
+        load: function () {
+          var self = this
+          var socket = io.connect('http://localhost:3000')
 
           // Separate highbid/lowask streams are fed to their own Highcharts series.
-          socket.on('message', function(data) {
-            var time    = data.message[0];
-            var highbid = parseFloat(data.message[1][0]);
-            var lowask  = parseFloat(data.message[1][2]);
-            //console.log(data.order.percentProfit);
-            console.log("hello\n");
+          socket.on('message', function (data) {
+            var time = data.message[0]
+            var highbid = parseFloat(data.message[1][0])
+            var lowask = parseFloat(data.message[1][2])
+            // console.log(data.order.percentProfit)
+            console.log('hello\n')
 
             // Adding the new points
-            self.series[0].addPoint([time, highbid]);
-            self.series[1].addPoint([time, lowask]);
+            self.series[0].addPoint([time, highbid])
+            self.series[1].addPoint([time, lowask])
           })
         }
       }
@@ -88,13 +86,13 @@ $( document ).ready(function() {
     series: [{
       name: 'Highest Bid ' + exch,
       data: [],
-      marker:   { enabled: true, radius: 3},
-      tooltip:  { valueDecimals: 5 }
-    },{
+      marker: { enabled: true, radius: 3 },
+      tooltip: { valueDecimals: 5 }
+    }, {
       name: 'Lowest Ask' + exch,
       data: [],
-      marker:   { enabled: true, radius: 3},
-      tooltip: { valueDecimals: 5 },
+      marker: { enabled: true, radius: 3 },
+      tooltip: { valueDecimals: 5 }
     }]
-  });
-});
+  })
+})
