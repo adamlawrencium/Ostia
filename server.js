@@ -7,6 +7,7 @@ var server  = require('http').Server(app);
 var io      = require('socket.io')(server);
 var path    = require('path');
 
+// Passsing in a sample config
 var config = {
   liveTrading:  true,
   backtestMode: false,
@@ -25,7 +26,6 @@ var config = {
 // Set up Trading desk and run strategy
 var runLiveTrading = require("./lib/TradingDesk.js");
 runLiveTrading(config);
-
 
 // Created to start and stop the liveFeed of a exchange
 var liveFeed;
@@ -48,10 +48,6 @@ io.sockets.on('connection', function (socket) {
     clearInterval(liveFeed);
   });
 });
-
-
-
-
 
 //************************/
 //        ROUTES
