@@ -14,8 +14,7 @@ var path    = require('path');
 // Set up Trading desk and run strategy
 var runLiveTrading = require("./lib/TradingDesk.js");
 runLiveTrading();
-var SMA = require("./lib/indicators/sma.js");
-var smaToChart = SMA();
+
 
 // Created to start and stop the liveFeed of a exchange
 var liveFeed;
@@ -27,8 +26,9 @@ io.sockets.on('connection', function (socket) {
     // Creating a live feed to the client of the data requested
     liveFeed = setInterval(function() {
       var date = new Date();
-      socket.emit('message', { message: [smaToChart,
-                                        date.getTime()]
+      socket.emit('message', { message: [Order,
+                                        date.getTime(),
+                                        mapParse(allExchangeData[data.data], data.data)]
                                       })
     }, 1000)
   });
