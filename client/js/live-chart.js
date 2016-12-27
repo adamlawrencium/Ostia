@@ -21,7 +21,15 @@ $(document).ready(function () {
 
   $('#container').highcharts('StockChart', {
 
-    
+    plotOptions: {
+      series: {
+        // reduces 'point clutter' with large data sets
+        dataGrouping: {
+          enabled: true,
+          groupPixelWidth: 30
+        }
+      }
+    },
     // TODO: Add initializer function here that set up charts with correct
     //        settings for each websocket feed it gets.
     rangeSelector: {
