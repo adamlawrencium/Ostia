@@ -1,6 +1,7 @@
 // Temporary until we can pass in the exchange needed when rendering a chart
 var exch = 'test'
 $(document).ready(function () {
+
   /*
   * [General Notes]
   * Dynamic charts are created using websockets.
@@ -55,25 +56,34 @@ $(document).ready(function () {
 
     chart: {
       // type: 'spline',
-
+      // TODO: Use addSeries function with checks in place
       // Event listener is used to capture data from websocket
       events: {
         load: function () {
-          var self = this
-          var socket = io.connect('http://localhost:3000')
+          var self = this;
+          var socket = io.connect('http://localhost:3000');
+          socket.on('chartData', function(chartData) {
+              // populate data and
+              console.log(chartData['time']);
+              console.log(chartData['livefeed']);
 
-          // Separate highbid/lowask streams are fed to their own Highcharts series.
-          socket.on('message', function (data) {
-            var time = data.message[0]
-            var highbid = parseFloat(data.message[1][0])
-            var lowask = parseFloat(data.message[1][2])
-            // console.log(data.order.percentProfit)
-            console.log('hello\n')
+              var time = chartData['time'];
+              var price = parseFloat(chartData['livefeed']['last']);
+              self.series[0].addPoint([time, price]);
+          });
 
-            // Adding the new points
-            self.series[0].addPoint([time, highbid])
-            self.series[1].addPoint([time, lowask])
-          })
+          // // Separate highbid/lowask streams are fed to their own Highcharts series.
+          // socket.on('message', function (data) {
+          //   var time = data.message[0]
+          //   var highbid = parseFloat(data.message[1][0])
+          //   var lowask = parseFloat(data.message[1][2])
+          //   // console.log(data.order.percentProfit)
+          //   console.log('hello\n')
+          //
+          //   // Adding the new points
+          //   self.series[0].addPoint([time, highbid])
+          //   self.series[1].addPoint([time, lowask])
+          // })
         }
       }
     },
