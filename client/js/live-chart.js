@@ -21,7 +21,9 @@ $(document).ready(function () {
 
   $('#container').highcharts('StockChart', {
 
-    // Range selectors can be used to adding time frames to the chart
+    
+    // TODO: Add initializer function here that set up charts with correct
+    //        settings for each websocket feed it gets.
     rangeSelector: {
       buttons: [{
         count: 1,
@@ -55,18 +57,12 @@ $(document).ready(function () {
     },
 
     chart: {
-      // type: 'spline',
-      // TODO: Use addSeries function with checks in place
-      // Event listener is used to capture data from websocket
+      // TODO: Use addSeries (instead of series literals) function with checks in place
       events: {
         load: function () {
           var self = this;
           var socket = io.connect('http://localhost:3000');
           socket.on('chartData', function(chartData) {
-              // populate data and
-              console.log(chartData['time']);
-              console.log(chartData['livefeed']);
-
               var time = chartData['time'];
               var price = parseFloat(chartData['livefeed']['last']);
               self.series[0].addPoint([time, price]);
