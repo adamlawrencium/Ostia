@@ -30,6 +30,7 @@ $(document).ready(function () {
 
     series: [{
       name: "MA 10 day",
+      type: "spline",
       data: [[1440979200,225.09771517600004],
 [1441065600,224.46623486500005],
 [1441152000,224.22097018600005],
@@ -521,10 +522,11 @@ $(document).ready(function () {
 [1483142400,929.4066242550002],
 [1483228800,943.5266242560003]
 ],
-marker: { enabled: true, radius: 3 },
+marker: { enabled: false, radius: 3 },
 tooltip: { valueDecimals: 5 }
     },{
       name: 'SMATimeSeries',
+      type: "spline",
       data: [
         [1443571200,231.764165552],
 [1443657600,232.0751779745],
@@ -986,7 +988,7 @@ tooltip: { valueDecimals: 5 }
 [1483056000,800.1984965477504],
 [1483142400,805.8877634900005],
 [1483228800,812.2334186627504]      ],
-        marker: { enabled: true, radius: 3 },
+        marker: { enabled: false, radius: 3 },
         tooltip: { valueDecimals: 5 }
       }, {
         name: 'closingPriceTimeSeries',
