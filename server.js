@@ -5,7 +5,7 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var path = require('path');
-var finData = require('./lib/strategies/triangularArbitrage');
+var finData = require('./lib/strategies/basicStrategy.js');
 
 // Passsing in a sample config
 var config = {
@@ -75,6 +75,10 @@ app.get('/', function (req, res) {
 
 app.get('/dashboard', function (req, res) {
   res.sendfile(path.join(__dirname, '/html/dashboard.html'))
+})
+
+app.get('/test', function (req, res) {
+  res.sendfile(path.join(__dirname, '/client/html/chartTest.html'))
 })
 
 // Creating Express server
