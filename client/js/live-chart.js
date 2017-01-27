@@ -1,5 +1,4 @@
 // Temporary until we can pass in the exchange needed when rendering a chart
-var exch = 'test'
 $(document).ready(function () {
 
   /*
@@ -30,8 +29,6 @@ $(document).ready(function () {
         }
       }
     },
-    // TODO: Add initializer function here that set up charts with correct
-    //        settings for each websocket feed it gets.
     rangeSelector: {
       buttons: [{
         count: 1,
