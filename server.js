@@ -5,7 +5,7 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var path = require('path');
-var finData = require('./lib/strategies/basicStrategy.js');
+var async    = require('async');
 
 // Passsing in a sample config
 var config = {
@@ -37,16 +37,55 @@ var liveFeed;
 
 // This sends data to the client for visualizations with socket.io
 // Handling the connection to the client through socket.io
+/*
+async.waterfall([
+    function(callback) {
+        callback(null, 'one', 'two');
+    },
+    function(arg1, arg2, callback) {
+        // arg1 now equals 'one' and arg2 now equals 'two'
+        callback(null, 'three');
+    },
+    function(arg1, callback) {
+        // arg1 now equals 'three'
+        callback(null, 'done');
+    }
+], function (err, result) {
+    // result now equals 'done'
+});
+*/
+
+
 io.sockets.on('connection', function (socket) {
 
-  setInterval(function() {
-    var livefeed_ = finData.financeData;
-    console.log(livefeed_);
-    socket.emit('chartData', {
-      time: new Date().getTime(),
-      livefeed: livefeed_
-    })
-  },2000);
+  var finData = require('./lib/strategies/basicStrategy.js');
+  var initialData = finData.initializedFinanceData;
+
+  var _flagCheck = setInterval(function() {
+    console.log('waiting...');
+
+    if (typeof initialData !== 'undefined') {
+      clearInterval(_flagCheck);
+
+      console.log('SERVER - Initial Data :\n', initialData);
+      socket.emit('initializedChartData', {
+        data: initialData
+      });
+
+      setInterval(function() {
+        var livefeed_ = finData.updatedFinanceData;
+        console.log('UPDATED DATA:\n', livefeed_);
+        socket.emit('updatedChartData', {
+          time: new Date().getTime(),
+          livefeed: livefeed_
+        })
+      },3000);
+    }
+  }, 1000);
+
+
+
+
 
   // io.socket.on('openExchange', function (data) {
   //   // Creating a live feed to the client of the data requested

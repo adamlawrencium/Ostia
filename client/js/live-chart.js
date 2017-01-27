@@ -51,7 +51,7 @@ $(document).ready(function () {
     },
 
     title: {
-      text: 'Stock Price From ' + exch
+      text: 'Charts brah '
     },
     subtitle: {
       text: 'Live updates'
@@ -67,11 +67,26 @@ $(document).ready(function () {
         load: function () {
           var self = this;
           var socket = io.connect('http://localhost:3000');
-          socket.on('chartData', function(chartData) {
-              var time = chartData['time'];
-              var price = parseFloat(chartData['livefeed']['last']);
-              self.series[0].addPoint([time, price]);
+
+          socket.on('initializedChartData', function(chartData) {
+            console.log('PACKAGE HAS ARRIVED');
+            alert('START INITIALIZATION');
+            var chartData = chartData['data'];
+            console.log(chartData);
+            console.log(chartData.length);
+            for (var i = 0; i < chartData.length; i++) {
+              self.series[0].addPoint([chartData[i]['date'], chartData[i]['close']]);
+              console.log('adding point...',i);
+            }
+
           });
+
+          socket.on('updatedChartData', function(chartData) {
+            var time = chartData['time'];
+            var price = parseFloat(chartData['livefeed']['last']);
+            self.series[0].addPoint([time,price]);
+          });
+
 
           // // Separate highbid/lowask streams are fed to their own Highcharts series.
           // socket.on('message', function (data) {
@@ -95,12 +110,12 @@ $(document).ready(function () {
     * to each of the Highest Bid and Lowest Ask data series.
     */
     series: [{
-      name: 'Highest Bid ' + exch,
+      name: 'PRICE',
       data: [],
       marker: { enabled: true, radius: 3 },
       tooltip: { valueDecimals: 5 }
     }, {
-      name: 'Lowest Ask' + exch,
+      name: 'PRICE',
       data: [],
       marker: { enabled: true, radius: 3 },
       tooltip: { valueDecimals: 5 }
