@@ -1,3 +1,25 @@
+var addData = function(chart, date, price) {
+    console.log('adding point...', date, price);
+    chart.series[0].addPoint([date, price]);
+};
+
+var loadChartData = function(chart) {
+    var socket = io.connect('http://localhost:3000');
+
+    socket.on('initializedChartData', function(data) {
+        var chartData = data.data;
+        for (var i = 0; i < chartData.length; i++) {
+            addData(chart, chartData[i].date*1000, chartData[i].close);
+        }
+    });
+
+    socket.on('updatedChartData', function(chartData) {
+        var time = chartData.time;
+        var price = parseFloat(chartData.livefeed.last);
+        addData(chart, time, price);
+    });
+};
+
 // Temporary until we can pass in the exchange needed when rendering a chart
 $(document).ready(function () {
 
@@ -24,7 +46,7 @@ $(document).ready(function () {
       series: {
         // reduces 'point clutter' with large data sets
         dataGrouping: {
-          enabled: true,
+          enabled: false,
           groupPixelWidth: 30
         }
       }
@@ -64,44 +86,11 @@ $(document).ready(function () {
     chart: {
       // TODO: Use addSeries (instead of series literals) function with checks in place
       events: {
-        load: function () {
-          var self = this;
-          var socket = io.connect('http://localhost:3000');
-
-          socket.on('initializedChartData', function(chartData) {
-            console.log('PACKAGE HAS ARRIVED');
-            alert('START INITIALIZATION');
-            var chartData = chartData['data'];
-            console.log(chartData);
-            console.log(chartData.length);
-            for (var i = 0; i < chartData.length; i++) {
-              self.series[0].addPoint([chartData[i]['date'], chartData[i]['close']]);
-              console.log('adding point...',i);
-            }
-
-          });
-
-          socket.on('updatedChartData', function(chartData) {
-            var time = chartData['time'];
-            var price = parseFloat(chartData['livefeed']['last']);
-            self.series[0].addPoint([time,price]);
-          });
-
-
-          // // Separate highbid/lowask streams are fed to their own Highcharts series.
-          // socket.on('message', function (data) {
-          //   var time = data.message[0]
-          //   var highbid = parseFloat(data.message[1][0])
-          //   var lowask = parseFloat(data.message[1][2])
-          //   // console.log(data.order.percentProfit)
-          //   console.log('hello\n')
-          //
-          //   // Adding the new points
-          //   self.series[0].addPoint([time, highbid])
-          //   self.series[1].addPoint([time, lowask])
-          // })
-        }
-      }
+          load: function () {
+              var self = this;
+              loadChartData(self);
+          }
+      },
     },
 
     /*
@@ -120,5 +109,5 @@ $(document).ready(function () {
       marker: { enabled: true, radius: 3 },
       tooltip: { valueDecimals: 5 }
     }]
-  })
-})
+  });
+});
