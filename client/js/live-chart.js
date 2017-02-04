@@ -1,6 +1,28 @@
+var addData = function(chart, date, price) {
+    console.log('adding point...', date, price);
+    chart.series[0].addPoint([date, price]);
+};
+
+var loadChartData = function(chart) {
+    var socket = io.connect('http://localhost:3000');
+
+    socket.on('initializedChartData', function(data) {
+        var chartData = data.data;
+        for (var i = 0; i < chartData.length; i++) {
+            addData(chart, chartData[i].date*1000, chartData[i].close);
+        }
+    });
+
+    socket.on('updatedChartData', function(chartData) {
+        var time = chartData.time;
+        var price = parseFloat(chartData.livefeed.last);
+        addData(chart, time, price);
+    });
+};
+
 // Temporary until we can pass in the exchange needed when rendering a chart
-var exch = 'test'
 $(document).ready(function () {
+
   /*
   * [General Notes]
   * Dynamic charts are created using websockets.
@@ -20,7 +42,15 @@ $(document).ready(function () {
 
   $('#container').highcharts('StockChart', {
 
-    // Range selectors can be used to adding time frames to the chart
+    plotOptions: {
+      series: {
+        // reduces 'point clutter' with large data sets
+        dataGrouping: {
+          enabled: false,
+          groupPixelWidth: 30
+        }
+      }
+    },
     rangeSelector: {
       buttons: [{
         count: 1,
@@ -43,7 +73,7 @@ $(document).ready(function () {
     },
 
     title: {
-      text: 'Stock Price From ' + exch
+      text: 'Charts brah '
     },
     subtitle: {
       text: 'Live updates'
@@ -54,28 +84,13 @@ $(document).ready(function () {
     },
 
     chart: {
-      // type: 'spline',
-
-      // Event listener is used to capture data from websocket
+      // TODO: Use addSeries (instead of series literals) function with checks in place
       events: {
-        load: function () {
-          var self = this
-          var socket = io.connect('http://localhost:3000')
-
-          // Separate highbid/lowask streams are fed to their own Highcharts series.
-          socket.on('message', function (data) {
-            var time = data.message[0]
-            var highbid = parseFloat(data.message[1][0])
-            var lowask = parseFloat(data.message[1][2])
-            // console.log(data.order.percentProfit)
-            console.log('hello\n')
-
-            // Adding the new points
-            self.series[0].addPoint([time, highbid])
-            self.series[1].addPoint([time, lowask])
-          })
-        }
-      }
+          load: function () {
+              var self = this;
+              loadChartData(self);
+          }
+      },
     },
 
     /*
@@ -84,15 +99,15 @@ $(document).ready(function () {
     * to each of the Highest Bid and Lowest Ask data series.
     */
     series: [{
-      name: 'Highest Bid ' + exch,
+      name: 'PRICE',
       data: [],
       marker: { enabled: true, radius: 3 },
       tooltip: { valueDecimals: 5 }
     }, {
-      name: 'Lowest Ask' + exch,
+      name: 'PRICE',
       data: [],
       marker: { enabled: true, radius: 3 },
       tooltip: { valueDecimals: 5 }
     }]
-  })
-})
+  });
+});
