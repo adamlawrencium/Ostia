@@ -20,6 +20,11 @@ var loadChartData = function(chart) {
     });
 };
 
+// TODO: add other handlers for highcharts
+var addSeries = function(chart, params) {
+
+};
+
 // Temporary until we can pass in the exchange needed when rendering a chart
 $(document).ready(function () {
 
