@@ -1,38 +1,60 @@
-var addData = function(chart, date, price) {
-    console.log('adding point...', date, price);
-    chart.series[0].addPoint([date, price]);
+var addDataPointToSeries = function(highchart, seriesName, date, price) {
+  console.log('adding point...', date, price);    // debugging purposes
+  console.log(highchart);
+  console.log(highchart.series)
+  console.log(highchart.series.seriesName);
+  highchart.series.seriesName.addPoint([date, price]);
 };
 
-var loadChartData = function(chart) {
-    var socket = io.connect('http://localhost:3000');
-
-    socket.on('initializedChartData', function(data) {
-        var chartData = data.data;
-        for (var i = 0; i < chartData.length; i++) {
-            addData(chart, chartData[i].date*1000, chartData[i].close);
-        }
-    });
-
-    socket.on('updatedChartData', function(chartData) {
-        var time = chartData.time;
-        var price = parseFloat(chartData.livefeed.last);
-        addData(chart, time, price);
-    });
+var addDatasetToSeries = function(highchart, seriesName, chartData) {
+  var seriesIndex = 0;
+  for (var i = 0; i < highchart.series.length; i++) {
+    if (highchart.series[i] == seriesName) {
+      console.log('FOUND SERIES');
+      seriesIndex = i;
+    }
+  }
+  for (var i = 0; i < chartData.length; i++) {
+    addDataPointToSeries(highchart, chartData[i].date*1000, chartData[i].close);
+  }
 };
+
 
 // TODO: add other handlers for highcharts
-var addSeries = function(chart, params) {
-
+var createSeries = function(highchart, params) {
+  var seriesObj = {};
+  seriesObj.name     = "testName";
+  seriesObj.data     = [];
+  seriesObj.marker   = { enabled: true, radius: 3 };
+  seriesObj.tooltip  = { valueDecimals: 5 };
+  highchart.series.push(seriesObj);
+  console.log(seriesObj);
 };
 
-// Temporary until we can pass in the exchange needed when rendering a chart
+
+var loadChartData = function(highchart) {
+  var socket = io.connect('http://localhost:3000');
+
+  socket.on('initializedChartData', function(data) {
+    createSeries(highchart, null);
+    var chartData = data.data;                      // TODO: clean up data.data
+    addDatasetToSeries(highchart, "testName", chartData);
+
+  });
+
+  socket.on('updatedChartData', function(chartData) {
+    var time = chartData.time;
+    var price = parseFloat(chartData.livefeed.last);
+    addDataPointToSeries(highchart, "testName", time, price);
+  });
+};
+
+
 $(document).ready(function () {
 
   /*
   * [General Notes]
   * Dynamic charts are created using websockets.
-  * Data is fed into the chart object and Highcharts takes
-  * care of the rest.
   *
   * Webockets -- (data) --> Highcharts.series[]
   *
@@ -78,10 +100,10 @@ $(document).ready(function () {
     },
 
     title: {
-      text: 'Charts brah '
+      text: 'Charts w/ Historical Data'
     },
     subtitle: {
-      text: 'Live updates'
+      text: '+ Live updates'
     },
 
     xAxis: {
@@ -91,10 +113,10 @@ $(document).ready(function () {
     chart: {
       // TODO: Use addSeries (instead of series literals) function with checks in place
       events: {
-          load: function () {
-              var self = this;
-              loadChartData(self);
-          }
+        load: function () {
+          var self = this;
+          loadChartData(self);
+        }
       },
     },
 
@@ -103,16 +125,6 @@ $(document).ready(function () {
     * Data streams from websockets listener pushes certain data to
     * to each of the Highest Bid and Lowest Ask data series.
     */
-    series: [{
-      name: 'PRICE',
-      data: [],
-      marker: { enabled: true, radius: 3 },
-      tooltip: { valueDecimals: 5 }
-    }, {
-      name: 'PRICE',
-      data: [],
-      marker: { enabled: true, radius: 3 },
-      tooltip: { valueDecimals: 5 }
-    }]
+    series: []
   });
 });
