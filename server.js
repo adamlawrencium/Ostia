@@ -5,19 +5,22 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var path = require('path');
-var async    = require('async');
+var async = require('async');
 
 // Passsing in a sample config
 var config = {
-  liveTrading:  true,
+  liveTrading: true,
   backtestMode: false,
-  strategyName: "simple-arbitrage",       // exponential moving average
-  exchanges:    "all",                 // exchanges strategy will trade
-  pair:         "BTCUSD",                 // or "none" for every pair
-  capital:      3000,                     // starting capital
-  timeFrame:    4,                        // how long to trade
-  interval:     1000,
-  API_KEYS:     {poloniex:"123XYZ", gdax:"123ABC"}
+  strategyName: "simple-arbitrage", // exponential moving average
+  exchanges: "all", // exchanges strategy will trade
+  pair: "BTCUSD", // or "none" for every pair
+  capital: 3000, // starting capital
+  timeFrame: 4, // how long to trade
+  interval: 1000,
+  API_KEYS: {
+    poloniex: "123XYZ",
+    gdax: "123ABC"
+  }
 }
 /*
 var server = require('http').Server(app)
@@ -61,7 +64,7 @@ io.sockets.on('connection', function (socket) {
   var finData = require('./lib/strategies/basicStrategy.js');
   var initialData = finData.initializedFinanceData;
 
-  var _flagCheck = setInterval(function() {
+  var _flagCheck = setInterval(function () {
     console.log('waiting...');
 
     if (typeof initialData !== 'undefined') {
@@ -72,14 +75,14 @@ io.sockets.on('connection', function (socket) {
         data: initialData
       });
 
-      setInterval(function() {
+      setInterval(function () {
         var livefeed_ = finData.updatedFinanceData;
         console.log('UPDATED DATA:\n', livefeed_);
         socket.emit('updatedChartData', {
           time: new Date().getTime(),
           livefeed: livefeed_
         })
-      },3000);
+      }, 3000);
     }
   }, 1000);
 
