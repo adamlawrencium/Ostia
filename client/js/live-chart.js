@@ -1,51 +1,67 @@
-var addDataPointToSeries = function(highchart, seriesName, date, price) {
-  console.log('adding point...', date, price);    // debugging purposes
-  console.log(highchart);
-  console.log(highchart.series)
-  console.log(highchart.series.seriesName);
-  highchart.series.seriesName.addPoint([date, price]);
+/**
+ * Adds a date and price as a tuple to a targetSeries
+ * @param {HighChart.series} targetSeries reference
+ * @param {int} date UTC formatted time
+ * @param {int} price currency price
+ */
+ var addDataPointToSeries = function(targetSeries, date, price) {
+  targetSeries.addPoint([date, price]);
 };
 
-var addDatasetToSeries = function(highchart, seriesName, chartData) {
-  var seriesIndex = 0;
-  for (var i = 0; i < highchart.series.length; i++) {
-    if (highchart.series[i] == seriesName) {
-      console.log('FOUND SERIES');
-      seriesIndex = i;
-    }
-  }
+
+/**
+ * Adds data points to a certain series, given a data set (chartData)
+ * @param {HighChart.series} targetSeries reference
+ * @param {array} chartData
+ */
+var addDatasetToSeries = function(targetSeries, chartData) {
   for (var i = 0; i < chartData.length; i++) {
-    addDataPointToSeries(highchart, chartData[i].date*1000, chartData[i].close);
+    var date = chartData[i].date*1000;
+    var price = chartData[i].close;
+    addDataPointToSeries(targetSeries, date, price);
   }
 };
 
 
-// TODO: add other handlers for highcharts
+/**
+ * Creates object literal, given paramaters, and adds it to highchart
+ * @param {HighChart} highchart self reference
+ * @param {object} params parameters to add to series
+ */
 var createSeries = function(highchart, params) {
   var seriesObj = {};
   seriesObj.name     = "testName";
+  seriesObj.id       = "series-testID";
   seriesObj.data     = [];
   seriesObj.marker   = { enabled: true, radius: 3 };
   seriesObj.tooltip  = { valueDecimals: 5 };
-  highchart.series.push(seriesObj);
-  console.log(seriesObj);
+  highchart.addSeries(seriesObj);
 };
 
 
+/**
+ * Connects and listens on two sockets to initialize and then update a chart.
+ *     initializedChartData creates a series and adds historical data to it.
+ *     updatedChartData listens for live data and adds it to a targetSeries
+ * @param {HighChart} highchart self reference
+ */
 var loadChartData = function(highchart) {
   var socket = io.connect('http://localhost:3000');
 
-  socket.on('initializedChartData', function(data) {
+  // INITALIZE CHART WITH HISTORICAL DATA
+  socket.on('initializedChartData', function(chartData) {
     createSeries(highchart, null);
-    var chartData = data.data;                      // TODO: clean up data.data
-    addDatasetToSeries(highchart, "testName", chartData);
-
+    var chartData = chartData.data;
+    var targetSeries = highchart.get("series-testID");
+    addDatasetToSeries(targetSeries, chartData);
   });
 
+  // UPDATE CHART WITH LIVE DATA
   socket.on('updatedChartData', function(chartData) {
-    var time = chartData.time;
+    var date = chartData.time;
     var price = parseFloat(chartData.livefeed.last);
-    addDataPointToSeries(highchart, "testName", time, price);
+    var targetSeries = highchart.get("series-testID");
+    addDataPointToSeries(targetSeries, date, price);
   });
 };
 
@@ -60,11 +76,6 @@ $(document).ready(function () {
   *
   * Abstraction function:
   * series.data: [ [time,price], [time,price], [time,price], ...]
-  *
-  * TODO:  Add functions (like updateChart()) before $() call that would show
-  *         or display different data to user. [frontend]
-  *
-  * TODO:  Find a way to pass the required exchange in when a button is pressed
   */
 
   $('#container').highcharts('StockChart', {
@@ -120,11 +131,7 @@ $(document).ready(function () {
       },
     },
 
-    /*
-    * Each series is a line on the chart.
-    * Data streams from websockets listener pushes certain data to
-    * to each of the Highest Bid and Lowest Ask data series.
-    */
     series: []
+
   });
 });
