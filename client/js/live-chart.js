@@ -67,17 +67,11 @@ var loadChartData = function(highchart) {
 
 
 $(document).ready(function () {
-
   /*
-  * [General Notes]
-  * Dynamic charts are created using websockets.
-  *
   * Webockets -- (data) --> Highcharts.series[]
-  *
   * Abstraction function:
   * series.data: [ [time,price], [time,price], [time,price], ...]
   */
-
   $('#container').highcharts('StockChart', {
 
     plotOptions: {
@@ -116,13 +110,10 @@ $(document).ready(function () {
     subtitle: {
       text: '+ Live updates'
     },
-
     xAxis: {
       type: 'datetime'
     },
-
     chart: {
-      // TODO: Use addSeries (instead of series literals) function with checks in place
       events: {
         load: function () {
           var self = this;
@@ -130,8 +121,6 @@ $(document).ready(function () {
         }
       },
     },
-
     series: []
-
   });
 });
