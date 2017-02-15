@@ -57,7 +57,6 @@ io.sockets.on('connection', function (socket) {
 
     /* Initialze data */
     function (callback) {
-      console.log("Initialze Data");
       var finData = require('./lib/strategies/basicStrategy.js');
       var initialData = finData.initializedFinanceData;
       callback(null, finData, initialData);
@@ -65,8 +64,6 @@ io.sockets.on('connection', function (socket) {
 
     /* emit initialized data */
     function (finData, initialData, callback) {
-
-      console.log("Emit initialized data");
       socket.emit('initializedChartData', {
         data: initialData
       });
@@ -75,7 +72,6 @@ io.sockets.on('connection', function (socket) {
 
     /* poll for live data and emit */
     function (finData, callback) {
-      console.log("poll for live data and emit...");
       setInterval(function () {
         var livefeed_ = finData.updatedFinanceData;
         console.log('UPDATED DATA:\n', livefeed_);
