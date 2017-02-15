@@ -22,14 +22,7 @@ var config = {
     gdax: "123ABC"
   }
 }
-/*
-var server = require('http').Server(app)
-var io = require('socket.io')(server)
-var path = require('path')
-*/
 
-// TODO: Determine which data to send to the client for viz's
-// Live trading (performance) data that will be sent to client via Socket.IO
 
 // Set up Trading desk and run strategy
 //var runLiveTrading = require("./lib/TradingDesk.js");
@@ -60,7 +53,44 @@ async.waterfall([
 
 
 io.sockets.on('connection', function (socket) {
+  async.waterfall([
 
+    /* Initialze data */
+    function (callback) {
+      console.log("Initialze Data");
+      var finData = require('./lib/strategies/basicStrategy.js');
+      var initialData = finData.initializedFinanceData;
+      callback(null, finData, initialData);
+    },
+
+    /* emit initialized data */
+    function (finData, initialData, callback) {
+
+      console.log("Emit initialized data");
+      socket.emit('initializedChartData', {
+        data: initialData
+      });
+      callback(null, finData);
+    },
+
+    /* poll for live data and emit */
+    function (finData, callback) {
+      console.log("poll for live data and emit...");
+      setInterval(function () {
+        var livefeed_ = finData.updatedFinanceData;
+        console.log('UPDATED DATA:\n', livefeed_);
+        socket.emit('updatedChartData', {
+          time: new Date().getTime(),
+          livefeed: livefeed_
+        })
+      }, 5000);
+      callback(null, 'done');
+    }
+  ], function (err, result) {
+    // result now equals 'done'
+  });
+
+/*
   var finData = require('./lib/strategies/basicStrategy.js');
   var initialData = finData.initializedFinanceData;
 
@@ -85,8 +115,7 @@ io.sockets.on('connection', function (socket) {
       }, 3000);
     }
   }, 1000);
-
-  // test comment
+*/
 
 
   // io.socket.on('openExchange', function (data) {
