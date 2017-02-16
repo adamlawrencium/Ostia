@@ -13,6 +13,8 @@
     "express": "~3.3.4",
     "highcharts": "~5.0.0",
     "mathjs": "^3.9.0",
+    "moment": "^2.17.1",
+    "poloniex.js": "0.0.7",
     "request": "~2.75.0",
     "socket.io": "~1.2.1",
     "ws": "~1.1.1"

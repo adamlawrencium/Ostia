@@ -56,6 +56,8 @@ var loadChartData = function(highchart) {
     addDatasetToSeries(targetSeries, chartData);
   });
 
+  
+
   // UPDATE CHART WITH LIVE DATA
   socket.on('updatedChartData', function(chartData) {
     var date = chartData.time;

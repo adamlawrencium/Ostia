@@ -6,6 +6,7 @@ var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var path = require('path');
 var async = require('async');
+var moment = require('moment');
 
 // Passsing in a sample config
 var config = {
@@ -28,30 +29,6 @@ var config = {
 //var runLiveTrading = require("./lib/TradingDesk.js");
 //runLiveTrading(config);
 
-// Created to start and stop the liveFeed of a exchange
-var liveFeed;
-
-// This sends data to the client for visualizations with socket.io
-// Handling the connection to the client through socket.io
-/*
-async.waterfall([
-    function(callback) {
-        callback(null, 'one', 'two');
-    },
-    function(arg1, arg2, callback) {
-        // arg1 now equals 'one' and arg2 now equals 'two'
-        callback(null, 'three');
-    },
-    function(arg1, callback) {
-        // arg1 now equals 'three'
-        callback(null, 'done');
-    }
-], function (err, result) {
-    // result now equals 'done'
-});
-*/
-
-
 io.sockets.on('connection', function (socket) {
   async.waterfall([
 
@@ -72,61 +49,24 @@ io.sockets.on('connection', function (socket) {
 
     /* poll for live data and emit */
     function (finData, callback) {
-      setInterval(function () {
-        var livefeed_ = finData.updatedFinanceData;
-        console.log('UPDATED DATA:\n', livefeed_);
-        socket.emit('updatedChartData', {
-          time: new Date().getTime(),
-          livefeed: livefeed_
-        })
-      }, 5000);
-      callback(null, 'done');
+      // var counter = 0;
+      // var eventLooper = setInterval(function () {
+      //   var livefeed = finData.updatedFinanceData;
+      //   socket.emit('updatedChartData', {
+      //     time: new Date().getTime(),
+      //     livefeed: livefeed
+      //   });
+      //   counter++;
+      //   if (counter > 3) {
+      //     clearInterval(eventLooper);
+      //     console.log("###", moment().format());
+      //   }
+      // }, 5000);
+      // callback(null, 'done');
     }
   ], function (err, result) {
     // result now equals 'done'
   });
-
-/*
-  var finData = require('./lib/strategies/basicStrategy.js');
-  var initialData = finData.initializedFinanceData;
-
-  var _flagCheck = setInterval(function () {
-    console.log('waiting...');
-
-    if (typeof initialData !== 'undefined') {
-      clearInterval(_flagCheck);
-
-      console.log('SERVER - Initial Data :\n', initialData);
-      socket.emit('initializedChartData', {
-        data: initialData
-      });
-
-      setInterval(function () {
-        var livefeed_ = finData.updatedFinanceData;
-        console.log('UPDATED DATA:\n', livefeed_);
-        socket.emit('updatedChartData', {
-          time: new Date().getTime(),
-          livefeed: livefeed_
-        })
-      }, 3000);
-    }
-  }, 1000);
-*/
-
-
-  // io.socket.on('openExchange', function (data) {
-  //   // Creating a live feed to the client of the data requested
-  //   liveFeed = setInterval(function () {
-  //     var date = new Date()
-  //     socket.emit('message', {
-  //       message: [Order, date.getTime(), mapParse(allExchangeData[data.data], data.data)]
-  //     })
-  //   }, 1000)
-  // })
-  // socket.on('closeExchange', function (data) {
-  //   // Closing the current data output
-  //   clearInterval(liveFeed);
-  // });
 });
 
 //************************/
