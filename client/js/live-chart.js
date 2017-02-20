@@ -5,29 +5,36 @@
  * @param {int} price currency price
  */
  var addDataPointToSeries = function(targetSeries, date, price) {
-  targetSeries.addPoint([date, price], true);
+  targetSeries.addPoint([date, price], false);
+  // tities
 };
 
 
 /**
  * Adds data points to a certain series, given a data set (chartData)
  * @param {HighChart.series} targetSeries reference
- * @param {array} chartData
+ * @param {object} chartData
  */
-var addCandlestickDatasetToSeries = function(targetSeries, chartData) {
-  for (var i = 0; i < chartData.length; i++) {
-    var date = chartData[i].date*1000;
-    var price = chartData[i].close;
+var addCandlestickDatasetToSeries = function(targetSeries, candlestick) {
+  for (var i = 0; i < candlestick.length; i++) {
+    var date = candlestick[i].date*1000;
+    var price = candlestick[i].close;
+    console.log('adding point...');
     addDataPointToSeries(targetSeries, date, price);
   }
 };
 
+/**
+ * Adds data points to a certain series, given a data set (chartData)
+ * @param {HighChart.series} targetSeries reference
+ * @param {array[][]} chartData
+ */
 var addIndicatorDatasetToSeries = function(targetSeries, chartData) {
   for (var i = 0; i < chartData.length; i++) {
-    var date = chartData[i]*1000;
-    var price = chartData[i];
-    targetSeries.addPoint([date, price], true);
-    //addDataPointToSeries(targetSeries, date, price);
+    var date = chartData[i][0]*1000;
+    var price = chartData[i][1];
+    console.log('date:',date,'price:',price);
+    addDataPointToSeries(targetSeries, date, price);
   }
 };
 
@@ -37,12 +44,28 @@ var addIndicatorDatasetToSeries = function(targetSeries, chartData) {
  * @param {HighChart} highchart self reference
  * @param {object} params parameters to add to series
  */
-var createSeries = function(highchart, name) {
+var createCandlestickSeries = function(highchart, name) {
   var seriesObj = {};
   seriesObj.name     = name;
   seriesObj.id       = name;
   seriesObj.data     = [];
   seriesObj.marker   = { enabled: true, radius: 3 };
+  seriesObj.tooltip  = { valueDecimals: 5 };
+  highchart.addSeries(seriesObj, true);
+};
+
+/**
+ * Creates object literal, given paramaters, and adds it to highchart
+ * @param {HighChart} highchart self reference
+ * @param {object} params parameters to add to series
+ */
+var createIndicatorSeries = function(highchart, name) {
+  var seriesObj = {};
+  seriesObj.name     = name;
+  seriesObj.id       = name;
+  seriesObj.data     = [];
+  seriesObj.marker   = { enabled: false, radius: 3 };
+  seriesObj.type = 'spline';
   seriesObj.tooltip  = { valueDecimals: 5 };
   highchart.addSeries(seriesObj, true);
 };
@@ -64,36 +87,28 @@ var loadChartData = function(highchart) {
     console.log('### initializedChartData received...');
     console.log('### creating series...');
 
-    createSeries(highchart, 'candlestick');
-    createSeries(highchart, 'SMA10');
-    createSeries(highchart, 'SMA20');
-
-//////////////////////
-    //var SMA10 = chartData.indicators.SMA10;
-    console.log('>>> chartData',chartData);
-    console.log();
-//////////////////////
-
+    createCandlestickSeries(highchart, 'Closing Price');
+    createIndicatorSeries(highchart, '10-Day Moving Average');
+    createIndicatorSeries(highchart, '20-Day Moving Average');
 
     // Creating candlestick chart lines
     var candlestickData = chartData.candlestickData;
-    var targetSeries = highchart.get("candlestick");
-    console.log('### adding Candlestick to chart');
+    var targetSeries = highchart.get("Closing Price");
     addCandlestickDatasetToSeries(targetSeries, candlestickData);
 
     // Adding indicators
     var SMA10 = chartData.indicators.SMA10;
-    var targetSMA10 = highchart.get('SMA10');
+    var targetSMA10 = highchart.get('10-Day Moving Average');
     console.log('### adding SMA10 to chart');
     addIndicatorDatasetToSeries(targetSMA10, SMA10);
 
     var SMA20 = chartData.indicators.SMA20;
-    var targetSMA20 = highchart.get('SMA20');
+    var targetSMA20 = highchart.get('20-Day Moving Average');
     console.log('### adding SMA20 to chart');
     addIndicatorDatasetToSeries(targetSMA20, SMA20);
 
     console.log(highchart.series);
-    highchart.redraw()
+    highchart.redraw();
   });
 
 
@@ -119,8 +134,8 @@ $(document).ready(function () {
       series: {
         // reduces 'point clutter' with large data sets
         dataGrouping: {
-          enabled: false,
-          groupPixelWidth: 30
+          enabled: true,
+          groupPixelWidth: 15
         }
       }
     },

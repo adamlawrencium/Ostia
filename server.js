@@ -47,7 +47,6 @@ io.sockets.on('connection', function (socket) {
 
     /* emit initialized data */
     function (candlestickData, indicators, callback) {
-      console.log("## SERVER.js - indicators", indicators);
       socket.emit('initializedChartData', {
         candlestickData: candlestickData,
         indicators: indicators
