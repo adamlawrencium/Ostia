@@ -41,8 +41,8 @@ io.sockets.on('connection', function (socket) {
       var indicators = financialData.indicators;
       callback(null, candlestickData, indicators);
 
-    //},
-    //10000);
+      //},
+      //10000);
     },
 
     /* emit initialized data */
@@ -51,7 +51,7 @@ io.sockets.on('connection', function (socket) {
         candlestickData: candlestickData,
         indicators: indicators
       });
-      callback(null /*temp*/);
+      callback(null /*temp*/ );
     },
 
     /* poll for live data and emit */

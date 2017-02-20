@@ -4,7 +4,7 @@
  * @param {int} date UTC formatted time
  * @param {int} price currency price
  */
- var addDataPointToSeries = function(targetSeries, date, price) {
+var addDataPointToSeries = function (targetSeries, date, price) {
   targetSeries.addPoint([date, price], false);
   // tities
 };
@@ -15,9 +15,9 @@
  * @param {HighChart.series} targetSeries reference
  * @param {object} chartData
  */
-var addCandlestickDatasetToSeries = function(targetSeries, candlestick) {
+var addCandlestickDatasetToSeries = function (targetSeries, candlestick) {
   for (var i = 0; i < candlestick.length; i++) {
-    var date = candlestick[i].date*1000;
+    var date = candlestick[i].date * 1000;
     var price = candlestick[i].close;
     console.log('adding point...');
     addDataPointToSeries(targetSeries, date, price);
@@ -29,11 +29,11 @@ var addCandlestickDatasetToSeries = function(targetSeries, candlestick) {
  * @param {HighChart.series} targetSeries reference
  * @param {array[][]} chartData
  */
-var addIndicatorDatasetToSeries = function(targetSeries, chartData) {
+var addIndicatorDatasetToSeries = function (targetSeries, chartData) {
   for (var i = 0; i < chartData.length; i++) {
-    var date = chartData[i][0]*1000;
+    var date = chartData[i][0] * 1000;
     var price = chartData[i][1];
-    console.log('date:',date,'price:',price);
+    console.log('date:', date, 'price:', price);
     addDataPointToSeries(targetSeries, date, price);
   }
 };
@@ -44,13 +44,18 @@ var addIndicatorDatasetToSeries = function(targetSeries, chartData) {
  * @param {HighChart} highchart self reference
  * @param {object} params parameters to add to series
  */
-var createCandlestickSeries = function(highchart, name) {
+var createCandlestickSeries = function (highchart, name) {
   var seriesObj = {};
-  seriesObj.name     = name;
-  seriesObj.id       = name;
-  seriesObj.data     = [];
-  seriesObj.marker   = { enabled: true, radius: 3 };
-  seriesObj.tooltip  = { valueDecimals: 5 };
+  seriesObj.name = name;
+  seriesObj.id = name;
+  seriesObj.data = [];
+  seriesObj.marker = {
+    enabled: true,
+    radius: 3
+  };
+  seriesObj.tooltip = {
+    valueDecimals: 5
+  };
   highchart.addSeries(seriesObj, true);
 };
 
@@ -59,14 +64,19 @@ var createCandlestickSeries = function(highchart, name) {
  * @param {HighChart} highchart self reference
  * @param {object} params parameters to add to series
  */
-var createIndicatorSeries = function(highchart, name) {
+var createIndicatorSeries = function (highchart, name) {
   var seriesObj = {};
-  seriesObj.name     = name;
-  seriesObj.id       = name;
-  seriesObj.data     = [];
-  seriesObj.marker   = { enabled: false, radius: 3 };
+  seriesObj.name = name;
+  seriesObj.id = name;
+  seriesObj.data = [];
+  seriesObj.marker = {
+    enabled: false,
+    radius: 3
+  };
   seriesObj.type = 'spline';
-  seriesObj.tooltip  = { valueDecimals: 5 };
+  seriesObj.tooltip = {
+    valueDecimals: 5
+  };
   highchart.addSeries(seriesObj, true);
 };
 
@@ -77,12 +87,12 @@ var createIndicatorSeries = function(highchart, name) {
  *     updatedChartData listens for live data and adds it to a targetSeries
  * @param {HighChart} highchart self reference
  */
-var loadChartData = function(highchart) {
+var loadChartData = function (highchart) {
   var socket = io.connect('http://localhost:3000');
   console.log('CONNECTION RECEIVED. SERVER RUNNING AT http://localhost:3000');
 
   // INITALIZE CHART WITH HISTORICAL DATA
-  socket.on('initializedChartData', function(chartData) {
+  socket.on('initializedChartData', function (chartData) {
 
     console.log('### initializedChartData received...');
     console.log('### creating series...');
@@ -113,7 +123,7 @@ var loadChartData = function(highchart) {
 
 
   // UPDATE CHART WITH LIVE DATA
-  socket.on('updatedChartData', function(chartData) {
+  socket.on('updatedChartData', function (chartData) {
     var date = chartData.time;
     var price = parseFloat(chartData.livefeed.last);
     var targetSeries = highchart.get("series-testID");
@@ -124,10 +134,10 @@ var loadChartData = function(highchart) {
 
 $(document).ready(function () {
   /*
-  * Webockets -- (data) --> Highcharts.series[]
-  * Abstraction function:
-  * series.data: [ [time,price], [time,price], [time,price], ...]
-  */
+   * Webockets -- (data) --> Highcharts.series[]
+   * Abstraction function:
+   * series.data: [ [time,price], [time,price], [time,price], ...]
+   */
   $('#container').highcharts('StockChart', {
 
     plotOptions: {
