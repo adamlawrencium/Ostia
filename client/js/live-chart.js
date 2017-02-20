@@ -15,6 +15,10 @@
  * @param {array} chartData
  */
 var addDatasetToSeries = function(targetSeries, chartData) {
+  console.log('addDatasetToSeries():');
+  console.log('>> targetSeries.name',targetSeries.name);
+  console.log('>> chartData', chartData);
+  console.log();
   for (var i = 0; i < chartData.length; i++) {
     var date = chartData[i].date*1000;
     var price = chartData[i].close;
@@ -28,10 +32,10 @@ var addDatasetToSeries = function(targetSeries, chartData) {
  * @param {HighChart} highchart self reference
  * @param {object} params parameters to add to series
  */
-var createSeries = function(highchart, params) {
+var createSeries = function(highchart, name) {
   var seriesObj = {};
-  seriesObj.name     = "testName";
-  seriesObj.id       = "series-testID";
+  seriesObj.name     = name;
+  seriesObj.id       = name;
   seriesObj.data     = [];
   seriesObj.marker   = { enabled: true, radius: 3 };
   seriesObj.tooltip  = { valueDecimals: 5 };
@@ -47,16 +51,44 @@ var createSeries = function(highchart, params) {
  */
 var loadChartData = function(highchart) {
   var socket = io.connect('http://localhost:3000');
+  console.log('CONNECTION RECEIVED. SERVER RUNNING AT http://localhost:3000');
 
   // INITALIZE CHART WITH HISTORICAL DATA
   socket.on('initializedChartData', function(chartData) {
-    createSeries(highchart, null);
-    var chartData = chartData.data;
-    var targetSeries = highchart.get("series-testID");
-    addDatasetToSeries(targetSeries, chartData);
+
+    console.log('### initializedChartData received...');
+    console.log('### creating series...');
+
+    createSeries(highchart, 'candlestick');
+    createSeries(highchart, 'SMA10');
+    createSeries(highchart, 'SMA20');
+
+//////////////////////
+    //var SMA10 = chartData.indicators.SMA10;
+    console.log('>>> chartData',chartData);
+    console.log();
+//////////////////////
+
+
+    // Creating candlestick chart lines
+    // var candlestickData = chartData.candlestickData;
+    // var targetSeries = highchart.get("candlestick");
+    // addDatasetToSeries(targetSeries, candlestickData);
+
+    // Adding indicators
+    var SMA10 = chartData.indicators.SMA10;
+    console.log('SMA10', SMA10);
+    var targetSMA10 = highchart.get('SMA10');
+    addDatasetToSeries(targetSMA10, SMA10);
+
+    var SMA20 = chartData.indicators.SMA20;
+    var targetSMA20 = highchart.get('SMA20');
+    addDatasetToSeries(targetSMA20, SMA20);
+
+    console.log(highchart.series);
+    highchart.redraw()
   });
 
-  
 
   // UPDATE CHART WITH LIVE DATA
   socket.on('updatedChartData', function(chartData) {

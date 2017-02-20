@@ -34,25 +34,32 @@ io.sockets.on('connection', function (socket) {
 
     /* Initialze data */
     function (callback) {
-      var finData = require('./lib/strategies/basicStrategy.js');
-      var initialData = finData.initializedFinanceData;
-      var indicators = finData.indicators;
-      callback(null, finData, initialData);
+      var financialData = require('./lib/strategies/basicStrategy.js');
+      // wait here
+      //setTimeout(function(){ ;
+      var candlestickData = financialData.candlestickData;
+      var indicators = financialData.indicators;
+      callback(null, candlestickData, indicators);
+
+    //},
+    //10000);
     },
 
     /* emit initialized data */
-    function (finData, initialData, callback) {
+    function (candlestickData, indicators, callback) {
+      console.log("## SERVER.js - indicators", indicators);
       socket.emit('initializedChartData', {
-        data: initialData
+        candlestickData: candlestickData,
+        indicators: indicators
       });
-      callback(null, finData);
+      callback(null /*temp*/);
     },
 
     /* poll for live data and emit */
-    function (finData, callback) {
+    function (financialData, callback) {
       // var counter = 0;
       // var eventLooper = setInterval(function () {
-      //   var livefeed = finData.updatedFinanceData;
+      //   var livefeed = financialData.updatedFinanceData;
       //   socket.emit('updatedChartData', {
       //     time: new Date().getTime(),
       //     livefeed: livefeed
