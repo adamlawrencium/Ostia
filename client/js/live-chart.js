@@ -9,6 +9,12 @@ var addDataPointToSeries = function (targetSeries, date, price) {
   // tities
 };
 
+// Adds a live data point to a series, differs from "addDataPointToSeries"
+//    because it defaults to true for redrawing the chart, hence a "live"
+//    addPoint functionality
+var addLiveDataPointToSeries = function (targetSeries, date, price) {
+  targetSeries.addPoint([date, price], true);
+};
 
 /**
  * Adds data points to a certain series, given a data set (chartData)
@@ -124,10 +130,11 @@ var loadChartData = function (highchart) {
 
   // UPDATE CHART WITH LIVE DATA
   socket.on('updatedChartData', function (chartData) {
+    console.log("### CLIENT: Live Data Point Received")
     var date = chartData.time;
-    var price = parseFloat(chartData.livefeed.last);
-    var targetSeries = highchart.get("series-testID");
-    addDataPointToSeries(targetSeries, date, price);
+    var price = parseFloat(chartData.mostRecentTickerPrice);
+    var targetSeries = highchart.get('Closing Price');
+    addLiveDataPointToSeries(targetSeries, date, price);
   });
 };
 
@@ -177,7 +184,8 @@ $(document).ready(function () {
       text: '+ Live updates'
     },
     xAxis: {
-      type: 'datetime'
+      type: 'datetime',
+      ordinal: false
     },
     chart: {
       events: {

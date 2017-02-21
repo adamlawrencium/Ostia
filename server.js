@@ -37,33 +37,35 @@ io.sockets.on('connection', function (socket) {
       var financialData = require('./lib/strategies/basicStrategy.js');
       var candlestickData = financialData.candlestickData;
       var indicators = financialData.indicators;
-      callback(null, candlestickData, indicators);
+  
+      callback(null, candlestickData, indicators, financialData);
     },
 
     /* emit initialized data */
-    function (candlestickData, indicators, callback) {
+    function (candlestickData, indicators, financialData, callback) {
       socket.emit('initializedChartData', {
         candlestickData: candlestickData,
         indicators: indicators
       });
-      callback(null /*temp*/ );
+      callback(null, financialData);
     },
 
     /* poll for live data and emit */
     function (financialData, callback) {
       // var counter = 0;
-      // var eventLooper = setInterval(function () {
-      //   var livefeed = financialData.updatedFinanceData;
-      //   socket.emit('updatedChartData', {
-      //     time: new Date().getTime(),
-      //     livefeed: livefeed
-      //   });
-      //   counter++;
-      //   if (counter > 3) {
-      //     clearInterval(eventLooper);
-      //     console.log("###", moment().format());
-      //   }
-      // }, 5000);
+      var eventLooper = setInterval(function () {
+        var mostRecentTickerPrice = financialData.updatedFinanceData;
+        socket.emit('updatedChartData', {
+          time: new Date().getTime(),
+          mostRecentTickerPrice: parseFloat(mostRecentTickerPrice)
+        });
+        console.log("### SERVER: Live Data Point Sent")
+        // counter++;
+        // if (counter > 3) {
+        //   clearInterval(eventLooper);
+        //   console.log("###", moment().format());
+        // }
+      }, 5000);
       // callback(null, 'done');
     }
   ], function (err, result) {
