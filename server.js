@@ -63,7 +63,7 @@ io.sockets.on('connection', function (socket) {
           time: new Date().getTime(),
           mostRecentTickerPrice: parseFloat(mostRecentTickerPrice)
         });
-        console.log("SERVER: Live Data Point Sent")
+        console.log("### SERVER: Live Data Point Sent")
         // counter++;
         // if (counter > 3) {
         //   clearInterval(eventLooper);

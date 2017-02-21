@@ -9,11 +9,6 @@ var addDataPointToSeries = function (targetSeries, date, price) {
   // tities
 };
 
-/**
- * NOTE In order to read this series of comments, you must be listening to
- *    "My Nigga" by YG on at least 63% volume.
- */
-
 // Adds a live data point to a series, differs from "addDataPointToSeries"
 //    because it defaults to true for redrawing the chart, hence a "live"
 //    addPoint functionality
@@ -135,7 +130,7 @@ var loadChartData = function (highchart) {
 
   // UPDATE CHART WITH LIVE DATA
   socket.on('updatedChartData', function (chartData) {
-    console.log("CLIENT: Live Data Point Received")
+    console.log("### CLIENT: Live Data Point Received")
     var date = chartData.time;
     var price = parseFloat(chartData.mostRecentTickerPrice);
     var targetSeries = highchart.get('Closing Price');
