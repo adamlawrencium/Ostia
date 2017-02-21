@@ -35,14 +35,10 @@ io.sockets.on('connection', function (socket) {
     /* Initialze data */
     function (callback) {
       var financialData = require('./lib/strategies/basicStrategy.js');
-      // wait here
-      //setTimeout(function(){ ;
       var candlestickData = financialData.candlestickData;
       var indicators = financialData.indicators;
+  
       callback(null, candlestickData, indicators, financialData);
-
-      //},
-      //10000);
     },
 
     /* emit initialized data */
