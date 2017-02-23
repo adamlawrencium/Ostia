@@ -86,6 +86,47 @@ var createIndicatorSeries = function (highchart, name) {
   highchart.addSeries(seriesObj, true);
 };
 
+// Flags are a new series that contains a list of objects. The first object is
+/**
+{
+  type: 'flags',
+  data [
+  {
+    x: Date.UTC(2015, 5, 8),
+    title: 'C',
+    text: 'Stocks fall on Greece, rate concerns; US dollar dips'
+    }, {
+    x: Date.UTC(2015, 5, 12),
+    title: 'D',
+    text: 'Zimbabwe ditches \'worthless\' currency for the US dollar '
+    }
+  ],
+  onSeries: 'dataseries',
+  shape: 'circlepin',
+  width: 16
+}
+*/
+var createFlagSeries = function (highchart) {
+  var seriesObj = {};
+  seriesObj.
+
+
+}
+
+/**
+ * Every flag consists of x, title and text. The attribute "x" must be set to
+ * the point where the flag should appear. The attribute "title" is the text
+ * which is displayed inside the flag on the chart. The attribute "text" contains
+ * the text which will appear when the mouse hover above the flag.
+*/
+var addFlag = function (highchart, targetSeries, timestamp, options) {
+
+
+
+}
+
+
+
 
 /**
  * Connects and listens on two sockets to initialize and then update a chart.
