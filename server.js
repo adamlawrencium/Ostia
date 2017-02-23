@@ -37,7 +37,7 @@ io.sockets.on('connection', function (socket) {
       var financialData = require('./lib/strategies/basicStrategy.js');
       var candlestickData = financialData.candlestickData;
       var indicators = financialData.indicators;
-  
+
       callback(null, candlestickData, indicators, financialData);
     },
 

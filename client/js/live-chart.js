@@ -108,10 +108,15 @@ var createIndicatorSeries = function (highchart, name) {
 */
 var createFlagSeries = function (highchart) {
   var seriesObj = {};
-  seriesObj.
+  seriesObj.id = 'flags';
+  seriesObj.type = 'flags';
+  seriesObj.data = [];
+  seriesObj.onSeries = 'Closing Price';
+  seriesObj.shape = 'circlepin';
+  seriesObj.width = 16;
 
-
-}
+  highchart.addSeries(seriesObj);
+};
 
 /**
  * Every flag consists of x, title and text. The attribute "x" must be set to
@@ -119,11 +124,15 @@ var createFlagSeries = function (highchart) {
  * which is displayed inside the flag on the chart. The attribute "text" contains
  * the text which will appear when the mouse hover above the flag.
 */
-var addFlag = function (highchart, targetSeries, timestamp, options) {
+var addFlagToSeries = function (highchart) {
 
+  var flagObj = {};
+  flagObj.x = 1484697600000;
+  flagObj.title = 'Z';
+  flagObj.text = 'This is a test flag. Trade happened.';
 
-
-}
+  highchart.get('flags').addPoint(flagObj);
+};
 
 
 
@@ -165,13 +174,17 @@ var loadChartData = function (highchart) {
     addIndicatorDatasetToSeries(targetSMA20, SMA20);
 
     console.log(highchart.series);
+
+    createFlagSeries(highchart);
+    addFlagToSeries(highchart);
+
     highchart.redraw();
   });
 
 
   // UPDATE CHART WITH LIVE DATA
   socket.on('updatedChartData', function (chartData) {
-    console.log("### CLIENT: Live Data Point Received")
+    console.log("### CLIENT: Live Data Point Received");
     var date = chartData.time;
     var price = parseFloat(chartData.mostRecentTickerPrice);
     var targetSeries = highchart.get('Closing Price');
