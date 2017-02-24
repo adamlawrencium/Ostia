@@ -47,6 +47,9 @@ io.sockets.on('connection', function (socket) {
         candlestickData: candlestickData,
         indicators: indicators
       });
+      socket.emit('chartFlags', {
+        flags: null
+      });
       callback(null, financialData);
     },
 
@@ -60,14 +63,9 @@ io.sockets.on('connection', function (socket) {
           mostRecentTickerPrice: parseFloat(mostRecentTickerPrice)
         });
         console.log("### SERVER: Live Data Point Sent")
-        // counter++;
-        // if (counter > 3) {
-        //   clearInterval(eventLooper);
-        //   console.log("###", moment().format());
-        // }
       }, 5000);
-      // callback(null, 'done');
     }
+    
   ], function (err, result) {
     // result now equals 'done'
   });
