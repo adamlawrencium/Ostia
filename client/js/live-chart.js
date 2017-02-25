@@ -124,12 +124,13 @@ var createFlagSeries = function (highchart) {
  * which is displayed inside the flag on the chart. The attribute "text" contains
  * the text which will appear when the mouse hover above the flag.
 */
-var addFlagToSeries = function (highchart) {
+var addFlagToSeries = function (highchart, x) {
 
   var flagObj = {};
-  flagObj.x = 1484697600000;
-  flagObj.title = 'Z';
-  flagObj.text = 'This is a test flag. Trade happened.';
+  console.log('inside addFlagToSeries', x);
+  flagObj.x = x;
+  flagObj.title = 'X';
+  flagObj.text = 'This is a test flag ${x}. Trade happened.';
 
   highchart.get('flags').addPoint(flagObj);
 };
@@ -176,14 +177,18 @@ var loadChartData = function (highchart) {
     console.log(highchart.series);
 
     createFlagSeries(highchart);
-    addFlagToSeries(highchart);
+    console.log(chartData.flags);
+    for (var i = 0; i < chartData.flags.length; i++) {
+      console.log('flag added');
+      addFlagToSeries(highchart, chartData.flags[i][0]*1000);
+    }
 
     highchart.redraw();
   });
 
 
   // UPDATE CHART WITH LIVE DATA
-  socket.on('updatedChartData', function (chartData) {
+  socket.on('updadtedChartData', function (chartData) {
     console.log("### CLIENT: Live Data Point Received");
     var date = chartData.time;
     var price = parseFloat(chartData.mostRecentTickerPrice);

@@ -43,7 +43,6 @@ io.sockets.on('connection', function (socket) {
 
     /* emit initialized data */
     function (candlestickData, indicators, financialData, flags, callback) {
-      console.log(orders);
       socket.emit('initializedChartData', {
         candlestickData: candlestickData,
         indicators: indicators,
