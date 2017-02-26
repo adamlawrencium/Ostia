@@ -169,7 +169,7 @@ var loadChartData = function (highchart) {
 
 
   // UPDATE CHART WITH LIVE DATA
-  socket.on('updadtedChartData', function (chartData) {
+  socket.on('updatedChartData', function (chartData) {
     console.log("### CLIENT: Live Data Point Received");
     var date = chartData.time;
     var price = parseFloat(chartData.mostRecentTickerPrice);
