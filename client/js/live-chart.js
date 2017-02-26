@@ -111,9 +111,9 @@ var createFlagSeries = function (highchart) {
   seriesObj.id = 'flags';
   seriesObj.type = 'flags';
   seriesObj.data = [];
-  seriesObj.onSeries = 'Closing Price';
+  seriesObj.onSeries = '10-Day Moving Average';
   seriesObj.shape = 'circlepin';
-  seriesObj.width = 16;
+  seriesObj.width = 20;
 
   highchart.addSeries(seriesObj);
 };
@@ -124,13 +124,13 @@ var createFlagSeries = function (highchart) {
  * which is displayed inside the flag on the chart. The attribute "text" contains
  * the text which will appear when the mouse hover above the flag.
 */
-var addFlagToSeries = function (highchart, x) {
+var addFlagToSeries = function (highchart, timeStamp, order) {
 
   var flagObj = {};
-  console.log('inside addFlagToSeries', x);
-  flagObj.x = x;
-  flagObj.title = 'X';
-  flagObj.text = 'This is a test flag ${x}. Trade happened.';
+  console.log('inside addFlagToSeries', timeStamp, order);
+  flagObj.x = timeStamp;
+  flagObj.title = order;
+  flagObj.text = 'Make a trade here.';
 
   highchart.get('flags').addPoint(flagObj);
 };
@@ -180,7 +180,9 @@ var loadChartData = function (highchart) {
     console.log(chartData.flags);
     for (var i = 0; i < chartData.flags.length; i++) {
       console.log('flag added');
-      addFlagToSeries(highchart, chartData.flags[i][0]*1000);
+      var timeStamp = chartData.flags[i].timeStamp * 1000;
+      var orderLongShort = chartData.flags[i].longShort;
+      addFlagToSeries(highchart, timeStamp, orderLongShort);
     }
 
     highchart.redraw();
