@@ -87,6 +87,37 @@ var createIndicatorSeries = function (highchart, name) {
 };
 
 
+var createFlagSeries = function (highchart) {
+  var seriesObj = {};
+  seriesObj.id = 'flags';
+  seriesObj.type = 'flags';
+  seriesObj.data = [];
+  seriesObj.onSeries = '10-Day Moving Average';
+  seriesObj.shape = 'circlepin';
+  seriesObj.width = 20;
+
+  highchart.addSeries(seriesObj);
+};
+
+
+/**
+ * Every flag consists of x, title and text. The attribute "x" must be set to
+ * the point where the flag should appear. The attribute "title" is the text
+ * which is displayed inside the flag on the chart. The attribute "text" contains
+ * the text which will appear when the mouse hover above the flag.
+ */
+var addFlagToSeries = function (highchart, timeStamp, order) {
+
+  var flagObj = {};
+  console.log('inside addFlagToSeries', timeStamp, order);
+  flagObj.x = timeStamp;
+  flagObj.title = order;
+  flagObj.text = 'Make a trade here.';
+
+  highchart.get('flags').addPoint(flagObj);
+};
+
+
 /**
  * Connects and listens on two sockets to initialize and then update a chart.
  *     initializedChartData creates a series and adds historical data to it.
@@ -107,12 +138,12 @@ var loadChartData = function (highchart) {
     createIndicatorSeries(highchart, '10-Day Moving Average');
     createIndicatorSeries(highchart, '20-Day Moving Average');
 
-    // Creating candlestick chart lines
+    /* Creating candlestick chart lines */
     var candlestickData = chartData.candlestickData;
     var targetSeries = highchart.get("Closing Price");
     addCandlestickDatasetToSeries(targetSeries, candlestickData);
 
-    // Adding indicators
+    /* Adding indicators */
     var SMA10 = chartData.indicators.SMA10;
     var targetSMA10 = highchart.get('10-Day Moving Average');
     console.log('### adding SMA10 to chart');
@@ -124,13 +155,22 @@ var loadChartData = function (highchart) {
     addIndicatorDatasetToSeries(targetSMA20, SMA20);
 
     console.log(highchart.series);
-    highchart.redraw();
+
+    /* Adding order flags */
+    createFlagSeries(highchart);
+    console.log(chartData.flags);
+    for (var i = 0; i < chartData.flags.length; i++) {
+      console.log('flag added');
+      var timeStamp = chartData.flags[i].timeStamp * 1000;
+      var orderLongShort = chartData.flags[i].longShort;
+      addFlagToSeries(highchart, timeStamp, orderLongShort);
+    }
   });
 
 
   // UPDATE CHART WITH LIVE DATA
   socket.on('updatedChartData', function (chartData) {
-    console.log("### CLIENT: Live Data Point Received")
+    console.log("### CLIENT: Live Data Point Received");
     var date = chartData.time;
     var price = parseFloat(chartData.mostRecentTickerPrice);
     var targetSeries = highchart.get('Closing Price');
@@ -140,16 +180,9 @@ var loadChartData = function (highchart) {
 
 
 $(document).ready(function () {
-  /*
-   * Webockets -- (data) --> Highcharts.series[]
-   * Abstraction function:
-   * series.data: [ [time,price], [time,price], [time,price], ...]
-   */
   $('#container').highcharts('StockChart', {
-
     plotOptions: {
       series: {
-        // reduces 'point clutter' with large data sets
         dataGrouping: {
           enabled: true,
           groupPixelWidth: 15
@@ -158,23 +191,30 @@ $(document).ready(function () {
     },
     rangeSelector: {
       buttons: [{
+        type: 'month',
         count: 1,
-        type: 'minute',
-        text: '1M'
+        text: '1m'
       }, {
-        count: 5,
-        type: 'minute',
-        text: '5M'
+        type: 'month',
+        count: 3,
+        text: '3m'
       }, {
-        count: 10,
-        type: 'minute',
-        text: '10M'
+        type: 'month',
+        count: 6,
+        text: '6m'
+      }, {
+        type: 'ytd',
+        text: 'YTD'
+      }, {
+        type: 'year',
+        count: 1,
+        text: '1y'
       }, {
         type: 'all',
         text: 'All'
       }],
       inputEnabled: false,
-      selected: 0
+      selected: 1
     },
 
     title: {

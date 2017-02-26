@@ -37,15 +37,19 @@ io.sockets.on('connection', function (socket) {
       var financialData = require('./lib/strategies/basicStrategy.js');
       var candlestickData = financialData.candlestickData;
       var indicators = financialData.indicators;
-  
-      callback(null, candlestickData, indicators, financialData);
+      var flags = financialData.flags;
+      callback(null, candlestickData, indicators, financialData, flags);
     },
 
     /* emit initialized data */
-    function (candlestickData, indicators, financialData, callback) {
+    function (candlestickData, indicators, financialData, flags, callback) {
       socket.emit('initializedChartData', {
         candlestickData: candlestickData,
-        indicators: indicators
+        indicators: indicators,
+        flags: flags
+      });
+      socket.emit('chartFlags', {
+        flags: null
       });
       callback(null, financialData);
     },
@@ -60,14 +64,9 @@ io.sockets.on('connection', function (socket) {
           mostRecentTickerPrice: parseFloat(mostRecentTickerPrice)
         });
         console.log("### SERVER: Live Data Point Sent")
-        // counter++;
-        // if (counter > 3) {
-        //   clearInterval(eventLooper);
-        //   console.log("###", moment().format());
-        // }
       }, 5000);
-      // callback(null, 'done');
     }
+
   ], function (err, result) {
     // result now equals 'done'
   });
