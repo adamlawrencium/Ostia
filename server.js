@@ -83,7 +83,7 @@ app.get('/', function (req, res) {
 })
 
 app.get('/dashboard', function (req, res) {
-  res.sendfile(path.join(__dirname, '/html/dashboard.html'))
+  res.sendfile(path.join(__dirname, '/client/pages/index.html'))
 })
 
 app.get('/test', function (req, res) {
