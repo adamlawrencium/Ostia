@@ -161,7 +161,7 @@ var loadChartData = function (highchart) {
     console.log(chartData.flags);
     for (var i = 0; i < chartData.flags.length; i++) {
       console.log('flag added');
-      var timeStamp = chartData.flags[i].timeStamp * 1000;
+      var timeStamp = chartData.flags[i].timestamp * 1000;
       var orderLongShort = chartData.flags[i].longShort;
       addFlagToSeries(highchart, timeStamp, orderLongShort);
     }

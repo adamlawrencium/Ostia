@@ -23,7 +23,7 @@ var config = {
     gdax: "123ABC"
   }
 }
- 
+
 
 // Set up Trading desk and run strategy
 //var runLiveTrading = require("./lib/TradingDesk.js");
