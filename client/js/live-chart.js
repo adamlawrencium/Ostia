@@ -53,7 +53,7 @@ var addIndicatorDatasetToSeries = function (targetSeries, chartData) {
   for (var i = 0; i < chartData.length; i++) {
     var date = chartData[i][0] * 1000;
     var price = chartData[i][1];
-    console.log('date:', date, 'price:', price);
+    //console.log('date:', date, 'price:', price);
     addDataPointToSeries(targetSeries, date, price);
   }
 };
@@ -122,7 +122,7 @@ var createFlagSeries = function (highchart) {
  */
 var addFlagToSeries = function (highchart, timeStamp, order) {
   var flagObj = {};
-  console.log('inside addFlagToSeries', timeStamp, order);
+  console.log('inside addFlagToSeries:', timeStamp, order);
   flagObj.x = timeStamp;
   flagObj.title = order;
   flagObj.text = 'Make a trade here.';
@@ -167,11 +167,11 @@ var loadStrategyTrades = function (highchart) {
     console.log('### adding SMA20 to chart');
     addIndicatorDatasetToSeries(targetSMA20, SMA20);
 
-    console.log(highchart.series);
+    //console.log(highchart.series);
 
     /* Adding order flags */
     createFlagSeries(highchart);
-    console.log(chartData.flags);
+    //console.log(chartData.flags);
     for (var i = 0; i < chartData.flags.length; i++) {
       console.log('flag added');
       var timeStamp = chartData.flags[i].timestamp * 1000;
@@ -208,14 +208,12 @@ var loadPortfolioPerformance = function (highchart) {
     console.log('### Portfolio: initializedChartData received...');
     console.log('### Portfolio: creating series...');
 
-    createCandlestickSeries(highchart, 'Backtest');
-
     /* Creating candlestick chart lines */
-    var backtest = chartData.backtest;
-    console.log('backtest',backtest);
-    var targetSeries = highchart.get("Backtest");
-    addBacktestDatasetToSeries(targetSeries, backtest);
-
+    createCandlestickSeries(highchart, 'Backtest');
+    var bt = chartData.backtest;
+    console.log('bt',bt);
+    var btarget = highchart.get('Backtest');
+    addBacktestDatasetToSeries(btarget, bt);
 
     /* Adding order flags */
     // createFlagSeries(highchart);

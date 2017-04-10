@@ -47,7 +47,8 @@ io.sockets.on('connection', function (socket) {
       socket.emit('initializedChartData', {
         candlestickData: candlestickData,
         indicators: indicators,
-        flags: flags
+        flags: flags,
+        backtest:backtest
       });
       socket.emit('chartFlags', {
         flags: null
