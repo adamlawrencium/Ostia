@@ -38,11 +38,12 @@ io.sockets.on('connection', function (socket) {
       var candlestickData = financialData.candlestickData;
       var indicators = financialData.indicators;
       var flags = financialData.flags;
-      callback(null, candlestickData, indicators, financialData, flags);
+      var backtest = financialData.backtest;
+      callback(null, candlestickData, indicators, financialData, flags, backtest);
     },
 
     /* emit initialized data */
-    function (candlestickData, indicators, financialData, flags, callback) {
+    function (candlestickData, indicators, financialData, flags, backtest, callback) {
       socket.emit('initializedChartData', {
         candlestickData: candlestickData,
         indicators: indicators,
@@ -51,20 +52,23 @@ io.sockets.on('connection', function (socket) {
       socket.emit('chartFlags', {
         flags: null
       });
+      socket.emit('backtest', {
+        backtest:backtest
+      });
       callback(null, financialData);
     },
 
     /* poll for live data and emit */
     function (financialData, callback) {
       // var counter = 0;
-      var eventLooper = setInterval(function () {
-        var mostRecentTickerPrice = financialData.updatedFinanceData;
-        socket.emit('updatedChartData', {
-          time: new Date().getTime(),
-          mostRecentTickerPrice: parseFloat(mostRecentTickerPrice)
-        });
-        console.log("### SERVER: " + Date.now() + ": live data point sent")
-      }, 5000);
+      // var eventLooper = setInterval(function () {
+      //   var mostRecentTickerPrice = financialData.updatedFinanceData;
+      //   socket.emit('updatedChartData', {
+      //     time: new Date().getTime(),
+      //     mostRecentTickerPrice: parseFloat(mostRecentTickerPrice)
+      //   });
+      //   console.log("### SERVER: " + Date.now() + ": live data point sent")
+      // }, 5000);
     }
 
   ], function (err, result) {

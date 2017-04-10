@@ -33,6 +33,20 @@ var addCandlestickDatasetToSeries = function (targetSeries, candlestick) {
 /**
  * Adds data points to a certain series, given a data set (chartData)
  * @param {HighChart.series} targetSeries reference
+ * @param {object} chartData
+ */
+var addBacktestDatasetToSeries = function (targetSeries, candlestick) {
+  for (var i = 0; i < candlestick.length; i++) {
+    var date = candlestick[i][0] * 1000;
+    var price = candlestick[i][1];
+    console.log('backtest: adding point...');
+    addDataPointToSeries(targetSeries, date, price);
+  }
+};
+
+/**
+ * Adds data points to a certain series, given a data set (chartData)
+ * @param {HighChart.series} targetSeries reference
  * @param {array[][]} chartData
  */
 var addIndicatorDatasetToSeries = function (targetSeries, chartData) {
@@ -107,7 +121,6 @@ var createFlagSeries = function (highchart) {
  * the text which will appear when the mouse hover above the flag.
  */
 var addFlagToSeries = function (highchart, timeStamp, order) {
-
   var flagObj = {};
   console.log('inside addFlagToSeries', timeStamp, order);
   flagObj.x = timeStamp;
@@ -124,7 +137,7 @@ var addFlagToSeries = function (highchart, timeStamp, order) {
  *     updatedChartData listens for live data and adds it to a targetSeries
  * @param {HighChart} highchart self reference
  */
-var loadChartData = function (highchart) {
+var loadStrategyTrades = function (highchart) {
   var socket = io.connect('http://localhost:3000');
   console.log('CONNECTION RECEIVED. SERVER RUNNING AT http://localhost:3000');
 
@@ -179,8 +192,56 @@ var loadChartData = function (highchart) {
 };
 
 
+/**
+ * Connects and listens on two sockets to initialize and then update a chart.
+ *     initializedChartData creates a series and adds historical data to it.
+ *     updatedChartData listens for live data and adds it to a targetSeries
+ * @param {HighChart} highchart self reference
+ */
+var loadPortfolioPerformance = function (highchart) {
+  var socket = io.connect('http://localhost:3000');
+  console.log('CONNECTION RECEIVED. SERVER RUNNING AT http://localhost:3000');
+
+  // INITALIZE CHART WITH HISTORICAL DATA
+  socket.on('backtest', function (chartData) {
+
+    console.log('### Portfolio: initializedChartData received...');
+    console.log('### Portfolio: creating series...');
+
+    createCandlestickSeries(highchart, 'Backtest');
+
+    /* Creating candlestick chart lines */
+    var backtest = chartData.backtest;
+    console.log('backtest',backtest);
+    var targetSeries = highchart.get("Backtest");
+    addBacktestDatasetToSeries(targetSeries, backtest);
+
+
+    /* Adding order flags */
+    // createFlagSeries(highchart);
+    // console.log(chartData.flags);
+    // for (var i = 0; i < chartData.flags.length; i++) {
+    //   console.log('flag added');
+    //   var timeStamp = chartData.flags[i].timestamp * 1000;
+    //   var orderLongShort = chartData.flags[i].longShort;
+    //   addFlagToSeries(highchart, timeStamp, orderLongShort);
+    // }
+  });
+
+
+  // UPDATE CHART WITH LIVE DATA
+  socket.on('updatedChartData', function (chartData) {
+    console.log("### CLIENT: Live Data Point Received");
+    var date = chartData.time;
+    var price = parseFloat(chartData.mostRecentTickerPrice);
+    var targetSeries = highchart.get('Closing Price');
+    addLiveDataPointToSeries(targetSeries, date, price);
+  });
+};
+
+
 $(document).ready(function () {
-  $('#container').highcharts('StockChart', {
+  $('#hcharts-strategy').highcharts('StockChart', {
     plotOptions: {
       series: {
         dataGrouping: {
@@ -218,10 +279,10 @@ $(document).ready(function () {
     },
 
     title: {
-      text: 'Charts w/ Historical Data'
+      text: 'Moving Average Crossover Trades'
     },
     subtitle: {
-      text: '+ Live updates'
+      text: '+ Indicators'
     },
     xAxis: {
       type: 'datetime',
@@ -231,10 +292,71 @@ $(document).ready(function () {
       events: {
         load: function () {
           var self = this;
-          loadChartData(self);
+          loadStrategyTrades(self);
         }
       },
     },
     series: []
   });
+
+
+  $('#hcharts-portfolio').highcharts('StockChart', {
+    plotOptions: {
+      series: {
+        dataGrouping: {
+          enabled: true,
+          groupPixelWidth: 15
+        }
+      }
+    },
+    rangeSelector: {
+      buttons: [{
+        type: 'month',
+        count: 1,
+        text: '1m'
+      }, {
+        type: 'month',
+        count: 3,
+        text: '3m'
+      }, {
+        type: 'month',
+        count: 6,
+        text: '6m'
+      }, {
+        type: 'ytd',
+        text: 'YTD'
+      }, {
+        type: 'year',
+        count: 1,
+        text: '1y'
+      }, {
+        type: 'all',
+        text: 'All'
+      }],
+      inputEnabled: false,
+      selected: 1
+    },
+
+    title: {
+      text: 'Portfolio Performance'
+    },
+    subtitle: {
+      text: 'Moving Average Crossover Strategy'
+    },
+    xAxis: {
+      type: 'datetime',
+      ordinal: false
+    },
+    chart: {
+      events: {
+        load: function () {
+          var self = this;
+          loadPortfolioPerformance(self);
+        }
+      },
+    },
+    series: []
+  });
+
+
 });
