@@ -167,11 +167,8 @@ var loadStrategyTrades = function (highchart) {
     console.log('### adding SMA20 to chart');
     addIndicatorDatasetToSeries(targetSMA20, SMA20);
 
-    //console.log(highchart.series);
-
     /* Adding order flags */
     createFlagSeries(highchart);
-    //console.log(chartData.flags);
     for (var i = 0; i < chartData.flags.length; i++) {
       console.log('flag added');
       var timeStamp = chartData.flags[i].timestamp * 1000;
@@ -211,29 +208,12 @@ var loadPortfolioPerformance = function (highchart) {
     /* Creating candlestick chart lines */
     createCandlestickSeries(highchart, 'Backtest');
     var bt = chartData.backtest;
-    console.log('bt',bt);
+    console.log('bt', bt);
     var btarget = highchart.get('Backtest');
     addBacktestDatasetToSeries(btarget, bt);
 
-    /* Adding order flags */
-    // createFlagSeries(highchart);
-    // console.log(chartData.flags);
-    // for (var i = 0; i < chartData.flags.length; i++) {
-    //   console.log('flag added');
-    //   var timeStamp = chartData.flags[i].timestamp * 1000;
-    //   var orderLongShort = chartData.flags[i].longShort;
-    //   addFlagToSeries(highchart, timeStamp, orderLongShort);
-    // }
-  });
-
-
-  // UPDATE CHART WITH LIVE DATA
-  socket.on('updatedChartData', function (chartData) {
-    console.log("### CLIENT: Live Data Point Received");
-    var date = chartData.time;
-    var price = parseFloat(chartData.mostRecentTickerPrice);
-    var targetSeries = highchart.get('Closing Price');
-    addLiveDataPointToSeries(targetSeries, date, price);
+    /* This line needs to be here for some reason, or else chart won't render properly... */
+    createFlagSeries(highchart);
   });
 };
 
@@ -244,7 +224,7 @@ $(document).ready(function () {
       series: {
         dataGrouping: {
           enabled: true,
-          groupPixelWidth: 15
+          groupPixelWidth: 8
         }
       }
     },
@@ -277,15 +257,23 @@ $(document).ready(function () {
     },
 
     title: {
-      text: 'Moving Average Crossover Trades'
+      text: 'Moving Avg. Crossover Trades'
     },
     subtitle: {
-      text: '+ Indicators'
+      text: '+ Indicators (BTC/USD)'
     },
     xAxis: {
       type: 'datetime',
       ordinal: false
     },
+    yAxis:
+      [{
+        title: {
+          text: 'Ticker',
+        },
+        opposite: false
+      }
+    ],
     chart: {
       events: {
         load: function () {
@@ -355,6 +343,4 @@ $(document).ready(function () {
     },
     series: []
   });
-
-
 });
