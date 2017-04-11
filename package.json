@@ -12,7 +12,6 @@
     "dsjslib": "~0.6.14",
     "express": "~3.3.4",
     "highcharts": "~5.0.0",
-    "jQuery": "^1.7.4",
     "mathjs": "^3.9.0",
     "moment": "^2.17.1",
     "poloniex.js": "0.0.7",
