@@ -33,13 +33,27 @@ var addCandlestickDatasetToSeries = function (targetSeries, candlestick) {
 /**
  * Adds data points to a certain series, given a data set (chartData)
  * @param {HighChart.series} targetSeries reference
+ * @param {object} chartData
+ */
+var addBacktestDatasetToSeries = function (targetSeries, candlestick) {
+  for (var i = 0; i < candlestick.length; i++) {
+    var date = candlestick[i][0] * 1000;
+    var price = candlestick[i][1];
+    console.log('backtest: adding point...');
+    addDataPointToSeries(targetSeries, date, price);
+  }
+};
+
+/**
+ * Adds data points to a certain series, given a data set (chartData)
+ * @param {HighChart.series} targetSeries reference
  * @param {array[][]} chartData
  */
 var addIndicatorDatasetToSeries = function (targetSeries, chartData) {
   for (var i = 0; i < chartData.length; i++) {
     var date = chartData[i][0] * 1000;
     var price = chartData[i][1];
-    console.log('date:', date, 'price:', price);
+    //console.log('date:', date, 'price:', price);
     addDataPointToSeries(targetSeries, date, price);
   }
 };
@@ -107,9 +121,8 @@ var createFlagSeries = function (highchart) {
  * the text which will appear when the mouse hover above the flag.
  */
 var addFlagToSeries = function (highchart, timeStamp, order) {
-
   var flagObj = {};
-  console.log('inside addFlagToSeries', timeStamp, order);
+  console.log('inside addFlagToSeries:', timeStamp, order);
   flagObj.x = timeStamp;
   flagObj.title = order;
   flagObj.text = 'Make a trade here.';
@@ -124,7 +137,7 @@ var addFlagToSeries = function (highchart, timeStamp, order) {
  *     updatedChartData listens for live data and adds it to a targetSeries
  * @param {HighChart} highchart self reference
  */
-var loadChartData = function (highchart) {
+var loadStrategyTrades = function (highchart) {
   var socket = io.connect('http://localhost:3000');
   console.log('CONNECTION RECEIVED. SERVER RUNNING AT http://localhost:3000');
 
@@ -154,14 +167,11 @@ var loadChartData = function (highchart) {
     console.log('### adding SMA20 to chart');
     addIndicatorDatasetToSeries(targetSMA20, SMA20);
 
-    console.log(highchart.series);
-
     /* Adding order flags */
     createFlagSeries(highchart);
-    console.log(chartData.flags);
     for (var i = 0; i < chartData.flags.length; i++) {
       console.log('flag added');
-      var timeStamp = chartData.flags[i].timeStamp * 1000;
+      var timeStamp = chartData.flags[i].timestamp * 1000;
       var orderLongShort = chartData.flags[i].longShort;
       addFlagToSeries(highchart, timeStamp, orderLongShort);
     }
@@ -179,8 +189,104 @@ var loadChartData = function (highchart) {
 };
 
 
+/**
+ * Connects and listens on two sockets to initialize and then update a chart.
+ *     initializedChartData creates a series and adds historical data to it.
+ *     updatedChartData listens for live data and adds it to a targetSeries
+ * @param {HighChart} highchart self reference
+ */
+var loadPortfolioPerformance = function (highchart) {
+  var socket = io.connect('http://localhost:3000');
+  console.log('CONNECTION RECEIVED. SERVER RUNNING AT http://localhost:3000');
+
+  // INITALIZE CHART WITH HISTORICAL DATA
+  socket.on('backtest', function (chartData) {
+
+    console.log('### Portfolio: initializedChartData received...');
+    console.log('### Portfolio: creating series...');
+
+    /* Creating candlestick chart lines */
+    createCandlestickSeries(highchart, 'Backtest');
+    var bt = chartData.backtest;
+    console.log('bt', bt);
+    var btarget = highchart.get('Backtest');
+    addBacktestDatasetToSeries(btarget, bt);
+
+    /* This line needs to be here for some reason, or else chart won't render properly... */
+    createFlagSeries(highchart);
+  });
+};
+
+
 $(document).ready(function () {
-  $('#container').highcharts('StockChart', {
+  $('#hcharts-strategy').highcharts('StockChart', {
+    plotOptions: {
+      series: {
+        dataGrouping: {
+          enabled: true,
+          groupPixelWidth: 8
+        }
+      }
+    },
+    rangeSelector: {
+      buttons: [{
+        type: 'month',
+        count: 1,
+        text: '1m'
+      }, {
+        type: 'month',
+        count: 3,
+        text: '3m'
+      }, {
+        type: 'month',
+        count: 6,
+        text: '6m'
+      }, {
+        type: 'ytd',
+        text: 'YTD'
+      }, {
+        type: 'year',
+        count: 1,
+        text: '1y'
+      }, {
+        type: 'all',
+        text: 'All'
+      }],
+      inputEnabled: false,
+      selected: 1
+    },
+
+    title: {
+      text: 'Moving Avg. Crossover Trades'
+    },
+    subtitle: {
+      text: '+ Indicators (BTC/USD)'
+    },
+    xAxis: {
+      type: 'datetime',
+      ordinal: false
+    },
+    yAxis:
+      [{
+        title: {
+          text: 'Ticker',
+        },
+        opposite: false
+      }
+    ],
+    chart: {
+      events: {
+        load: function () {
+          var self = this;
+          loadStrategyTrades(self);
+        }
+      },
+    },
+    series: []
+  });
+
+
+  $('#hcharts-portfolio').highcharts('StockChart', {
     plotOptions: {
       series: {
         dataGrouping: {
@@ -218,10 +324,10 @@ $(document).ready(function () {
     },
 
     title: {
-      text: 'Charts w/ Historical Data'
+      text: 'Portfolio Performance'
     },
     subtitle: {
-      text: '+ Live updates'
+      text: 'Moving Average Crossover Strategy'
     },
     xAxis: {
       type: 'datetime',
@@ -231,7 +337,7 @@ $(document).ready(function () {
       events: {
         load: function () {
           var self = this;
-          loadChartData(self);
+          loadPortfolioPerformance(self);
         }
       },
     },
