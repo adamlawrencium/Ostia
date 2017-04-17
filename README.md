@@ -2,18 +2,24 @@
     <img src="https://cloud.githubusercontent.com/assets/10917080/19712997/5e3837e4-9b10-11e6-9fd0-7f61a6d1ed97.png" width=200px/>
 </p>
 
-### Ostia is a cryptocurrency trading platform that allows you to run algorithmic trading strategies across all major exchanges.
-Step 1. Download node
+### Ostia is a cryptocurrency trading platform that allows you to test and run algorithmic trading strategies.
 
+## Install
+```
+git clone https://github.com/adamalawrence/Ostia.git
+```
+First of all make sure you have Node properly installed. Then...
+1. Install dependencies
+```
+npm install
+```
+2. Start application
+```
+npm start
+```
+3. Visit the Ostia dashboard on your browser
+```
+localhost:3000/dashboard
+```
 
-Step 2. Navigate to directory in terminal
-
-
-Step 3. npm install
-
-
-Step 4. npm start
-
-
-Step 5. Revel in the Beauty of our Application
-
+Note: you may have to refresh the page once or twice for it to properly load
