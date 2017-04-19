@@ -141,11 +141,22 @@ var loadStrategyTrades = function (highchart) {
   var socket = io.connect('http://localhost:3000');
   console.log('CONNECTION RECEIVED. SERVER RUNNING AT http://localhost:3000');
 
+  highchart.showLoading('<img src="/assets/ostia-ship-blue-loading.png">');
+
+
   // INITALIZE CHART WITH HISTORICAL DATA
   socket.on('initializedChartData', function (chartData) {
 
+
+
+    // setTimeout(function () {
+    //   highchart.hideLoading();
+    // }, 2000);
+
     console.log('### initializedChartData received...');
     console.log('### creating series...');
+
+
 
     createCandlestickSeries(highchart, 'Closing Price');
     createIndicatorSeries(highchart, '10-Day Moving Average');
@@ -175,6 +186,9 @@ var loadStrategyTrades = function (highchart) {
       var orderLongShort = chartData.flags[i].longShort;
       addFlagToSeries(highchart, timeStamp, orderLongShort);
     }
+
+    highchart.hideLoading();
+
   });
 
 
@@ -198,6 +212,7 @@ var loadStrategyTrades = function (highchart) {
 var loadPortfolioPerformance = function (highchart) {
   var socket = io.connect('http://localhost:3000');
   console.log('CONNECTION RECEIVED. SERVER RUNNING AT http://localhost:3000');
+  highchart.showLoading('<img src="/assets/ostia-ship-blue-loading.png">');
 
   // INITALIZE CHART WITH HISTORICAL DATA
   socket.on('backtest', function (chartData) {
@@ -214,6 +229,8 @@ var loadPortfolioPerformance = function (highchart) {
 
     /* This line needs to be here for some reason, or else chart won't render properly... */
     createFlagSeries(highchart);
+
+    highchart.hideLoading();
   });
 };
 
@@ -228,6 +245,11 @@ $(document).ready(function () {
         }
       }
     },
+    // loading: {
+    //     labelStyle: {
+    //         fontStyle: 'italic'
+    //     }
+    // },
     rangeSelector: {
       buttons: [{
         type: 'month',

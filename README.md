@@ -19,7 +19,7 @@ npm start
 ```
 3. Visit the Ostia dashboard on your browser
 ```
-localhost:3000/dashboard
+localhost:3000/
 ```
 
 Note: you may have to refresh the page once or twice for it to properly load

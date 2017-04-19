@@ -83,11 +83,11 @@ io.sockets.on('connection', function (socket) {
 
 app.use(express.static('client'))
 
-app.get('/', function (req, res) {
+app.get('/1', function (req, res) {
   res.sendfile(path.join(__dirname, '/client/html/index.html'))
 })
 
-app.get('/dashboard', function (req, res) {
+app.get('/', function (req, res) {
   res.sendfile(path.join(__dirname, '/client/pages/index.html'))
 })
 
