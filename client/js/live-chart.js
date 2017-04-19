@@ -266,14 +266,14 @@ $(document).ready(function () {
       type: 'datetime',
       ordinal: false
     },
-    yAxis:
-      [{
-        title: {
-          text: 'Ticker',
-        },
-        opposite: false
-      }
-    ],
+    // yAxis:
+    //   [{
+    //     title: {
+    //       text: 'Ticker',
+    //     },
+    //     opposite: false
+    //   }
+    // ],
     chart: {
       events: {
         load: function () {
@@ -333,6 +333,14 @@ $(document).ready(function () {
       type: 'datetime',
       ordinal: false
     },
+    // yAxis:
+    //   [{
+    //     title: {
+    //       text: 'Value',
+    //     },
+    //     opposite: false
+    //   }
+    // ],
     chart: {
       events: {
         load: function () {

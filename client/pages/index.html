@@ -79,7 +79,7 @@
                             <a href="index.html"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
                         </li>
                         <li>
-                            <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Simple Moving Average </a>
+                            <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Moving Average Crossover</a>
                         </li>
                         <li>
                             <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Exponential Moving Average </a>
@@ -94,7 +94,7 @@
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header">Strategy</h1>
+                    <h1 class="page-header">Moving Average Crossover</h1>
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
@@ -104,13 +104,56 @@
                     <!-- Chart -->
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <i class="fa fa-bar-chart-o fa-fw"></i> Currency Pair Chart
+                            <i class="fa fa-bar-chart-o fa-fw"></i> Trading Signals
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
                           <div class="row">
-                            <div class="col-lg-12">
+                            <div class="col-lg-8">
                                 <div id="hcharts-strategy" style="height: 400px;"></div>
+                            </div>
+                            <div class="col-lg-4">
+                              <div class="panel panel-default">
+                                  <div class="panel-heading">
+                                      Strategy Information and Parameters
+                                  </div>
+                                  <!-- /.panel-heading -->
+                                  <div class="panel-body">
+                                      <div class="table-responsive">
+
+                                        <h4>User Description:</h4>
+                                        <p>This strategy relies on two indicators crossing over each other to trigger a signal.</p>
+
+                                        <h4>Parameters:</h4>
+                                          <table class="table">
+                                              <thead>
+                                                  <tr>
+                                                      <th>Show</th>
+                                                      <th>Indicator</th>
+                                                      <th>Param. type</th>
+                                                      <th>Param</th>
+                                                  </tr>
+                                              </thead>
+                                              <tbody>
+                                                  <tr>
+                                                      <td>x</td>
+                                                      <td>Moving Average</td>
+                                                      <td>Window</td>
+                                                      <td>10</td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td>x</td>
+                                                    <td>Moving Average</td>
+                                                    <td>Window</td>
+                                                    <td>15</td>
+                                                  </tr>
+                                              </tbody>
+                                          </table>
+                                      </div>
+                                      <!-- /.table-responsive -->
+                                  </div>
+                                  <!-- /.panel-body -->
+                              </div>
                             </div>
                           </div>
                           <div class="row">
@@ -129,7 +172,7 @@
                     <!-- Chart -->
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <i class="fa fa-bar-chart-o fa-fw"></i> Currency Pair Chart
+                            <i class="fa fa-bar-chart-o fa-fw"></i> Portfolio and Backtesting
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
@@ -181,6 +224,7 @@
                           </div>
                           <div class="row">
                             <div class="col-lg-12">
+                              <h1>sup</h1>
                             </div>
                           </div>
                         </div>
