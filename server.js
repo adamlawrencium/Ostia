@@ -39,11 +39,12 @@ io.sockets.on('connection', function (socket) {
       var indicators = financialData.indicators;
       var flags = financialData.flags;
       var backtest = financialData.backtest;
-      callback(null, candlestickData, indicators, financialData, flags, backtest);
+      var benchmark = financialData.benchmark;
+      callback(null, candlestickData, indicators, financialData, flags, backtest, benchmark);
     },
 
     /* emit initialized data */
-    function (candlestickData, indicators, financialData, flags, backtest, callback) {
+    function (candlestickData, indicators, financialData, flags, backtest, benchmark, callback) {
       socket.emit('initializedChartData', {
         candlestickData: candlestickData,
         indicators: indicators,
@@ -54,7 +55,8 @@ io.sockets.on('connection', function (socket) {
         flags: null
       });
       socket.emit('backtest', {
-        backtest:backtest
+        backtest:backtest,
+        benchmark:benchmark
       });
       callback(null, financialData);
     },
