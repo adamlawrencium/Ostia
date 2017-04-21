@@ -84,7 +84,7 @@ var createCandlestickSeries = function (highchart, name) {
   seriesObj.id = name;
   seriesObj.data = [];
   seriesObj.marker = {
-    enabled: true,
+    enabled: false,
     radius: 3
   };
   seriesObj.tooltip = {
@@ -98,7 +98,7 @@ var createCandlestickSeries = function (highchart, name) {
  * @param {HighChart} highchart self reference
  * @param {object} params parameters to add to series
  */
-var createIndicatorSeries = function (highchart, name) {
+var createIndicatorSeries = function (highchart, name, spline) {
   var seriesObj = {};
   seriesObj.name = name;
   seriesObj.id = name;
@@ -107,7 +107,9 @@ var createIndicatorSeries = function (highchart, name) {
     enabled: false,
     radius: 3
   };
-  seriesObj.type = 'spline';
+  if (spline == true) {
+    seriesObj.type = 'spline';
+  }
   seriesObj.tooltip = {
     valueDecimals: 5
   };
@@ -235,7 +237,7 @@ var loadPortfolioPerformance = function (highchart) {
     console.log('### Portfolio: creating series...');
 
     /* Creating candlestick chart lines */
-    createIndicatorSeries(highchart, 'Backtest');
+    createIndicatorSeries(highchart, 'Backtest', false);
     var bt = chartData.backtest;
     //console.log(chartData);
     console.log('bt', bt);
@@ -243,7 +245,7 @@ var loadPortfolioPerformance = function (highchart) {
     addBacktestDatasetToSeries(btarget, bt);
 
     /* Creating candlestick benchmark chart lines */
-    createIndicatorSeries(highchart, 'Benchmark');
+    createIndicatorSeries(highchart, 'Benchmark', false);
     var bm = chartData.benchmark;
     var bmtarget = highchart.get('Benchmark');
     addBenchMarkDatasetToSeries(bmtarget, bm);
@@ -261,8 +263,8 @@ $(document).ready(function () {
     plotOptions: {
       series: {
         dataGrouping: {
-          enabled: true,
-          groupPixelWidth: 8
+          enabled: false,
+          groupPixelWidth: 5
         }
       }
     },
@@ -333,7 +335,7 @@ $(document).ready(function () {
     plotOptions: {
       series: {
         dataGrouping: {
-          enabled: true,
+          enabled: false,
           groupPixelWidth: 15
         }
       }
