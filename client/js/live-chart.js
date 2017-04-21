@@ -236,6 +236,12 @@ var loadPortfolioPerformance = function (highchart) {
     console.log('### Portfolio: initializedChartData received...');
     console.log('### Portfolio: creating series...');
 
+    /* Creating candlestick benchmark chart lines */
+    createIndicatorSeries(highchart, 'Benchmark', false);
+    var bm = chartData.benchmark;
+    var bmtarget = highchart.get('Benchmark');
+    addBenchMarkDatasetToSeries(bmtarget, bm);
+
     /* Creating candlestick chart lines */
     createIndicatorSeries(highchart, 'Backtest', false);
     var bt = chartData.backtest;
@@ -244,11 +250,7 @@ var loadPortfolioPerformance = function (highchart) {
     var btarget = highchart.get('Backtest');
     addBacktestDatasetToSeries(btarget, bt);
 
-    /* Creating candlestick benchmark chart lines */
-    createIndicatorSeries(highchart, 'Benchmark', false);
-    var bm = chartData.benchmark;
-    var bmtarget = highchart.get('Benchmark');
-    addBenchMarkDatasetToSeries(bmtarget, bm);
+
 
     /* This line needs to be here for some reason, or else chart won't render properly... */
     createFlagSeries(highchart);
