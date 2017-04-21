@@ -47,6 +47,20 @@ var addBacktestDatasetToSeries = function (targetSeries, candlestick) {
 /**
  * Adds data points to a certain series, given a data set (chartData)
  * @param {HighChart.series} targetSeries reference
+ * @param {object} chartData
+ */
+var addBenchMarkDatasetToSeries = function (targetSeries, candlestick) {
+  for (var i = 0; i < candlestick.length; i++) {
+    var date = candlestick[i][0] * 1000;
+    var price = candlestick[i][1];
+    console.log('benchmark: adding point...');
+    addDataPointToSeries(targetSeries, date, price);
+  }
+};
+
+/**
+ * Adds data points to a certain series, given a data set (chartData)
+ * @param {HighChart.series} targetSeries reference
  * @param {array[][]} chartData
  */
 var addIndicatorDatasetToSeries = function (targetSeries, chartData) {
@@ -71,7 +85,7 @@ var createCandlestickSeries = function (highchart, name) {
   seriesObj.data = [];
   seriesObj.marker = {
     enabled: true,
-    radius: 3
+    radius: 2
   };
   seriesObj.tooltip = {
     valueDecimals: 5
@@ -84,7 +98,7 @@ var createCandlestickSeries = function (highchart, name) {
  * @param {HighChart} highchart self reference
  * @param {object} params parameters to add to series
  */
-var createIndicatorSeries = function (highchart, name) {
+var createIndicatorSeries = function (highchart, name, spline) {
   var seriesObj = {};
   seriesObj.name = name;
   seriesObj.id = name;
@@ -93,7 +107,9 @@ var createIndicatorSeries = function (highchart, name) {
     enabled: false,
     radius: 3
   };
-  seriesObj.type = 'spline';
+  if (spline == true) {
+    seriesObj.type = 'spline';
+  }
   seriesObj.tooltip = {
     valueDecimals: 5
   };
@@ -106,7 +122,7 @@ var createFlagSeries = function (highchart) {
   seriesObj.id = 'flags';
   seriesObj.type = 'flags';
   seriesObj.data = [];
-  seriesObj.onSeries = '10-Day Moving Average';
+  seriesObj.onSeries = 'Closing Price';
   seriesObj.shape = 'circlepin';
   seriesObj.width = 20;
 
@@ -220,12 +236,21 @@ var loadPortfolioPerformance = function (highchart) {
     console.log('### Portfolio: initializedChartData received...');
     console.log('### Portfolio: creating series...');
 
+    /* Creating candlestick benchmark chart lines */
+    createIndicatorSeries(highchart, 'Benchmark', false);
+    var bm = chartData.benchmark;
+    var bmtarget = highchart.get('Benchmark');
+    addBenchMarkDatasetToSeries(bmtarget, bm);
+
     /* Creating candlestick chart lines */
-    createCandlestickSeries(highchart, 'Backtest');
+    createIndicatorSeries(highchart, 'Backtest', false);
     var bt = chartData.backtest;
+    //console.log(chartData);
     console.log('bt', bt);
     var btarget = highchart.get('Backtest');
     addBacktestDatasetToSeries(btarget, bt);
+
+
 
     /* This line needs to be here for some reason, or else chart won't render properly... */
     createFlagSeries(highchart);
@@ -241,15 +266,10 @@ $(document).ready(function () {
       series: {
         dataGrouping: {
           enabled: true,
-          groupPixelWidth: 8
+          groupPixelWidth: 4
         }
       }
     },
-    // loading: {
-    //     labelStyle: {
-    //         fontStyle: 'italic'
-    //     }
-    // },
     rangeSelector: {
       buttons: [{
         type: 'month',
@@ -313,7 +333,7 @@ $(document).ready(function () {
       series: {
         dataGrouping: {
           enabled: true,
-          groupPixelWidth: 15
+          groupPixelWidth: 4
         }
       }
     },
