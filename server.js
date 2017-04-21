@@ -49,14 +49,14 @@ io.sockets.on('connection', function (socket) {
         candlestickData: candlestickData,
         indicators: indicators,
         flags: flags,
-        backtest:backtest
+        backtest: backtest
       });
       socket.emit('chartFlags', {
         flags: null
       });
       socket.emit('backtest', {
-        backtest:backtest,
-        benchmark:benchmark
+        backtest: backtest,
+        benchmark: benchmark
       });
       callback(null, financialData);
     },
