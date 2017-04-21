@@ -84,8 +84,8 @@ var createCandlestickSeries = function (highchart, name) {
   seriesObj.id = name;
   seriesObj.data = [];
   seriesObj.marker = {
-    enabled: false,
-    radius: 3
+    enabled: true,
+    radius: 2
   };
   seriesObj.tooltip = {
     valueDecimals: 5
@@ -122,7 +122,7 @@ var createFlagSeries = function (highchart) {
   seriesObj.id = 'flags';
   seriesObj.type = 'flags';
   seriesObj.data = [];
-  seriesObj.onSeries = '10-Day Moving Average';
+  seriesObj.onSeries = 'Closing Price';
   seriesObj.shape = 'circlepin';
   seriesObj.width = 20;
 
@@ -265,16 +265,11 @@ $(document).ready(function () {
     plotOptions: {
       series: {
         dataGrouping: {
-          enabled: false,
-          groupPixelWidth: 5
+          enabled: true,
+          groupPixelWidth: 4
         }
       }
     },
-    // loading: {
-    //     labelStyle: {
-    //         fontStyle: 'italic'
-    //     }
-    // },
     rangeSelector: {
       buttons: [{
         type: 'month',
@@ -337,8 +332,8 @@ $(document).ready(function () {
     plotOptions: {
       series: {
         dataGrouping: {
-          enabled: false,
-          groupPixelWidth: 15
+          enabled: true,
+          groupPixelWidth: 4
         }
       }
     },
