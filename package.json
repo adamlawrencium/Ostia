@@ -19,6 +19,9 @@
     "socket.io": "~1.2.1",
     "ws": "~1.1.1"
   },
+  "engines": {
+    "node": "6.2.2"
+  },
   "devDependencies": {
     "standard": "^8.5.0"
   },
