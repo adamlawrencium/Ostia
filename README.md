@@ -5,7 +5,7 @@
 ### Ostia is a cryptocurrency trading platform that allows you to test and run algorithmic trading strategies.
 
 ## Getting started
-You can either deploy Ostia to Heroku with a click of a button -- or you can clone the app locally and run it on your machine.
+The easiest way to run Ostia is to deploy it to Heroku -- or you can clone the app locally and run it on your machine.
 
 ### Deploy to Heruoku
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
