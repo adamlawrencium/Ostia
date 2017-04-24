@@ -98,4 +98,4 @@ app.get('/test', function (req, res) {
 })
 
 // Creating Express server
-server.listen(3000)
+server.listen(process.env.PORT || 3000);
