@@ -15,7 +15,7 @@ var config = {
   currencyB: 'BTC',
   reqData: {
     period: 14400,
-    startDate: Math.floor(((new Date()).getTime() / 1000)) - (300 * 86400),
+    startDate: Math.floor(((new Date()).getTime() / 1000)) - (200 * 86400),
     endDate: 9999999999,
   },
   indicators: [ {
@@ -46,21 +46,14 @@ io.sockets.on('connection', (socket) =>  {
   // });
 
   var data_handler = new DataHandler(config);
-  data_handler.initializeDataFromExchange()
+  data_handler.getFinancialData()
   .then( data => {
     console.log(data);
   })
   .catch( err => {
     console.log(err);
   });
-
-
-  /*
-
-
-
-
-  */
+  
 });
 
 io.sockets.on('$$$connection', function (socket) {
