@@ -6,30 +6,50 @@ var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var path = require('path');
 var async = require('async');
-var moment = require('moment');
 
-// Passsing in a sample config
+// Dummy config that the client would pass into a strategy file
 var config = {
-  liveTrading: true,
-  backtestMode: false,
-  strategyName: "simple-arbitrage", // exponential moving average
-  exchanges: "all", // exchanges strategy will trade
-  pair: "BTCUSD", // or "none" for every pair
-  capital: 3000, // starting capital
-  timeFrame: 4, // how long to trade
-  interval: 1000,
-  API_KEYS: {
-    poloniex: "123XYZ",
-    gdax: "123ABC"
+  strategyName: 'My SMA strategy',
+  currencyPair: 'BTCUSD',
+  indicators: [ {
+    indicator: 'SMA',
+    parameters: 10
+  }, {
+    indicator: 'EMA',
+    parameters: 15
+  }],
+  backtest: {
+    backtestRequested: true,
+    startingCapital: 1000
   }
 }
-
 
 // Set up Trading desk and run strategy
 //var runLiveTrading = require("./lib/TradingDesk.js");
 //runLiveTrading(config);
 
+var DataHandler = require('./lib/DataHandler.js');
+var AbstractStrategy = require('./lib/strategies/AbstractStrategy.js');
+
+var Strategy = new AbstractStrategy();
+
+
+io.sockets.on('connection', (socket) =>  {
+
+  io.sockets.on('createNewStrategy', (strategyRequest) => {
+    var DataHandler = new DataHandler(strategyRequest);
+    DataHandler.getFinancialData().then()
+  });
+  /*
+
+
+
+
+  */
+});
+
 io.sockets.on('connection', function (socket) {
+  console.log(`New client connected at ${Date()}`);
   async.waterfall([
 
     /* Initialze data */
