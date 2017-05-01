@@ -46,9 +46,12 @@ io.sockets.on('connection', (socket) =>  {
   // });
 
   var data_handler = new DataHandler(config);
-
-  data_handler.getFinancialData().then( data => {
+  data_handler.initializeDataFromExchange()
+  .then( data => {
     console.log(data);
+  })
+  .catch( err => {
+    console.log(err);
   });
 
 
@@ -60,7 +63,7 @@ io.sockets.on('connection', (socket) =>  {
   */
 });
 
-io.sockets.on('Xconnection', function (socket) {
+io.sockets.on('$$$connection', function (socket) {
   console.log(`New client connected at ${Date()}`);
   async.waterfall([
 
