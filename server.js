@@ -11,10 +11,11 @@ var async = require('async');
 // Dummy config that the client would pass into a strategy file
 var config = {
   strategyName: 'My SMA strategy',
-  currencyPair: 'BTCUSD',
+  currencyA: 'USDT',
+  currencyB: 'BTC',
   reqData: {
     period: 14400,
-    startDate: 160938253,
+    startDate: Math.floor(((new Date()).getTime() / 1000)) - (300 * 86400),
     endDate: 9999999999,
   },
   indicators: [ {
@@ -49,7 +50,8 @@ io.sockets.on('connection', (socket) =>  {
   data_handler.getFinancialData().then( data => {
     console.log(data);
   });
-  console.log(data_handler.getblah());
+
+
   /*
 
 
