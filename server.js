@@ -1,4 +1,5 @@
 /* WELCOME TO THE OSTIA TRADING PLATFORM */
+"use strict";
 
 var express = require('express');
 var app = express();
@@ -24,22 +25,26 @@ var config = {
   }
 }
 
-// Set up Trading desk and run strategy
-//var runLiveTrading = require("./lib/TradingDesk.js");
-//runLiveTrading(config);
-
 var DataHandler = require('./lib/DataHandler.js');
-var AbstractStrategy = require('./lib/strategies/AbstractStrategy.js');
-
-var Strategy = new AbstractStrategy();
+// var AbstractStrategy = require('./lib/strategies/AbstractStrategy.js');
+// var Strategy = new AbstractStrategy();
 
 
 io.sockets.on('connection', (socket) =>  {
+  console.log(`New client connected at ${Date()}`);
+  // io.sockets.on('createNewStrategy', (strategyRequest) => {
+  //   var DataHandler = new DataHandler(strategyRequest);
+  //   DataHandler.getFinancialData().then( data => {
+  //     console.log(data);
+  //   })
+  // });
 
-  io.sockets.on('createNewStrategy', (strategyRequest) => {
-    var DataHandler = new DataHandler(strategyRequest);
-    DataHandler.getFinancialData().then()
+  var data_handler = new DataHandler(config);
+
+  data_handler.getFinancialData().then( data => {
+    console.log(data);
   });
+  console.log(data_handler.getblah());
   /*
 
 
@@ -48,7 +53,7 @@ io.sockets.on('connection', (socket) =>  {
   */
 });
 
-io.sockets.on('connection', function (socket) {
+io.sockets.on('Xconnection', function (socket) {
   console.log(`New client connected at ${Date()}`);
   async.waterfall([
 
