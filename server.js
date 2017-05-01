@@ -39,9 +39,6 @@ var DataHandler = require('./lib/DataHandler.js');
 io.sockets.on('connection', (socket) =>  {
   console.log(`New client connected at ${Date()}`);
   // io.sockets.on('createNewStrategy', (strategyRequest) => {
-  //   var DataHandler = new DataHandler(strategyRequest);
-  //   DataHandler.getFinancialData().then( data => {
-  //     console.log(data);
   //   })
   // });
 
@@ -53,7 +50,8 @@ io.sockets.on('connection', (socket) =>  {
   .catch( err => {
     console.log(err);
   });
-  
+
+
 });
 
 io.sockets.on('$$$connection', function (socket) {
