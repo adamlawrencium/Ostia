@@ -12,6 +12,11 @@ var async = require('async');
 var config = {
   strategyName: 'My SMA strategy',
   currencyPair: 'BTCUSD',
+  reqData: {
+    period: 14400,
+    startDate: 160938253,
+    endDate: 9999999999,
+  },
   indicators: [ {
     indicator: 'SMA',
     parameters: 10
