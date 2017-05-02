@@ -22,6 +22,7 @@ var addLiveDataPointToSeries = function (targetSeries, date, price) {
  * @param {object} chartData
  */
 var addCandlestickDatasetToSeries = function (targetSeries, candlestick) {
+  console.log('@@', candlestick);
   for (var i = 0; i < candlestick.length; i++) {
     var date = candlestick[i].date * 1000;
     var price = candlestick[i].close;
@@ -180,16 +181,19 @@ var loadStrategyTrades = function (highchart) {
 
     /* Creating candlestick chart lines */
     var candlestickData = chartData.candlestickData;
+    console.log(candlestickData);
     var targetSeries = highchart.get("Closing Price");
     addCandlestickDatasetToSeries(targetSeries, candlestickData);
 
     /* Adding indicators */
-    var SMA10 = chartData.indicators.SMA10;
+    console.log(chartData);
+    var SMA10 = chartData.indicators[0];
+    console.log(SMA10);
     var targetSMA10 = highchart.get('10-Day Moving Average');
     console.log('### adding SMA10 to chart');
     addIndicatorDatasetToSeries(targetSMA10, SMA10);
 
-    var SMA20 = chartData.indicators.SMA20;
+    var SMA20 = chartData.indicators.SMA_B;
     var targetSMA20 = highchart.get('20-Day Moving Average');
     console.log('### adding SMA20 to chart');
     addIndicatorDatasetToSeries(targetSMA20, SMA20);

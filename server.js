@@ -38,15 +38,26 @@ var AbstractStrategy = require('./lib/AbstractStrategy.js');
 io.sockets.on('connection', (socket) =>  {
   console.log(`New client connected at ${Date()}`);
   // io.sockets.on('createNewStrategy', (strategyRequest) => {
-  //   })
-  // });
 
   var data_handler = new DataHandler(config);
-  // var strategy = new AbstractStrategy(config, 'data');
   data_handler.getFinancialData()
   .then( data => {
     var strategy = new AbstractStrategy(config, data);
-    console.log(strategy.getTradeOrders());
+    var exportData = strategy.getTradeOrders();
+    console.log(exportData.indicators);
+    socket.emit('initializedChartData', {
+      candlestickData: exportData.tickerData,
+      indicators: exportData.indicators,
+      flags: exportData.orders,
+    });
+    socket.emit('chartFlags', {
+      flags: null
+    });
+    socket.emit('backtest', {
+      backtest: exportData.backtest,
+      benchmark: exportData.benchmark
+    });
+
   })
   .catch( err => {
     console.log(err);
