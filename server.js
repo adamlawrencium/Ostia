@@ -31,10 +31,9 @@ var config = {
   }
 }
 
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
 var DataHandler = require('./lib/DataHandler.js');
-var AbstractStrategy = require('./lib/strategies/AbstractStrategy.js');
-
-
+var AbstractStrategy = require('./lib/AbstractStrategy.js');
 
 io.sockets.on('connection', (socket) =>  {
   console.log(`New client connected at ${Date()}`);
@@ -43,6 +42,7 @@ io.sockets.on('connection', (socket) =>  {
   // });
 
   var data_handler = new DataHandler(config);
+  var strategy = new AbstractStrategy(config, 'data');
   data_handler.getFinancialData()
   .then( data => {
     var strategy = new AbstractStrategy(config, data);
@@ -50,9 +50,9 @@ io.sockets.on('connection', (socket) =>  {
   .catch( err => {
     console.log(err);
   });
-
-
 });
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
+
 
 io.sockets.on('$$$connection', function (socket) {
   console.log(`New client connected at ${Date()}`);
