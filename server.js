@@ -42,10 +42,13 @@ io.sockets.on('connection', (socket) =>  {
   // });
 
   var data_handler = new DataHandler(config);
-  var strategy = new AbstractStrategy(config, 'data');
+  // var strategy = new AbstractStrategy(config, 'data');
   data_handler.getFinancialData()
   .then( data => {
+    // console.log(data.generatedIndicators[0]);
+    // console.log(data);
     var strategy = new AbstractStrategy(config, data);
+    console.log(strategy.getTradeOrders());
   })
   .catch( err => {
     console.log(err);
