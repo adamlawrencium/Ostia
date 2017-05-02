@@ -14,7 +14,7 @@ var config = {
   currencyA: 'USDT',
   currencyB: 'BTC',
   reqData: {
-    period: 14400,
+    period: 86400,
     startDate: Math.floor(((new Date()).getTime() / 1000)) - (200 * 86400),
     endDate: 9999999999,
   },
@@ -45,8 +45,6 @@ io.sockets.on('connection', (socket) =>  {
   // var strategy = new AbstractStrategy(config, 'data');
   data_handler.getFinancialData()
   .then( data => {
-    // console.log(data.generatedIndicators[0]);
-    // console.log(data);
     var strategy = new AbstractStrategy(config, data);
     console.log(strategy.getTradeOrders());
   })
