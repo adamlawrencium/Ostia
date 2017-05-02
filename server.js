@@ -20,10 +20,10 @@ var config = {
   },
   indicators: [ {
     indicator: 'SMA',
-    parameters: 10
+    parameter: 10
   }, {
-    indicator: 'EMA',
-    parameters: 15
+    indicator: 'SMA',
+    parameter: 25
   }],
   backtest: {
     backtestRequested: true,
@@ -32,8 +32,8 @@ var config = {
 }
 
 var DataHandler = require('./lib/DataHandler.js');
-// var AbstractStrategy = require('./lib/strategies/AbstractStrategy.js');
-// var Strategy = new AbstractStrategy();
+var AbstractStrategy = require('./lib/strategies/AbstractStrategy.js');
+
 
 
 io.sockets.on('connection', (socket) =>  {
@@ -45,7 +45,7 @@ io.sockets.on('connection', (socket) =>  {
   var data_handler = new DataHandler(config);
   data_handler.getFinancialData()
   .then( data => {
-    console.log(data);
+    var strategy = new AbstractStrategy(config, data);
   })
   .catch( err => {
     console.log(err);
