@@ -33,7 +33,7 @@ var config = {
   }
 }
 
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
+// ~~~~~~~~~~~~~~~~ Main App Process ~~~~~~~~~~~~~~~~~~ //
 var DataHandler = require('./lib/DataHandler.js');
 var AbstractStrategy = require('./lib/AbstractStrategy.js');
 
@@ -61,77 +61,27 @@ io.sockets.on('connection', (socket) => {
     console.log(err);
   });
 });
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
+// ~~~~~~~~~~~~~~~~~ End App Process ~~~~~~~~~~~~~~~~~~~ //
 
 
-io.sockets.on('$$$connection', function (socket) {
-  console.log(`New client connected at ${Date()}`);
-  async.waterfall([
 
-    /* Initialze data */
-    function (callback) {
-      var financialData = require('./lib/strategies/basicStrategy.js');
-      var candlestickData = financialData.candlestickData;
-      var indicators = financialData.indicators;
-      var flags = financialData.flags;
-      var backtest = financialData.backtest;
-      var benchmark = financialData.benchmark;
-      callback(null, candlestickData, indicators, financialData, flags, backtest, benchmark);
-    },
 
-    /* emit initialized data */
-    function (candlestickData, indicators, financialData, flags, backtest, benchmark, callback) {
-      socket.emit('initializedChartData', {
-        candlestickData: candlestickData,
-        indicators: indicators,
-        flags: flags,
-        backtest: backtest
-      });
-      socket.emit('chartFlags', {
-        flags: null
-      });
-      socket.emit('backtest', {
-        backtest: backtest,
-        benchmark: benchmark
-      });
-      callback(null, financialData);
-    },
-
-    /* poll for live data and emit */
-    function (financialData, callback) {
-      // var counter = 0;
-      // var eventLooper = setInterval(function () {
-      //   var mostRecentTickerPrice = financialData.updatedFinanceData;
-      //   socket.emit('updatedChartData', {
-      //     time: new Date().getTime(),
-      //     mostRecentTickerPrice: parseFloat(mostRecentTickerPrice)
-      //   });
-      //   console.log("### SERVER: " + Date.now() + ": live data point sent")
-      // }, 5000);
-    }
-
-  ], function (err, result) {
-    // result now equals 'done'
-  });
-});
-
-//************************/
-//        ROUTES
-//* ***********************/
-
+// ~~~~~~~~~~~~~~~~~~ App Routes ~~~~~~~~~~~~~~~~~~~~~ //
 app.use(express.static('client'))
 
 app.get('/1', function (req, res) {
   res.sendfile(path.join(__dirname, '/client/html/index.html'))
-})
+});
 
 app.get('/', function (req, res) {
   res.sendfile(path.join(__dirname, '/client/pages/index.html'))
-})
+});
 
 app.get('/test', function (req, res) {
   res.sendfile(path.join(__dirname, '/client/html/chartTest.html'))
-})
+});
+// ~~~~~~~~~~~~~~~~ End App Routes ~~~~~~~~~~~~~~~~~~ //
+
 
 // Creating Express server
 server.listen(3000);
