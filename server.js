@@ -7,6 +7,8 @@ var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var path = require('path');
 var async = require('async');
+var chalk = require('chalk');
+var fs = require('fs');
 
 // Dummy config that the client would pass into a strategy file
 var config = {
@@ -36,7 +38,7 @@ var DataHandler = require('./lib/DataHandler.js');
 var AbstractStrategy = require('./lib/AbstractStrategy.js');
 
 io.sockets.on('connection', (socket) =>  {
-  console.log(`New client connected at ${Date()}`);
+  console.log(chalk.green(`New client connected at ${Date()}`));
   // io.sockets.on('createNewStrategy', (strategyRequest) => {
 
   var data_handler = new DataHandler(config);
@@ -137,4 +139,8 @@ app.get('/test', function (req, res) {
 })
 
 // Creating Express server
-server.listen(3000)
+server.listen(3000);
+
+fs.readFile('./lib/ascii-logo.txt',"utf8", function(error,data) {
+  console.log(data);
+})
