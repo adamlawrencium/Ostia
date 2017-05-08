@@ -15,7 +15,7 @@ var config = {
   currencyB: 'BTC',
   reqData: {
     period: 86400,
-    startDate: Math.floor(((new Date()).getTime() / 1000)) - (200 * 86400),
+    startDate: Math.floor(((new Date()).getTime() / 1000)) - (100 * 86400),
     endDate: 9999999999,
   },
   indicators: [ {
@@ -43,15 +43,16 @@ io.sockets.on('connection', (socket) =>  {
   data_handler.getFinancialData()
   .then( data => {
     var strategy = new AbstractStrategy(config, data);
+
+    // exportData = tickerData, backtest, benchmark, orders, indicators
     var exportData = strategy.getTradeOrders();
-    console.log(exportData.indicators);
+    // console.log(exportData.indicators);
+    console.log(Object.keys(exportData));
+
     socket.emit('initializedChartData', {
-      candlestickData: exportData.tickerData,
+      tickerData: exportData.tickerData,
       indicators: exportData.indicators,
       flags: exportData.orders,
-    });
-    socket.emit('chartFlags', {
-      flags: null
     });
     socket.emit('backtest', {
       backtest: exportData.backtest,
