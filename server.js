@@ -20,7 +20,7 @@ var config = {
     startDate: Math.floor(((new Date()).getTime() / 1000)) - (100 * 86400),
     endDate: 9999999999,
   },
-  indicators: [ {
+  indicators: [{
     indicator: 'SMA',
     parameter: 10
   }, {
@@ -37,19 +37,16 @@ var config = {
 var DataHandler = require('./lib/DataHandler.js');
 var AbstractStrategy = require('./lib/AbstractStrategy.js');
 
-io.sockets.on('connection', (socket) =>  {
+io.sockets.on('connection', (socket) => {
   console.log(chalk.green(`New client connected at ${Date()}`));
   // io.sockets.on('createNewStrategy', (strategyRequest) => {
 
   var data_handler = new DataHandler(config);
-  data_handler.getFinancialData()
-  .then( data => {
+  data_handler.getFinancialData().then(data => {
     var strategy = new AbstractStrategy(config, data);
 
     // exportData = tickerData, backtest, benchmark, orders, indicators
     var exportData = strategy.getTradeOrders();
-    // console.log(exportData.indicators);
-    console.log(Object.keys(exportData));
 
     socket.emit('initializedChartData', {
       tickerData: exportData.tickerData,
@@ -60,9 +57,7 @@ io.sockets.on('connection', (socket) =>  {
       backtest: exportData.backtest,
       benchmark: exportData.benchmark
     });
-
-  })
-  .catch( err => {
+  }).catch(err => {
     console.log(err);
   });
 });
@@ -141,6 +136,6 @@ app.get('/test', function (req, res) {
 // Creating Express server
 server.listen(3000);
 
-fs.readFile('./lib/ascii-logo.txt',"utf8", function(error,data) {
+fs.readFile('./lib/ascii-logo.txt', "utf8", function (error, data) {
   console.log(data);
 })
