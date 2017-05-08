@@ -6,7 +6,6 @@
  */
 var addDataPointToSeries = function (targetSeries, date, price) {
   targetSeries.addPoint([date, price], false);
-  // tities
 };
 
 // Adds a live data point to a series, differs from "addDataPointToSeries"
@@ -22,7 +21,6 @@ var addLiveDataPointToSeries = function (targetSeries, date, price) {
  * @param {object} chartData
  */
 var addTickerDatasetToSeries = function (targetSeries, tickerData) {
-  console.log('@@', tickerData);
   for (var i = 0; i < tickerData.length; i++) {
     var date = tickerData[i].date * 1000;
     var price = tickerData[i].close;
@@ -179,7 +177,7 @@ var loadStrategyTrades = function (highchart) {
     addTickerDatasetToSeries(targetSeries, tickerData);
     //
     // /* Adding indicators */
-    var SMA_A = chartData.indicators[0]; console.log('indi', SMA_A);
+    var SMA_A = chartData.indicators[0];
     var targetSMA10 = highchart.get('10-Day Moving Average');
     console.log('### adding SMA10 to chart');
     addIndicatorDatasetToSeries(targetSMA10, SMA_A);
@@ -228,8 +226,7 @@ var loadPortfolioPerformance = function (highchart) {
   // INITALIZE CHART WITH HISTORICAL DATA
   socket.on('backtest', function (chartData) {
 
-
-    console.log('### Portfolio: initializedChartData received...');
+    console.log('### <Backtest> received...');
     console.log(Object.keys(chartData));
 
     /* Creating tickerData benchmark chart lines */
@@ -242,7 +239,6 @@ var loadPortfolioPerformance = function (highchart) {
     createIndicatorSeries(highchart, 'Backtest', false);
     var bt = chartData.backtest;
     //console.log(chartData);
-    console.log('bt', bt);
     var btarget = highchart.get('Backtest');
     addBacktestDatasetToSeries(btarget, bt);
 
@@ -383,7 +379,7 @@ $(document).ready(function () {
       events: {
         load: function () {
           var self = this;
-          // loadPortfolioPerformance(self);
+          loadPortfolioPerformance(self);
         }
       },
     },
