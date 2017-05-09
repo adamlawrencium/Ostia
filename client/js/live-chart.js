@@ -382,7 +382,7 @@ $(document).ready(function () {
       events: {
         load: function () {
           var self = this;
-          // loadPortfolioPerformance(self);
+          loadPortfolioPerformance(self);
         }
       },
     },
