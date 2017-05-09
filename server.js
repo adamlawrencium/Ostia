@@ -1,4 +1,5 @@
 /* WELCOME TO THE OSTIA TRADING PLATFORM */
+"use strict";
 
 var express = require('express');
 var app = express();
@@ -6,96 +7,85 @@ var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var path = require('path');
 var async = require('async');
-var moment = require('moment');
+var chalk = require('chalk');
+var fs = require('fs');
 
-// Passsing in a sample config
+// Dummy config that the client would pass into a strategy file
 var config = {
-  liveTrading: true,
-  backtestMode: false,
-  strategyName: "simple-arbitrage", // exponential moving average
-  exchanges: "all", // exchanges strategy will trade
-  pair: "BTCUSD", // or "none" for every pair
-  capital: 3000, // starting capital
-  timeFrame: 4, // how long to trade
-  interval: 1000,
-  API_KEYS: {
-    poloniex: "123XYZ",
-    gdax: "123ABC"
+  strategyName: 'My SMA strategy',
+  currencyA: 'USDT',
+  currencyB: 'BTC',
+  reqData: {
+    period: 86400,
+    startDate: Math.floor(((new Date()).getTime() / 1000)) - (100 * 86400),
+    endDate: 9999999999,
+  },
+  indicators: [{
+    indicator: 'SMA',
+    parameter: 10
+  }, {
+    indicator: 'SMA',
+    parameter: 25
+  }],
+  backtest: {
+    backtestRequested: true,
+    startingCapital: 1000
   }
 }
 
+// ~~~~~~~~~~~~~~~~ Main App Process ~~~~~~~~~~~~~~~~~~ //
+var DataHandler = require('./lib/DataHandler.js');
+var AbstractStrategy = require('./lib/AbstractStrategy.js');
 
-// Set up Trading desk and run strategy
-//var runLiveTrading = require("./lib/TradingDesk.js");
-//runLiveTrading(config);
+io.sockets.on('connection', (socket) => {
+  console.log(chalk.green(`New client connected at ${Date()}`));
+  // io.sockets.on('createNewStrategy', (strategyRequest) => {
 
-io.sockets.on('connection', function (socket) {
-  async.waterfall([
+  var data_handler = new DataHandler(config);
+  data_handler.getFinancialData().then(data => {
+    var strategy = new AbstractStrategy(config, data);
 
-    /* Initialze data */
-    function (callback) {
-      var financialData = require('./lib/strategies/basicStrategy.js');
-      var candlestickData = financialData.candlestickData;
-      var indicators = financialData.indicators;
-      var flags = financialData.flags;
-      var backtest = financialData.backtest;
-      var benchmark = financialData.benchmark;
-      callback(null, candlestickData, indicators, financialData, flags, backtest, benchmark);
-    },
+    // exportData = tickerData, backtest, benchmark, orders, indicators
+    var exportData = strategy.getTradeOrders();
 
-    /* emit initialized data */
-    function (candlestickData, indicators, financialData, flags, backtest, benchmark, callback) {
-      socket.emit('initializedChartData', {
-        candlestickData: candlestickData,
-        indicators: indicators,
-        flags: flags,
-        backtest: backtest
-      });
-      socket.emit('chartFlags', {
-        flags: null
-      });
-      socket.emit('backtest', {
-        backtest: backtest,
-        benchmark: benchmark
-      });
-      callback(null, financialData);
-    },
-
-    /* poll for live data and emit */
-    function (financialData, callback) {
-      // var counter = 0;
-      // var eventLooper = setInterval(function () {
-      //   var mostRecentTickerPrice = financialData.updatedFinanceData;
-      //   socket.emit('updatedChartData', {
-      //     time: new Date().getTime(),
-      //     mostRecentTickerPrice: parseFloat(mostRecentTickerPrice)
-      //   });
-      //   console.log("### SERVER: " + Date.now() + ": live data point sent")
-      // }, 5000);
-    }
-
-  ], function (err, result) {
-    // result now equals 'done'
+    socket.emit('initializedChartData', {
+      tickerData: exportData.tickerData,
+      indicators: exportData.indicators,
+      flags: exportData.orders,
+    });
+    socket.emit('backtest', {
+      backtest: exportData.backtest,
+      benchmark: exportData.benchmark
+    });
+  }).catch(err => {
+    console.log(err);
   });
 });
+// ~~~~~~~~~~~~~~~~~ End App Process ~~~~~~~~~~~~~~~~~~~ //
 
-//************************/
-//        ROUTES
-//* ***********************/
 
+
+
+// ~~~~~~~~~~~~~~~~~~ App Routes ~~~~~~~~~~~~~~~~~~~~~ //
 app.use(express.static('client'))
 
 app.get('/1', function (req, res) {
   res.sendfile(path.join(__dirname, '/client/html/index.html'))
-})
+});
 
 app.get('/', function (req, res) {
   res.sendfile(path.join(__dirname, '/client/pages/index.html'))
-})
+});
 
 app.get('/test', function (req, res) {
   res.sendfile(path.join(__dirname, '/client/html/chartTest.html'))
-})
+});
+// ~~~~~~~~~~~~~~~~ End App Routes ~~~~~~~~~~~~~~~~~~ //
+
 
 // Creating Express server
-server.listen(3000)
+server.listen(3000);
+
+fs.readFile('./lib/ascii-logo.txt', "utf8", function (error, data) {
+  console.log(data);
+})
