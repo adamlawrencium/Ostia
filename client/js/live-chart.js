@@ -153,6 +153,7 @@ var addFlagToSeries = function (highchart, timeStamp, order) {
  * @param {HighChart} highchart self reference
  */
 var loadStrategyTrades = function (highchart) {
+  var socket = io.connect('http://localhost:3000');
   var socket = io.connect('https://powerful-lake-24304.herokuapp.com/');
   console.log('CONNECTION RECEIVED. SERVER RUNNING AT http://localhost:3000');
   highchart.showLoading('<img src="/assets/ostia-ship-blue-loading.png">');
@@ -220,6 +221,8 @@ var loadStrategyTrades = function (highchart) {
  */
 var loadPortfolioPerformance = function (highchart) {
   var socket = io.connect('http://localhost:3000');
+  var socket = io.connect('https://powerful-lake-24304.herokuapp.com/');
+
   console.log('CONNECTION RECEIVED. SERVER RUNNING AT http://localhost:3000');
   highchart.showLoading('<img src="/assets/ostia-ship-blue-loading.png">');
 
