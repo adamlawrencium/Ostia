@@ -9,6 +9,7 @@
   "dependencies": {
     "async": "^2.1.4",
     "autobahn": "~0.10.0",
+    "chalk": "^1.1.3",
     "dsjslib": "~0.6.14",
     "express": "~3.3.4",
     "highcharts": "~5.0.0",

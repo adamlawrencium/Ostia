@@ -6,7 +6,6 @@
  */
 var addDataPointToSeries = function (targetSeries, date, price) {
   targetSeries.addPoint([date, price], false);
-  // tities
 };
 
 // Adds a live data point to a series, differs from "addDataPointToSeries"
@@ -21,10 +20,10 @@ var addLiveDataPointToSeries = function (targetSeries, date, price) {
  * @param {HighChart.series} targetSeries reference
  * @param {object} chartData
  */
-var addCandlestickDatasetToSeries = function (targetSeries, candlestick) {
-  for (var i = 0; i < candlestick.length; i++) {
-    var date = candlestick[i].date * 1000;
-    var price = candlestick[i].close;
+var addTickerDatasetToSeries = function (targetSeries, tickerData) {
+  for (var i = 0; i < tickerData.length; i++) {
+    var date = tickerData[i].date * 1000;
+    var price = tickerData[i].close;
     console.log('adding point...');
     addDataPointToSeries(targetSeries, date, price);
   }
@@ -35,10 +34,10 @@ var addCandlestickDatasetToSeries = function (targetSeries, candlestick) {
  * @param {HighChart.series} targetSeries reference
  * @param {object} chartData
  */
-var addBacktestDatasetToSeries = function (targetSeries, candlestick) {
-  for (var i = 0; i < candlestick.length; i++) {
-    var date = candlestick[i][0] * 1000;
-    var price = candlestick[i][1];
+var addBacktestDatasetToSeries = function (targetSeries, tickerData) {
+  for (var i = 0; i < tickerData.length; i++) {
+    var date = tickerData[i][0] * 1000;
+    var price = tickerData[i][1];
     console.log('backtest: adding point...');
     addDataPointToSeries(targetSeries, date, price);
   }
@@ -49,10 +48,10 @@ var addBacktestDatasetToSeries = function (targetSeries, candlestick) {
  * @param {HighChart.series} targetSeries reference
  * @param {object} chartData
  */
-var addBenchMarkDatasetToSeries = function (targetSeries, candlestick) {
-  for (var i = 0; i < candlestick.length; i++) {
-    var date = candlestick[i][0] * 1000;
-    var price = candlestick[i][1];
+var addBenchMarkDatasetToSeries = function (targetSeries, tickerData) {
+  for (var i = 0; i < tickerData.length; i++) {
+    var date = tickerData[i][0] * 1000;
+    var price = tickerData[i][1];
     console.log('benchmark: adding point...');
     addDataPointToSeries(targetSeries, date, price);
   }
@@ -156,45 +155,39 @@ var addFlagToSeries = function (highchart, timeStamp, order) {
 var loadStrategyTrades = function (highchart) {
   var socket = io.connect('http://localhost:3000');
   console.log('CONNECTION RECEIVED. SERVER RUNNING AT http://localhost:3000');
-
   highchart.showLoading('<img src="/assets/ostia-ship-blue-loading.png">');
 
 
   // INITALIZE CHART WITH HISTORICAL DATA
   socket.on('initializedChartData', function (chartData) {
 
-
-
-    // setTimeout(function () {
-    //   highchart.hideLoading();
-    // }, 2000);
-
     console.log('### initializedChartData received...');
     console.log('### creating series...');
 
-
+    console.log(Object.keys(chartData));
 
     createCandlestickSeries(highchart, 'Closing Price');
     createIndicatorSeries(highchart, '10-Day Moving Average');
     createIndicatorSeries(highchart, '20-Day Moving Average');
 
-    /* Creating candlestick chart lines */
-    var candlestickData = chartData.candlestickData;
+    /* Creating tickerData chart lines */
+    var tickerData = chartData.tickerData;
+    // console.log(tickerData);
     var targetSeries = highchart.get("Closing Price");
-    addCandlestickDatasetToSeries(targetSeries, candlestickData);
-
-    /* Adding indicators */
-    var SMA10 = chartData.indicators.SMA10;
+    addTickerDatasetToSeries(targetSeries, tickerData);
+    //
+    // /* Adding indicators */
+    var SMA_A = chartData.indicators[0];
     var targetSMA10 = highchart.get('10-Day Moving Average');
     console.log('### adding SMA10 to chart');
-    addIndicatorDatasetToSeries(targetSMA10, SMA10);
+    addIndicatorDatasetToSeries(targetSMA10, SMA_A);
 
-    var SMA20 = chartData.indicators.SMA20;
+    var SMA_B = chartData.indicators[1];
     var targetSMA20 = highchart.get('20-Day Moving Average');
     console.log('### adding SMA20 to chart');
-    addIndicatorDatasetToSeries(targetSMA20, SMA20);
+    addIndicatorDatasetToSeries(targetSMA20, SMA_B);
 
-    /* Adding order flags */
+    // /* Adding order flags */
     createFlagSeries(highchart);
     for (var i = 0; i < chartData.flags.length; i++) {
       console.log('flag added');
@@ -233,20 +226,19 @@ var loadPortfolioPerformance = function (highchart) {
   // INITALIZE CHART WITH HISTORICAL DATA
   socket.on('backtest', function (chartData) {
 
-    console.log('### Portfolio: initializedChartData received...');
-    console.log('### Portfolio: creating series...');
+    console.log('### <Backtest> received...');
+    console.log(Object.keys(chartData));
 
-    /* Creating candlestick benchmark chart lines */
+    /* Creating tickerData benchmark chart lines */
     createIndicatorSeries(highchart, 'Benchmark', false);
     var bm = chartData.benchmark;
     var bmtarget = highchart.get('Benchmark');
     addBenchMarkDatasetToSeries(bmtarget, bm);
 
-    /* Creating candlestick chart lines */
+    /* Creating tickerData chart lines */
     createIndicatorSeries(highchart, 'Backtest', false);
     var bt = chartData.backtest;
     //console.log(chartData);
-    console.log('bt', bt);
     var btarget = highchart.get('Backtest');
     addBacktestDatasetToSeries(btarget, bt);
 
