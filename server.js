@@ -17,7 +17,7 @@ var config = {
   currencyB: 'BTC',
   reqData: {
     period: 86400,
-    startDate: Math.floor(((new Date()).getTime() / 1000)) - (100 * 86400),
+    startDate: Math.floor(((new Date()).getTime() / 1000)) - (300 * 86400),
     endDate: 9999999999,
   },
   indicators: [{
