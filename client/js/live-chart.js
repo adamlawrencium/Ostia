@@ -154,7 +154,12 @@ var addFlagToSeries = function (highchart, timeStamp, order) {
  */
 var loadStrategyTrades = function (highchart) {
   var socket = io.connect('http://localhost:3000');
-  var socket = io.connect('https://powerful-lake-24304.herokuapp.com/');
+  console.log(socket);
+  if ((socket).connected) {     // weird issue where accessing variable switches disconnected and concected
+    socket = io.connect('https://powerful-lake-24304.herokuapp.com/');
+    console.log('Heroku domain socket selected');
+  }
+
   console.log('CONNECTION RECEIVED. SERVER RUNNING AT http://localhost:3000');
   highchart.showLoading('<img src="/assets/ostia-ship-blue-loading.png">');
 
@@ -220,16 +225,34 @@ var loadStrategyTrades = function (highchart) {
  * @param {HighChart} highchart self reference
  */
 var loadPortfolioPerformance = function (highchart) {
-  var socket = io.connect('http://localhost:3000');
+
   var socket = io.connect('https://powerful-lake-24304.herokuapp.com/');
+  console.log('~~~~~~');
+  console.log(socket);
+  console.log(socket.connected);
+  console.log(socket.disconnected);
+  console.log('~~~~~~');
+
+  var socket = io.connect('http://localhost:3000');
+  console.log('~~~~~~');
+  console.log(socket);
+  console.log(socket.connected);
+  console.log(socket.disconnected);
+  console.log('~~~~~~');
+
+  // if ((socket).connected) {     // weird issue where accessing variable switches disconnected and concected
+  //   socket = io.connect('https://powerful-lake-24304.herokuapp.com/');
+  //   console.log('Heroku domain socket selected');
+  // }
 
   console.log('CONNECTION RECEIVED. SERVER RUNNING AT http://localhost:3000');
   highchart.showLoading('<img src="/assets/ostia-ship-blue-loading.png">');
 
   // INITALIZE CHART WITH HISTORICAL DATA
   socket.on('backtest', function (chartData) {
-
-    console.log('### <Backtest> received...');
+    console.log(socket);
+    console.log(socket.connected);
+    console.log(socket.disconnected);    console.log('### <Backtest> received...');
     console.log(Object.keys(chartData));
 
     /* Creating tickerData benchmark chart lines */
@@ -261,7 +284,7 @@ $(document).ready(function () {
       series: {
         dataGrouping: {
           enabled: true,
-          groupPixelWidth: 4
+          groupPixelWidth: 5
         }
       }
     },
@@ -315,7 +338,7 @@ $(document).ready(function () {
       events: {
         load: function () {
           var self = this;
-          loadStrategyTrades(self);
+          // loadStrategyTrades(self);
         }
       },
     },

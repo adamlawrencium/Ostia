@@ -16,7 +16,7 @@ var config = {
   currencyA: 'USDT',
   currencyB: 'BTC',
   reqData: {
-    period: 900, // valid values: 300, 900, 1800, 7200, 14400, 86400
+    period: 86400, // valid values: 300, 900, 1800, 7200, 14400, 86400
     startDate: Math.floor(((new Date()).getTime() / 1000)) - (365 * 86400),
     endDate: 9999999999,
   },
