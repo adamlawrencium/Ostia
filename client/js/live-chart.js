@@ -226,26 +226,21 @@ var loadStrategyTrades = function (highchart) {
  */
 var loadPortfolioPerformance = function (highchart) {
 
-  var socket = io.connect('https://powerful-lake-24304.herokuapp.com/');
+  var socket = io.connect(window.location.href);
   console.log('~~~~~~');
   console.log(socket);
   console.log(socket.connected);
   console.log(socket.disconnected);
   console.log('~~~~~~');
 
-  var socket = io.connect('http://localhost:3000');
-  console.log('~~~~~~');
-  console.log(socket);
-  console.log(socket.connected);
-  console.log(socket.disconnected);
-  console.log('~~~~~~');
+  console.log(window.location.href);
+
 
   // if ((socket).connected) {     // weird issue where accessing variable switches disconnected and concected
   //   socket = io.connect('https://powerful-lake-24304.herokuapp.com/');
   //   console.log('Heroku domain socket selected');
   // }
 
-  console.log('CONNECTION RECEIVED. SERVER RUNNING AT http://localhost:3000');
   highchart.showLoading('<img src="/assets/ostia-ship-blue-loading.png">');
 
   // INITALIZE CHART WITH HISTORICAL DATA
