@@ -16,8 +16,8 @@ var config = {
   currencyA: 'USDT',
   currencyB: 'BTC',
   reqData: {
-    period: 86400,
-    startDate: Math.floor(((new Date()).getTime() / 1000)) - (100 * 86400),
+    period: 86400, // valid values: 300, 900, 1800, 7200, 14400, 86400
+    startDate: Math.floor(((new Date()).getTime() / 1000)) - (365 * 86400),
     endDate: 9999999999,
   },
   indicators: [{
@@ -84,8 +84,8 @@ app.get('/test', function (req, res) {
 
 
 // Creating Express server
-server.listen(3000);
+server.listen(process.env.PORT || 3000);
 
 fs.readFile('./lib/ascii-logo.txt', "utf8", function (error, data) {
   console.log(data);
-})
+});
