@@ -232,6 +232,8 @@ var loadPortfolioPerformance = function (highchart) {
     console.log(socket.disconnected);    console.log('### <Backtest> received...');
     console.log(Object.keys(chartData));
 
+    console.log(chartData.benchmark.length);
+    console.log(chartData.backtest.length);
     /* Creating tickerData benchmark chart lines */
     createIndicatorSeries(highchart, 'Benchmark', false);
     var bm = chartData.benchmark;
