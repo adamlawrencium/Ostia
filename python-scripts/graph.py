@@ -4,12 +4,6 @@ IMPLEMENTATION OF graph TO DETERMINE ARBITRAGE OPPORTUNITIES VIA BELLMAN-FORD
 
 Given pricing data for poloniex data, find arbitrage opportunities.
 
-
-write a script that someone can input and be able to output in tabular format.
-then write a frontend around that
-write api wrappers
-
-
 u'BTC_ETH': {
     u'last': u'0.01938904',
     u'quoteVolume': u'751935.44455731',
@@ -31,8 +25,6 @@ BTC ------------> ETH
 ETH <------------ BTC
 
 
-A <-- B
-
 """
 
 import networkx as nx
@@ -43,12 +35,10 @@ import json
 
 
 
-
-
 def getTickerData():
     response = requests.get("https://poloniex.com/public?command=returnTicker")
     tickerData = response.json()
-    print tickerData
+    # print tickerData
     return tickerData
 
 
@@ -77,7 +67,7 @@ def createGraphFromData(tickerData):
 
 
 
-def prepEdges(G):
+def logEdges(G):
 
     # Bellman-Ford edge preparation \\ edge_weight = -log(edge_weight)
     for edge in G.edges(data=True):
@@ -96,33 +86,19 @@ def prepEdges(G):
 def main():
     data = getTickerData()
     Graph = createGraphFromData(data)
-    Graph = prepEdges(Graph)
-
+    # Graph = logEdges(Graph)
 
     print nx.info(Graph)
-    print(nx.negative_edge_cycle(Graph))
+    print "Negative cycle?:", nx.negative_edge_cycle(Graph)
     #print nx.bellman_ford(G,'BTC',weight='weight')
 
-    import pylab
-    pos=nx.spring_layout(Graph)
-    # version 1
-    pylab.figure(1)
+    pos = nx.circular_layout(Graph)
+    print Graph
     nx.draw(Graph,pos)
     # use default edge labels
     nx.draw_networkx_edge_labels(Graph,pos)
 
-
-    # show graphs
-    pylab.show()
-
-    pos = nx.spring_layout(Graph)
-    nx.draw_networkx_edges(Graph,pos)
     plt.show()
-
 
 if __name__ == '__main__':
     main()
-
-
-
-""""""
