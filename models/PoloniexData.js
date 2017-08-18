@@ -7,11 +7,24 @@ const mongoose = require('mongoose');
  *
  */
 
-const poloniexDataSchema = new mongoose.Schema({
-
-  topCurrency: String
-
-}, { timestamps: true });
+const poloniexDataSchema = new mongoose.Schema(
+  {
+    baseCurrency: String,
+    tradeCurrency: String,
+    tickerData: [{
+      date: Number,
+      high: Number,
+      low: Number,
+      close: Number,
+      volume: Number,
+      quoteVolume: Number,
+      weightedAverage: Number
+    }]
+  },
+  { timestamps: true,
+    collection: "poloniexdata"
+  }
+);
 
 
 

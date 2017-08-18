@@ -21,8 +21,43 @@ exports.tickerData = (req, res) => {
 };
 
 
-exports.updatePoloniexData = async (req, res) => {
-  const poloData = await (new PoloniexData({"topCurrency": "bob"})).save();
-  console.log(poloData);
-  res.send({'sup': "man"})
+exports.updatePoloniexData = (req, res) => {
+  const q = req.query;
+
+  getTickerData(q).then(tickerData => {
+    const entry = {
+      "baseCurrency": q.currencyA,
+      "tradeCurrency": q.currencyB,
+      "tickerData": tickerData
+    }
+    const poloData = (new PoloniexData(entry)).save().then(data => {
+      res.send(data);
+    }).catch( err => {
+      console.log('ERROR', err);
+    });
+
+  })
+
+  // console.log(entry);
+  // const poloData = await (new PoloniexData(entry)).save();
+  // console.log(poloData);
+  // res.send({'sup': "man"})
 };
+//
+// exports.updatePoloniexData = async (req, res) => {
+//   const q = req.query;
+//   getTickerData(q).then(tickerData => {
+//     const entry = {
+//       "baseCurrency": q.currencyA,
+//       "tradeCurrency": q.currencyB,
+//       "tickerData": tickerData
+//     }
+//     const poloData = await (new PoloniexData(entry)).save();
+//     console.log(poloData);
+//     res.send({poloData});
+//   })
+//   .catch( err => {
+//     console.log(err);
+//   });
+//
+// };
