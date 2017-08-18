@@ -9,6 +9,11 @@ const mongoose = require('mongoose');
 
 const poloniexDataSchema = new mongoose.Schema(
   {
+    currencyPair: {
+      type: String,
+      unique: true,
+      required: true
+    },
     baseCurrency: String,
     tradeCurrency: String,
     tickerData: [{

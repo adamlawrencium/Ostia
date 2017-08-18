@@ -20,10 +20,8 @@ exports.tickerData = (req, res) => {
   });
 };
 
-
 exports.updatePoloniexData = (req, res) => {
   const q = req.query;
-
   getTickerData(q).then(tickerData => {
     const entry = {
       "baseCurrency": q.currencyA,
@@ -35,29 +33,44 @@ exports.updatePoloniexData = (req, res) => {
     }).catch( err => {
       console.log('ERROR', err);
     });
-
   })
-
-  // console.log(entry);
-  // const poloData = await (new PoloniexData(entry)).save();
-  // console.log(poloData);
-  // res.send({'sup': "man"})
 };
-//
+
+
+
+exports.updatePoloniexDataAPI = (pair, q) => {
+  getTickerData(q).then(tickerData => {
+    const entry = {
+      "currencyPair": pair,
+      "baseCurrency": q.currencyA,
+      "tradeCurrency": q.currencyB,
+      "tickerData": tickerData
+    }
+    const poloData = (new PoloniexData(entry)).save().then(data => {
+      return data.message;
+    }).catch( err => {
+      console.log(err.message);
+    });
+  })
+};
+
+
+//  TRYING TO USE ASYNC/AWAIT ....
 // exports.updatePoloniexData = async (req, res) => {
 //   const q = req.query;
 //   getTickerData(q).then(tickerData => {
 //     const entry = {
 //       "baseCurrency": q.currencyA,
 //       "tradeCurrency": q.currencyB,
-//       "tickerData": tickerData
+//       "tickerData": [tickerData]
 //     }
-//     const poloData = await (new PoloniexData(entry)).save();
-//     console.log(poloData);
-//     res.send({poloData});
+//     // let poloData = null;
+//     try {
+//       var poloData = (await (new PoloniexData(entry)).save());
+//       console.log(poloData);
+//     } catch (e) {
+//       console.log(e);
+//     }
+//     res.send(poloData)
 //   })
-//   .catch( err => {
-//     console.log(err);
-//   });
-//
 // };

@@ -42,6 +42,7 @@
     "node-foursquare": "^0.3.0",
     "node-linkedin": "^0.5.4",
     "node-sass-middleware": "^0.11.0",
+    "node-schedule": "^1.2.4",
     "nodemailer": "^3.1.7",
     "passport": "0.3.2",
     "passport-facebook": "^2.1.1",

@@ -19,6 +19,7 @@ const expressValidator = require('express-validator');
 const expressStatusMonitor = require('express-status-monitor');
 const sass = require('node-sass-middleware');
 const multer = require('multer');
+const dbScheduler = require('./dbScheduler');
 
 const upload = multer({ dest: path.join(__dirname, 'uploads') });
 
@@ -57,6 +58,32 @@ mongoose.connection.on('error', (err) => {
   console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
   process.exit();
 });
+// (async () => {
+//     try {
+//       var result = await dbScheduler.dbInitializer();
+//       console.log(result);
+//     } catch(e) {
+//       console.log(e)
+//     }
+// })();
+
+
+
+//
+// (async () => {
+//
+//   db = await dbScheduler.dbInitializer();
+//   console.log('hi');
+// })();
+// async function() {
+  // try {
+//     db = await dbScheduler.dbInitializer();
+//   } catch (e) {
+    // console.log('error');
+//   }
+// }
+
+
 
 /**
  * Express configuration.
@@ -228,11 +255,15 @@ app.get('/auth/pinterest/callback', passport.authorize('pinterest', { failureRed
 app.use(errorHandler());
 
 /**
- * Start Express server.
+ * Update MongoDB and start Express server.
  */
-app.listen(app.get('port'), () => {
-  console.log('%s App is running at http://localhost:%d in %s mode', chalk.green('✓'), app.get('port'), app.get('env')); 
-  console.log('  Press CTRL-C to stop\n');
-});
+dbScheduler.dbInitializer().then( () => {
+  app.listen(app.get('port'), () => {
+    dbScheduler.dbUpdater();
+    console.log('%s App is running at http://localhost:%d in %s mode', chalk.green('✓'), app.get('port'), app.get('env')); 
+    console.log('  Press CTRL-C to stop\n');
+  });
+})
+
 
 module.exports = app;
