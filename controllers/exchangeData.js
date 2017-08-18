@@ -1,3 +1,6 @@
+const mongoose = require('mongoose');
+const PoloniexData = require('../models/PoloniexData');
+
 const getTickerData = require('./exchanges/exchangeData')
 
 /**
@@ -15,4 +18,11 @@ exports.tickerData = (req, res) => {
   .catch( err => {
     console.log(err);
   });
+};
+
+
+exports.updatePoloniexData = async (req, res) => {
+  const poloData = await (new PoloniexData({"topCurrency": "bob"})).save();
+  console.log(poloData);
+  res.send({'sup': "man"})
 };

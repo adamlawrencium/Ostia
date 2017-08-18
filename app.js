@@ -122,6 +122,7 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }))
 app.get('/', homeController.index);
 
 app.get('/exchangeData', exchangeController.tickerData);
+app.get('/updateDB', exchangeController.updatePoloniexData);
 
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
