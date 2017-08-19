@@ -253,6 +253,10 @@ app.get('/auth/pinterest/callback', passport.authorize('pinterest', { failureRed
  * Error Handler.
  */
 app.use(errorHandler());
+process.on('unhandledRejection', (reason, p) => {
+  console.log('### Unhandled Rejection at: Promise', p, '\n### Reason:', reason);
+  // application specific logging, throwing an error, or other logic here
+});
 
 /**
  * Update MongoDB and start Express server.

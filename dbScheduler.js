@@ -7,7 +7,7 @@ find all documents
     if last elements 'date' is more than five minutes old
       add currencies to list
 
-PoloniexData.deleteMany({}).then( (data) => {
+DB_Poloniex.deleteMany({}).then( (data) => {
   console.log(data);
 });
  */
@@ -20,107 +20,119 @@ PoloniexData.deleteMany({}).then( (data) => {
 const mongoose = require('mongoose');
 const schedule = require('node-schedule');
 const poloniex = require('poloniex.js');
-const PoloniexData = require('./models/PoloniexData');
-const exchangeData = require('./controllers/exchangeData');
+const DB_Poloniex = require('./models/PoloniexData');
+// const exchangeData = require('./controllers/exchangeData');
 
 const polo = new poloniex();
 
-// var USDT_baseCurrencies = []
-// polo.getTicker( (err, data) => {
-//   for (item in data) {
-//     console.log(data[item]);
-//     if (data[item].slice(0,4) == data[item].slice(0,4) /*'USDT'*/) {
-//       USDT_baseCurrencies.push(data[item]);
-//       console.log(USDT_baseCurrencies[item]);
-//     }
-//   }
-//   for (pair in USDT_baseCurrencies) {
-//     let A = USDT_baseCurrencies[pair].split('_')[0];
-//     let B = USDT_baseCurrencies[pair].split('_')[1];
-//     let q = {"currencyA": A, "currencyB": B};
-//     console.log(pair);
-//     // exchangeData.updatePoloniexDataAPI(USDT_baseCurrencies[pair], q);
-//   }
-// })
-
-// PoloniexData.find({}).then( (doc) => {
-//   for (var i = 0; i < doc.length; i++) {
-//     for (var j = 0; j < )
-//     console.log(doc[i]);
-//   }
-// });
-//
-
-var getPoloData = function() {
-  // var USDT_baseCurrencies = []
-  return new Promise(function(resolve, reject) {
-    polo.getTicker( (err, data) => {
-      resolve(data)
-      // for (item in data) {
-      //   console.log(data[item]);
-      //   if (data[item].slice(0,4) == data[item].slice(0,4) /*'USDT'*/) {
-      //     USDT_baseCurrencies.push(data[item]);
-      //     console.log(USDT_baseCurrencies[item]);
-      //   }
-      // }
-      if (err) { reject(err); }
+function getTickData(currencyA, currencyB) {
+  return new Promise((resolve, reject) => {
+    var tickData = [];
+    polo.returnChartData(currencyA, currencyB, 86400, 1000000000, 9999999999, (err, data) => {
+      if (err) {
+        throw new Error('data request messed up...')
+      } else {
+        for (var i = 0; i < data.length; i++) {
+          tickData.push(data[i]);
+        }
+        resolve(tickData);
+      }
+      reject('Something happened, oh no!');
     });
   });
 }
+
+function addPairToDB_Poloniex(pair, currencyA, currencyB) {
+  return new Promise(async function(resolve, reject) {
+    console.log('### Getting tick data for', pair,'...');
+    try {
+      var tickData = await getTickData(currencyA, currencyB);
+    } catch (e) {
+      console.log(e);
+      reject('### ERROR GETTING POLONIEX DATA FOR', pair)
+    }
+
+    const entry = {
+      "currencyPair": pair,
+      "baseCurrency": currencyA,
+      "tradeCurrency": currencyB,
+      "tickData": tickData
+    };
+    console.log('### Recieved data for', pair, tickData[0]);
+    console.log('### Adding', pair, 'tick data to DB...');
+    try {
+      var savedData = await (new DB_Poloniex(entry)).save();
+    } catch (e) {
+      console.log('### ERROR: Couldn\'t save data.');
+      reject(e)
+    }
+    resolve('### Data for',pair,'was saved to DB');
+  });
+}
+
+function getCurrentOrderbook() {
+  return new Promise(function(resolve, reject) {
+    polo.getTicker( (err, data) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(data)
+    });
+  });
+}
+
 
 exports.dbInitializer = async function() {
   // take an orderbook snapshot
   // for pairs in snapshot but not in database, add it (this will add new currencies)
   //
-
-  const [orderbook, docs] = await Promise.all([getPoloData(), PoloniexData.find({})]);
-
-  // console.log("docs", docs);
-  // console.log("orderbook", orderbook);
-
-  for (pair in orderbook) {
-    let foundPairInDB = false
-    for (let i = 0; i < docs.length; i++) {
-      if (pair == docs[i].currencyPair) {
-        foundPairInDB = true;
-      }
-    }
-    if (foundPairInDB) {
-      console.log('found match:', pair);
-      console.log('updating entry\n');
-      // update DB entry
-      // find db entry
-      //  check current date - tickerData[-1].date < 5 mins
-      //  if yes, get data from tickerData[-1].date to current time and add to DB
-      //  if no, do nothing
-    }
-    else {
-      console.log('new pair found', pair);
-      console.log('adding pair to db\n');
-      // add entry to DB
-      // add data from 0000000000 to 9999999999
-    }
-  }
-
-  // console.log(docs[0].currencyPair);
-  // for (doc in docs.keys()) {
-  //   console.log(doc);
-  // }
-
-  // items.forEach( (item) => {
-  //   console.log(item);
-  // })
   return new Promise(function(resolve, reject) {
-    resolve();
-  });
+
+    DB_Poloniex.deleteMany({}).then( data => { console.log(data); resolve();});
+
+    // const [orderbook, docs] = await Promise.all([getCurrentOrderbook(), DB_Poloniex.find({})]);
+    //
+    // // console.log("docs", docs);
+    // // console.log("orderbook", orderbook);
+    //
+    // var DBUpdatePromises = []
+    // var toAdd = []
+    // var updates = {}
+    // for (pair in orderbook) {
+    //   let foundPairInDB = false
+    //   for (let i = 0; i < docs.length; i++) {
+    //     if (pair == docs[i].currencyPair) {
+    //       foundPairInDB = true;
+    //     }
+    //   }
+    //   if (foundPairInDB) {
+    //     console.log('###',pair,'already exists in DB. Updating entry...');
+    //     // update DB entry
+    //     // find db entry
+    //     //  check current date - tickData[-1].date < 5 mins
+    //     //  if yes, get data from tickData[-1].date to current time and add to DB
+    //     //  if no, do nothing
+    //   }
+    //   else {
+    //     console.log('### New pair found:', pair);
+    //     var AB = pair.split('_'); var A = AB[0]; var B = AB[1];
+    //     DBUpdatePromises.push(addPairToDB_Poloniex(pair, A, B));
+    //     // process.exit(1)
+    //   }
+    // }
+    //
+    // const DBUpdateResolves = await Promise.all(DBUpdatePromises);
+    // console.log(DBUpdatePromises);
+    //
+
+  })
 }
 
 
 exports.dbUpdater = function() {
   // Job runs at the top of every 5 minutes
-  var j = schedule.scheduleJob('*/5 * * * *', function(){
+  var j = schedule.scheduleJob('*/5 * * * *', function() {
     console.log(new Date(), 'DATABASE UPDATED');
     console.log();
   });
-
 }
