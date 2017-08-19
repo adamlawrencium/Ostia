@@ -52,7 +52,7 @@ const polo = new poloniex();
 //
 
 var getPoloData = function() {
-  var USDT_baseCurrencies = []
+  // var USDT_baseCurrencies = []
   return new Promise(function(resolve, reject) {
     polo.getTicker( (err, data) => {
       resolve(data)
@@ -63,6 +63,7 @@ var getPoloData = function() {
       //     console.log(USDT_baseCurrencies[item]);
       //   }
       // }
+      if (err) { reject(err); }
     });
   });
 }
@@ -71,11 +72,40 @@ exports.dbInitializer = async function() {
   // take an orderbook snapshot
   // for pairs in snapshot but not in database, add it (this will add new currencies)
   //
-  
-  var [orderbook, docs] = await Promise.all([getPoloData(), PoloniexData.find({})]);
 
-  console.log("doc", docs);
-  console.log("orderbook", orderbook);
+  const [orderbook, docs] = await Promise.all([getPoloData(), PoloniexData.find({})]);
+
+  // console.log("docs", docs);
+  // console.log("orderbook", orderbook);
+
+  for (pair in orderbook) {
+    let foundPairInDB = false
+    for (let i = 0; i < docs.length; i++) {
+      if (pair == docs[i].currencyPair) {
+        foundPairInDB = true;
+      }
+    }
+    if (foundPairInDB) {
+      console.log('found match:', pair);
+      console.log('updating entry\n');
+      // update DB entry
+      // find db entry
+      //  check current date - tickerData[-1].date < 5 mins
+      //  if yes, get data from tickerData[-1].date to current time and add to DB
+      //  if no, do nothing
+    }
+    else {
+      console.log('new pair found', pair);
+      console.log('adding pair to db\n');
+      // add entry to DB
+      // add data from 0000000000 to 9999999999
+    }
+  }
+
+  // console.log(docs[0].currencyPair);
+  // for (doc in docs.keys()) {
+  //   console.log(doc);
+  // }
 
   // items.forEach( (item) => {
   //   console.log(item);
