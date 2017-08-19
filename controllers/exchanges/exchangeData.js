@@ -26,7 +26,7 @@ function getTickerData(q) {
   return new Promise((resolve, reject) => {
     var tickerData = [];
     console.log(q);
-    polo.returnChartData(q.currencyA, q.currencyB, 300, Math.floor(((new Date()).getTime() / 1000)) - (365 * 86400), 9999999999, (err, data) => {
+    polo.returnChartData(q.currencyA, q.currencyB, 300, 1000000000, 9999999999, (err, data) => {
       if (err) {
         throw new Error('data request messed up...')
       } else {

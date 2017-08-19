@@ -25,27 +25,63 @@ const exchangeData = require('./controllers/exchangeData');
 
 const polo = new poloniex();
 
-var USDT_baseCurrencies = []
-polo.getTicker( (err, data) => {
-  for (item in data) {
-    console.log(data[item]);
-    if (data[item].slice(0,4) == data[item].slice(0,4) /*'USDT'*/) {
-      USDT_baseCurrencies.push(data[item]);
-      console.log(USDT_baseCurrencies[item]);
-    }
-  }
-  for (pair in USDT_baseCurrencies) {
-    let A = USDT_baseCurrencies[pair].split('_')[0];
-    let B = USDT_baseCurrencies[pair].split('_')[1];
-    let q = {"currencyA": A, "currencyB": B};
-    console.log(pair);
-    // exchangeData.updatePoloniexDataAPI(USDT_baseCurrencies[pair], q);
-  }
-})
+// var USDT_baseCurrencies = []
+// polo.getTicker( (err, data) => {
+//   for (item in data) {
+//     console.log(data[item]);
+//     if (data[item].slice(0,4) == data[item].slice(0,4) /*'USDT'*/) {
+//       USDT_baseCurrencies.push(data[item]);
+//       console.log(USDT_baseCurrencies[item]);
+//     }
+//   }
+//   for (pair in USDT_baseCurrencies) {
+//     let A = USDT_baseCurrencies[pair].split('_')[0];
+//     let B = USDT_baseCurrencies[pair].split('_')[1];
+//     let q = {"currencyA": A, "currencyB": B};
+//     console.log(pair);
+//     // exchangeData.updatePoloniexDataAPI(USDT_baseCurrencies[pair], q);
+//   }
+// })
 
-exports.dbInitializer = function() {
+// PoloniexData.find({}).then( (doc) => {
+//   for (var i = 0; i < doc.length; i++) {
+//     for (var j = 0; j < )
+//     console.log(doc[i]);
+//   }
+// });
+//
+
+var getPoloData = function() {
+  var USDT_baseCurrencies = []
   return new Promise(function(resolve, reject) {
+    polo.getTicker( (err, data) => {
+      resolve(data)
+      // for (item in data) {
+      //   console.log(data[item]);
+      //   if (data[item].slice(0,4) == data[item].slice(0,4) /*'USDT'*/) {
+      //     USDT_baseCurrencies.push(data[item]);
+      //     console.log(USDT_baseCurrencies[item]);
+      //   }
+      // }
+    });
+  });
+}
 
+exports.dbInitializer = async function() {
+  // take an orderbook snapshot
+  // for pairs in snapshot but not in database, add it (this will add new currencies)
+  //
+  
+  var [orderbook, docs] = await Promise.all([getPoloData(), PoloniexData.find({})]);
+
+  console.log("doc", docs);
+  console.log("orderbook", orderbook);
+
+  // items.forEach( (item) => {
+  //   console.log(item);
+  // })
+  return new Promise(function(resolve, reject) {
+    resolve();
   });
 }
 

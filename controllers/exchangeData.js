@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const PoloniexData = require('../models/PoloniexData');
-
 const getTickerData = require('./exchanges/exchangeData')
 
 /**
