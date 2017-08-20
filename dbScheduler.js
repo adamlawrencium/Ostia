@@ -110,12 +110,14 @@ function getCurrentOrderbook() {
 
 
 function checkAgeOfTickData(tickData) {
-  for (var i = 0; i < tickData.length; i++) {
+  var i;
+  for (i = 0; i < tickData.length; i++) {
     if ((new Date().getTime()/1000) - tickData[i].date < GRANULARITY) {
-      console.log(`### Data for ${tickData[i].currencyPair} is fresh!`);
-      return (true);
+      return true;
     }
   }
+  // console.log(`### Data for ${tickData[i].currencyPair} is ${(new Date().getTime()/1000) - tickData[i].date} old!`);
+  return false;
 }
 
 function updateDoc(tickData, currencyA, currencyB) {
@@ -128,7 +130,7 @@ function updateDoc(tickData, currencyA, currencyB) {
     }
     var startTime = mostRecent + GRANULARITY;
     var newData = [];
-    polo.returnChartData(currencyA, currencyB, GRANULARITY, startTime, 9999999999, (err, data) => {
+    polo.returnChartData(currencyA, currencyB, GRANULARITY, startTime, 9999999999, async (err, data) => {
       if (err) {
         console.log('### ERROR getting historical tick data for', (currencyA+'_'+currencyB));
         console.log(err);
@@ -156,8 +158,8 @@ function updateDoc(tickData, currencyA, currencyB) {
       try {
         console.log('### Updating entry to the DB...');
         var savedData = await (new DB_Poloniex.insertMany(bulkWriteToDB));
-        console.log('### SUCCESS: Data for ' + pair + ' was updated to DB');
-        resolve(('### SUCCESS: Data for ' + pair + ' was updated to DB'));
+        console.log('### SUCCESS: Data for ' + (currencyA+'_'+currencyB) + ' was updated to DB');
+        resolve(('### SUCCESS: Data for ' + (currencyA+'_'+currencyB) + ' was updated to DB'));
       } catch (e) {
         console.log('### ERROR: Couldn\'t update data.');
         console.log(e);
@@ -193,13 +195,14 @@ exports.dbInitializer = async function() {
         var tickDataFromDB = await DB_Poloniex.find({
           currencyPair: pair
         });
+        console.log(tickDataFromDB);
 
-        if (tickDataFromDB.length > 5) {
+        if (tickDataFromDB.length != 0) {
           console.log(`### ${pair} found in DB.`);
           if (checkAgeOfTickData(tickDataFromDB) == true) {
-            console.log(`### Data for ${pair} is up to date.`);
+            console.log(`### ${pair} data is up to date.`);
           } else {
-            console.log(`### Data for ${pair} is not up to date. Updating...`);
+            console.log(`### ${pair} data is not up to date. Updating...`);
             await updateDoc(tickDataFromDB, A, B);
           }
         }
