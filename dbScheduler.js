@@ -27,6 +27,7 @@ const DB_Poloniex = require('./models/PoloniexData');
 // const exchangeData = require('./controllers/exchangeData');
 
 const polo = new poloniex();
+const GRANULARITY = 86400;
 
 // makes bursts of 6 requests
 function poloniexRequester(requests) {
@@ -37,7 +38,7 @@ function poloniexRequester(requests) {
 function getTickData(currencyA, currencyB) {
   return new Promise((resolve, reject) => {
     var tickData = [];
-    polo.returnChartData(currencyA, currencyB, 86400, 1000000000, 9999999999, (err, data) => {
+    polo.returnChartData(currencyA, currencyB, GRANULARITY, 1000000000, 9999999999, (err, data) => {
       if (err) {
         console.log('### ERROR getting historical tick data for', (currencyA+'_'+currencyB));
         console.log(err);
@@ -107,18 +108,62 @@ function getCurrentOrderbook() {
   });
 }
 
-function checkAgeOfPair(currencyPair) {
+
+function checkAgeOfTickData(tickData) {
+  for (var i = 0; i < tickData.length; i++) {
+    if ((new Date().getTime()/1000) - tickData[i].date < GRANULARITY) {
+      console.log(`### Data for ${tickData[i].currencyPair} is fresh!`);
+      return (true);
+    }
+  }
+}
+
+function updateDoc(tickData, currencyA, currencyB) {
   return new Promise(async function(resolve, reject) {
-    console.log('### finding age of', currencyPair,'...');
-    var tickData = await DB_Poloniex.find({
-      currencyPair: currencyPair
-    });
+    var mostRecent = 0;
     for (var i = 0; i < tickData.length; i++) {
-      if ((new Date().getTime()/1000) - tickData[i].date < 86400) {
-        console.log(`Data for ${currencyPair} is fresh!`);
-        resolve('Data is fresh!');
+      if (tickData[i].date > mostRecent) {
+        mostRecent = tickData[i].date;
       }
     }
+    var startTime = mostRecent + GRANULARITY;
+    var newData = [];
+    polo.returnChartData(currencyA, currencyB, GRANULARITY, startTime, 9999999999, (err, data) => {
+      if (err) {
+        console.log('### ERROR getting historical tick data for', (currencyA+'_'+currencyB));
+        console.log(err);
+      } else {
+        for (var i = 0; i < data.length; i++) {
+          newData.push(data[i]);
+        }
+      }
+      var bulkWriteToDB = [];
+      for (var i = 0; i < newData.length; i++) {
+        const entry = {
+          "currencyPair": (currencyA+'_'+currencyB),
+          "baseCurrency": currencyA,
+          "tradeCurrency": currencyB,
+          "date": newData[i].date,
+          "high": newData[i].high,
+          "low": newData[i].low,
+          "close": newData[i].close,
+          "volume": newData[i].volume,
+          "quoteVolume": newData[i].quoteVolume,
+          "weightedAverage": newData[i].weightedAverage
+        };
+        bulkWriteToDB.push(entry);
+      }
+      try {
+        console.log('### Updating entry to the DB...');
+        var savedData = await (new DB_Poloniex.insertMany(bulkWriteToDB));
+        console.log('### SUCCESS: Data for ' + pair + ' was updated to DB');
+        resolve(('### SUCCESS: Data for ' + pair + ' was updated to DB'));
+      } catch (e) {
+        console.log('### ERROR: Couldn\'t update data.');
+        console.log(e);
+        reject(e)
+      }
+    });
   });
 }
 
@@ -144,23 +189,23 @@ exports.dbInitializer = async function() {
       var toAdd = [];
       var updates = {};
       for (var pair in orderbook) {
-        let foundPairInDB = false;
-        console.log(await checkAgeOfPair(pair));
-        if (foundPairInDB) {
-          console.log('###', pair, 'already exists in DB.');
-          // update DB entry
-          // find db entry
-          //  check current date - tickData[-1].date < 5 mins
-          //  if yes, get data from tickData[-1].date to current time and add to DB
-          //  if no, do nothing
+        var AB = pair.split('_'); var A = AB[0]; var B = AB[1];
+        var tickDataFromDB = await DB_Poloniex.find({
+          currencyPair: pair
+        });
+
+        if (tickDataFromDB.length > 5) {
+          console.log(`### ${pair} found in DB.`);
+          if (checkAgeOfTickData(tickDataFromDB) == true) {
+            console.log(`### Data for ${pair} is up to date.`);
+          } else {
+            console.log(`### Data for ${pair} is not up to date. Updating...`);
+            await updateDoc(tickDataFromDB, A, B);
+          }
         }
         else {
           console.log('### New pair found:', pair);
-          var AB = pair.split('_'); var A = AB[0]; var B = AB[1];
-          // setTimeout(function () {
-          // sleep.msleep(1000);
           DBUpdatePromises.push(addPairToDB_Poloniex(pair, A, B));
-          // }, 0);
         }
       }
 
@@ -173,9 +218,6 @@ exports.dbInitializer = async function() {
         reject(DBUpdateResolves)
       }
     }
-    // resolve();
-    // DB_Poloniex.find({}).then(data => {console.log(data);})
-
   });
 }
 
