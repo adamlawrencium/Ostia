@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
  *
  */
 
-const poloniexDataSchema = new mongoose.Schema(
+const poloniexDataSchema__ = new mongoose.Schema(
   {
     currencyPair: {
       type: String,
@@ -30,6 +30,25 @@ const poloniexDataSchema = new mongoose.Schema(
   }
 );
 
+const poloniexDataSchema = new mongoose.Schema(
+  {
+    currencyPair: {
+      type: String,
+      required: false
+    },
+    baseCurrency: String,
+    tradeCurrency: String,
+    date: Number,
+    high: Number,
+    low: Number,
+    close: Number,
+    volume: Number,
+    quoteVolume: Number,
+    weightedAverage: Number},
+  { timestamps: true,
+    collection: "poloniexdata"
+  }
+);
 
 
 const PoloniexData = mongoose.model('PoloniexData', poloniexDataSchema);
