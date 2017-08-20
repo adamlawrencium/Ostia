@@ -24,20 +24,23 @@ const DB_Poloniex = require('./models/PoloniexData');
 // const exchangeData = require('./controllers/exchangeData');
 
 const polo = new poloniex();
-
+// 300, 900, 1800, 7200, 14400, 86400
 function getTickData(currencyA, currencyB) {
   return new Promise((resolve, reject) => {
     var tickData = [];
     polo.returnChartData(currencyA, currencyB, 86400, 1000000000, 9999999999, (err, data) => {
       if (err) {
-        throw new Error('data request messed up...')
+        console.log('### ERROR getting historical tick data for', (currencyA+'_'+currencyB));
+        console.log(err);
+        // throw new Error('data request messed up...')
+        reject(err);
       } else {
         for (var i = 0; i < data.length; i++) {
           tickData.push(data[i]);
         }
         resolve(tickData);
       }
-      reject('Something happened, oh no!');
+      reject(err);
     });
   });
 }
@@ -50,6 +53,7 @@ function addPairToDB_Poloniex(pair, currencyA, currencyB) {
     } catch (e) {
       console.log(e);
       reject('### ERROR GETTING POLONIEX DATA FOR', pair)
+      return;
     }
 
     const entry = {
@@ -58,15 +62,18 @@ function addPairToDB_Poloniex(pair, currencyA, currencyB) {
       "tradeCurrency": currencyB,
       "tickData": tickData
     };
-    console.log('### Recieved data for', pair, tickData[0]);
+    console.log('### Recieved data for', pair); console.log(tickData[0]);
+    console.log(`${tickData.length-1} other ticks`);
     console.log('### Adding', pair, 'tick data to DB...');
     try {
       var savedData = await (new DB_Poloniex(entry)).save();
     } catch (e) {
       console.log('### ERROR: Couldn\'t save data.');
       reject(e)
+      return;
     }
-    resolve('### Data for',pair,'was saved to DB');
+    console.log('### SUCCESS: Data for ' + pair + ' was saved to DB');
+    resolve(('### SUCCESS: Data for ' + pair + ' was saved to DB'));
   });
 }
 
@@ -75,6 +82,7 @@ function getCurrentOrderbook() {
     polo.getTicker( (err, data) => {
       if (err) {
         reject(err);
+        return;
       }
       resolve(data)
     });
@@ -86,46 +94,60 @@ exports.dbInitializer = async function() {
   // take an orderbook snapshot
   // for pairs in snapshot but not in database, add it (this will add new currencies)
   //
-  return new Promise(function(resolve, reject) {
+  return new Promise(async function(resolve, reject) {
+    if (0) {
+        DB_Poloniex.deleteMany({}).then( data => { console.log(data); resolve();});
+    } else {
+      console.log('### Getting orderbooks and current DB docs');
+      // var orderbook; var docs;
+      try {
+        [orderbook, docs] = await Promise.all([getCurrentOrderbook(), DB_Poloniex.find({})]);
+      } catch (e) {
+        console.log(e);
+        reject(e);
+      }
+      // const [orderbook, docs] = await Promise.all([getCurrentOrderbook(), DB_Poloniex.find({})]);
+      var DBUpdatePromises = [];
+      var toAdd = [];
+      var updates = {};
+      var c = 0;
+      for (pair in orderbook) {
+        c++;
+        if (c > 3) {continue;}
+        let foundPairInDB = false
+        for (let i = 0; i < docs.length; i++) {
+          if (pair == docs[i].currencyPair && orderbook) {
+            foundPairInDB = true;
+          }
+        }
+        if (foundPairInDB) {
+          console.log('###', pair, 'already exists in DB.');
+          // update DB entry
+          // find db entry
+          //  check current date - tickData[-1].date < 5 mins
+          //  if yes, get data from tickData[-1].date to current time and add to DB
+          //  if no, do nothing
+        }
+        else {
+          console.log('### New pair found:', pair);
+          var AB = pair.split('_'); var A = AB[0]; var B = AB[1];
+          DBUpdatePromises.push(addPairToDB_Poloniex(pair, A, B));
+        }
+      }
 
-    DB_Poloniex.deleteMany({}).then( data => { console.log(data); resolve();});
+      let DBUpdateResolves;
+      try {
+        DBUpdateResolves = await Promise.all(DBUpdatePromises);
+        resolve(DBUpdateResolves)
+      } catch (e) {
+        console.log(e);
+        reject(DBUpdateResolves)
+      }
+    }
+    // resolve();
+    // DB_Poloniex.find({}).then(data => {console.log(data);})
 
-    // const [orderbook, docs] = await Promise.all([getCurrentOrderbook(), DB_Poloniex.find({})]);
-    //
-    // // console.log("docs", docs);
-    // // console.log("orderbook", orderbook);
-    //
-    // var DBUpdatePromises = []
-    // var toAdd = []
-    // var updates = {}
-    // for (pair in orderbook) {
-    //   let foundPairInDB = false
-    //   for (let i = 0; i < docs.length; i++) {
-    //     if (pair == docs[i].currencyPair) {
-    //       foundPairInDB = true;
-    //     }
-    //   }
-    //   if (foundPairInDB) {
-    //     console.log('###',pair,'already exists in DB. Updating entry...');
-    //     // update DB entry
-    //     // find db entry
-    //     //  check current date - tickData[-1].date < 5 mins
-    //     //  if yes, get data from tickData[-1].date to current time and add to DB
-    //     //  if no, do nothing
-    //   }
-    //   else {
-    //     console.log('### New pair found:', pair);
-    //     var AB = pair.split('_'); var A = AB[0]; var B = AB[1];
-    //     DBUpdatePromises.push(addPairToDB_Poloniex(pair, A, B));
-    //     // process.exit(1)
-    //   }
-    // }
-    //
-    // const DBUpdateResolves = await Promise.all(DBUpdatePromises);
-    // console.log(DBUpdatePromises);
-    //
-
-  })
+  });
 }
 
 

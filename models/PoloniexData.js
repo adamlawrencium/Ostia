@@ -11,12 +11,11 @@ const poloniexDataSchema = new mongoose.Schema(
   {
     currencyPair: {
       type: String,
-      unique: true,
       required: true
     },
     baseCurrency: String,
     tradeCurrency: String,
-    tickerData: [{
+    tickData: [{
       date: Number,
       high: Number,
       low: Number,
