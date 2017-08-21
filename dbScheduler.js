@@ -27,7 +27,7 @@ const DB_Poloniex = require('./models/PoloniexData');
 // const exchangeData = require('./controllers/exchangeData');
 
 const polo = new poloniex();
-const GRANULARITY = 86400;
+const GRANULARITY = 300;
 
 // makes bursts of 6 requests
 function poloniexRequester(requests) {
@@ -38,7 +38,7 @@ function poloniexRequester(requests) {
 function getTickData(currencyA, currencyB) {
   return new Promise((resolve, reject) => {
     var tickData = [];
-    polo.returnChartData(currencyA, currencyB, GRANULARITY, 1000000000, 9999999999, (err, data) => {
+    polo.returnChartData(currencyA, currencyB, GRANULARITY, 1503014400, 9999999999, (err, data) => {
       if (err) {
         console.log('### ERROR getting historical tick data for', (currencyA+'_'+currencyB));
         console.log(err);
@@ -55,7 +55,7 @@ function getTickData(currencyA, currencyB) {
   });
 }
 
-function addPairToDB_Poloniex(pair, currencyA, currencyB) {
+function addNewPairToDB_Poloniex(pair, currencyA, currencyB) {
   return new Promise(async function(resolve, reject) {
     console.log('### Getting tick data for', pair,'...');
     try {
@@ -187,15 +187,16 @@ exports.dbInitializer = async function() {
         console.log(e);
         reject(e);
       }
-      var DBUpdatePromises = [];
+      var DBAddNewEntryPromises = [];
+      var DBUpdateEntryPromises = [];
       var toAdd = [];
       var updates = {};
       for (var pair in orderbook) {
         var AB = pair.split('_'); var A = AB[0]; var B = AB[1];
+
         var tickDataFromDB = await DB_Poloniex.find({
           currencyPair: pair
         });
-        console.log(tickDataFromDB);
 
         if (tickDataFromDB.length != 0) {
           console.log(`### ${pair} found in DB.`);
@@ -208,13 +209,13 @@ exports.dbInitializer = async function() {
         }
         else {
           console.log('### New pair found:', pair);
-          DBUpdatePromises.push(addPairToDB_Poloniex(pair, A, B));
+          DBAddNewEntryPromises.push(addNewPairToDB_Poloniex(pair, A, B));
         }
       }
 
       let DBUpdateResolves;
       try {
-        DBUpdateResolves = await Promise.all(DBUpdatePromises);
+        DBUpdateResolves = await Promise.all(DBAddNewEntryPromises);
         resolve(DBUpdateResolves)
       } catch (e) {
         console.log(e);
@@ -227,7 +228,16 @@ exports.dbInitializer = async function() {
 
 exports.dbUpdater = function() {
   // Job runs at the top of every 5 minutes
-  var j = schedule.scheduleJob('*/5 * * * *', function() {
+  var j = schedule.scheduleJob('*/1 * * * *', function() {
+    for (var blah in j) {
+      console.log(blah);
+    }
+    console.log();
+    getCurrentOrderbook().then( orderbook => {
+      console.log(orderbook);
+    })
+    // get orderbook
+    // for each currency in book, create new entry with updated price
     console.log(new Date(), 'DATABASE UPDATED');
     console.log();
   });
