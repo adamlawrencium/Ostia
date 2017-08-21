@@ -256,13 +256,13 @@ process.on('unhandledRejection', (reason, p) => {
   // application specific logging, throwing an error, or other logic here
 });
 
-/** 
+/**
  * Update MongoDB and start Express server.
  */
 dbScheduler.dbInitializer().then((DBUpdateResolves) => {
   console.log('### DB UPDATES:', DBUpdateResolves);
   console.log('### EXITING...');
-  process.exit(0)
+  process.exit(0);
   app.listen(app.get('port'), () => {
     // dbScheduler.dbUpdater();
     console.log('%s App is running at http://localhost:%d in %s mode', chalk.green('✓'), app.get('port'), app.get('env'));

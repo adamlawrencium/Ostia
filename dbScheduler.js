@@ -24,7 +24,7 @@ const DBPoloniex = require('./models/PoloniexData');
 // const exchangeData = require('./controllers/exchangeData');
 
 const polo = new Poloniex();
-const GRANULARITY = 86400;
+const GRANULARITY = 7200;
 
 // 300, 900, 1800, 7200, 14400, 86400 // 1503014400
 function getTickData(currencyA, currencyB) {
@@ -33,17 +33,26 @@ function getTickData(currencyA, currencyB) {
     polo.returnChartData(currencyA, currencyB, GRANULARITY, 1000000000, 9999999999, (err, data) => {
       if (err) {
         console.log('### ERROR getting historical tick data for', (`${currencyA}_${currencyB}`));
-        console.log(err);
-        // throw new Error('data request messed up...')
+        console.log('### Trying again to get historical data for', (`${currencyA}_${currencyB}`));
+        polo.returnChartData(currencyA, currencyB, GRANULARITY, 1000000000, 9999999999, (err, data) => {
+          if (err) {
+            console.log('### SECOND ERROR getting historical tick data for', (`${currencyA}_${currencyB}`));
+            console.log(err);
+            reject(err);
+          } else {
+            for (let i = 0; i < data.length; i++) {
+              tickData.push(data[i]);
+            }
+            resolve(tickData);
+          }
+        });
         reject(err);
       } else {
-        // console.log(tickData);
         for (let i = 0; i < data.length; i++) {
           tickData.push(data[i]);
         }
         resolve(tickData);
       }
-      // reject(err);
     });
   });
 }
@@ -57,8 +66,7 @@ function addNewPairToDBPoloniex(pair, currencyA, currencyB) {
       // console.log('tickData', tickData);
     } catch (e) {
       console.log(e);
-      reject('### ERROR GETTING POLONIEX DATA FOR', pair);
-      return;
+      reject(e); 
     }
 
     console.log('### Recieved data for', pair, `[${tickData.length}] points`);
@@ -78,12 +86,11 @@ function addNewPairToDBPoloniex(pair, currencyA, currencyB) {
       };
       bulkWriteToDB.push(entry);
     }
-    // console.log('bulkwrite',bulkWriteToDB);
     try {
       console.log(`### Adding ${bulkWriteToDB.length} new entries to the DB...`);
       await DBPoloniex.insertMany(bulkWriteToDB);
       console.log(`### SUCCESS: ${bulkWriteToDB.length} new entries for ${pair} was saved to DB`);
-      resolve((`### SUCCESS: ${bulkWriteToDB.length} new entries for ${pair} was saved to DB`));
+      resolve((`SUCCESS: ${bulkWriteToDB.length} new entries for ${pair} was saved to DB`));
     } catch (e) {
       console.log('### ERROR: Couldn\'t save data.');
       console.log(e);
@@ -209,7 +216,7 @@ exports.dbInitializer = async function () {
       }
 
       // Findf if each currency exists in our MongoDB
-      const DBAddNewEntryPromises = [];
+      // const DBAddNewEntryPromises = [];
       const DBQueries = [];
       for (let i = 0; i < orderbook.length; i++) {
         const pair = Object.keys(orderbook[i])[0];
