@@ -266,7 +266,7 @@ dbScheduler.dbInitializer().then( (DBUpdateResolves) => {
   console.log('### EXITING...');
   // process.exit(0)
   app.listen(app.get('port'), () => {
-    dbScheduler.dbUpdater();
+    // dbScheduler.dbUpdater();
     console.log('%s App is running at http://localhost:%d in %s mode', chalk.green('✓'), app.get('port'), app.get('env')); 
     console.log('  Press CTRL-C to stop\n');
   });

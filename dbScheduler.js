@@ -67,7 +67,7 @@ function addNewPairToDB_Poloniex(pair, currencyA, currencyB) {
     }
 
     console.log('### Recieved data for', pair, `[${tickData.length-1}] points`);
-    var bulkWriteToDB = [];
+    const bulkWriteToDB = [];
     for (var i = 0; i < tickData.length; i++) {
       const entry = {
         "currencyPair": pair,
@@ -113,6 +113,7 @@ function checkAgeOfTickData(tickData) {
   var i;
   for (i = 0; i < tickData.length; i++) {
     if ((new Date().getTime()/1000) - tickData[i].date < GRANULARITY) {
+      console.log('data is freshhh');
       return true;
     }
   }
@@ -192,30 +193,32 @@ exports.dbInitializer = async function() {
       var toAdd = [];
       var updates = {};
       for (var pair in orderbook) {
+        console.log(pair);
         var AB = pair.split('_'); var A = AB[0]; var B = AB[1];
-
-        var tickDataFromDB = await DB_Poloniex.find({
-          currencyPair: pair
-        });
-
-        if (tickDataFromDB.length != 0) {
-          console.log(`### ${pair} found in DB.`);
-          if (checkAgeOfTickData(tickDataFromDB) == true) {
-            console.log(`### ${pair} data is up to date.`);
-          } else {
-            console.log(`### ${pair} data is not up to date. Updating...`);
-            await updateDoc(tickDataFromDB, A, B);
+        DB_Poloniex.find({currencyPair: pair}).sort({date:-1}).limit(1).then( tickDataFromDB => {
+          if (tickDataFromDB.length != 0) {
+            console.log(`### ${pair} found in DB.`);
+            if (checkAgeOfTickData(tickDataFromDB) == true) {
+              console.log(`### ${pair} data is up to date.`);
+            } else {
+              console.log(`### ${pair} data is not up to date. Updating...`);
+              // await updateDoc(tickDataFromDB, A, B);
+            }
           }
-        }
-        else {
+        }).catch( err => {
           console.log('### New pair found:', pair);
           DBAddNewEntryPromises.push(addNewPairToDB_Poloniex(pair, A, B));
-        }
+          console.log(err);
+        });
+        // console.log(tickDataFromDB);
+        // console.log('### Querying most recent tick for',pair);
+        // DBUpdateEntryPromises.push(tickDataFromDB);
       }
 
       let DBUpdateResolves;
       try {
-        DBUpdateResolves = await Promise.all(DBAddNewEntryPromises);
+        // console.log((await Promise.all(DBUpdateEntryPromises)));
+        // DBUpdateResolves = await Promise.all(DBAddNewEntryPromises);
         resolve(DBUpdateResolves)
       } catch (e) {
         console.log(e);
@@ -234,11 +237,12 @@ exports.dbUpdater = function() {
     }
     console.log();
     getCurrentOrderbook().then( orderbook => {
-      console.log(orderbook);
+      // console.log(orderbook);
+      console.log(new Date(), 'DATABASE UPDATED');
     })
     // get orderbook
     // for each currency in book, create new entry with updated price
-    console.log(new Date(), 'DATABASE UPDATED');
+
     console.log();
   });
 }
