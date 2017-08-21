@@ -43,14 +43,14 @@ function getTickData(currencyA, currencyB) {
         }
         resolve(tickData);
       }
-      reject(err);
+      // reject(err);
     });
   });
 }
 
 function addNewPairToDBPoloniex(pair, currencyA, currencyB) {
   return new Promise(async (resolve, reject) => {
-    console.log('### Getting tick data for', pair, '...');
+    console.log(`### Adding ${pair} to DB. Getting tick data...`);
     let tickData;
     try {
       tickData = await getTickData(currencyA, currencyB);
@@ -61,7 +61,7 @@ function addNewPairToDBPoloniex(pair, currencyA, currencyB) {
       return;
     }
 
-    console.log('### Recieved data for', pair, `[${tickData.length - 1}] points`);
+    console.log('### Recieved data for', pair, `[${tickData.length}] points`);
     const bulkWriteToDB = [];
     for (let i = 0; i < tickData.length; i++) {
       const entry = {
@@ -78,7 +78,7 @@ function addNewPairToDBPoloniex(pair, currencyA, currencyB) {
       };
       bulkWriteToDB.push(entry);
     }
-    console.log('bulkwrite',bulkWriteToDB[0]);
+    // console.log('bulkwrite',bulkWriteToDB);
     try {
       console.log(`### Adding ${bulkWriteToDB.length} new entries to the DB...`);
       await DBPoloniex.insertMany(bulkWriteToDB);
@@ -125,7 +125,7 @@ function getCurrentOrderbook() {
 function checkAgeOfTickData(tick) {
   const age = Math.floor((new Date().getTime() / 1000) - tick.date);
   if (age <= GRANULARITY) {
-    console.log(`### Data for ${tick.currencyPair} is up to date (${age} seconds (${Math.floor(age / 60)} minutes)`);
+    console.log(`### Data for ${tick.currencyPair} is up to date (${age} seconds)`);
     return true;
   }
   console.log(`### Data for ${tick.currencyPair} is ${age} seconds (${Math.floor(age / 60)} minutes) old!`);
@@ -148,7 +148,8 @@ function updateDoc(mostRecentTick, currencyA, currencyB) {
     polo.returnChartData(currencyA, currencyB, GRANULARITY, startTime, 9999999999, async (err, data) => {
       if (err) {
         console.log('### ERROR getting historical tick data for', (`${currencyA}_${currencyB}`));
-        console.log(err);
+        // console.log(err);
+        reject(err);
       } else {
         for (let i = 0; i < data.length; i++) {
           newData.push(data[i]);
@@ -175,7 +176,7 @@ function updateDoc(mostRecentTick, currencyA, currencyB) {
         console.log('### Updating entry to the DB...');
         await DBPoloniex.insertMany(bulkWriteToDB);
         console.log(`### SUCCESS: Data for ${currencyA}_${currencyB} was updated to DB`);
-        resolve((`### SUCCESS: Data for ${currencyA}_${currencyB} was updated to DB`));
+        resolve((`SUCCESS: Data for ${currencyA}_${currencyB} was updated to DB`));
       } catch (e) {
         console.log('### ERROR: Couldn\'t update data.');
         console.log(e);
@@ -191,8 +192,11 @@ exports.dbInitializer = async function () {
   //
   return new Promise(async (resolve, reject) => {
     if (0) {
-      console.log('Clearing out database...');
-      DBPoloniex.deleteMany({}).then((data) => { console.log(data); resolve(); });
+      console.log('### Clearing out database...');
+      DBPoloniex.deleteMany({}).then((data) => {
+        // console.log();
+        resolve(`Deleted ${data.deletedCount} elements`);
+      });
     } else {
       let orderbook;
       try {
@@ -212,24 +216,32 @@ exports.dbInitializer = async function () {
         const AB = pair.split('_'); const A = AB[0]; const B = AB[1];
         // Find the most recent document (tick) for a currency
         console.log(`### Querying DB for ${pair}...`);
-        const DBQuery = DBPoloniex.find({ currencyPair: pair }).sort({ date: -1 }).limit(1).then(async (tickDataFromDB) => {
+        const DBQuery = new Promise((resolve_, reject_) => {
+          DBPoloniex.find({ currencyPair: pair }).sort({ date: -1 }).limit(1).then(async (tickDataFromDB) => {
           // If currency isn't found, add it. Else, make sure it's up to date.
-          if (tickDataFromDB.length !== 0) {
-            console.log(`### ${pair} found in DB.`);
-            if (checkAgeOfTickData(tickDataFromDB[0]) !== true) {
+            if (tickDataFromDB.length !== 0) {
+              console.log(`### ${pair} found in DB.`);
+              if (checkAgeOfTickData(tickDataFromDB[0]) !== true) {
               // Update collection by adding missing ticks
-              await updateDoc(tickDataFromDB[0].date, A, B);
-            }
+                resolve_(await updateDoc(tickDataFromDB[0].date, A, B));
+              } else {
+                resolve_(`Data for ${tickDataFromDB[0].currencyPair} is up to date.`);
+              }
           // Currency pair not found in DB
-          } else {
-            console.log('### New pair found:', pair);
-            DBAddNewEntryPromises.push(addNewPairToDBPoloniex(pair, A, B));
-          }
-        })
-        .catch((err) => {
-          console.log(err);
+            } else {
+              console.log(`### ${pair} not found in DB.`);
+              resolve_(await addNewPairToDBPoloniex(pair, A, B));
+            // DBAddNewEntryPromises.push(addNewPairToDBPoloniex(pair, A, B));
+            }
+          })
+          .catch((err) => {
+            reject_(err);
+            // console.log(err);
+          });
         });
+
         DBQueries.push(DBQuery);
+        // console.log(DBQuery);
         // console.log(tickDataFromDB);
         // console.log('### Querying most recent tick for',pair);
         // DBUpdateEntryPromises.push(tickDataFromDB);
@@ -238,9 +250,11 @@ exports.dbInitializer = async function () {
       let DBUpdateResolves;
       try {
         // console.log((await Promise.all(DBUpdateEntryPromises)));
-        DBUpdateResolves = await Promise.all(DBAddNewEntryPromises);
-        console.log('Resolves:', DBUpdateResolves);
-        await Promise.all(DBQueries);
+        DBUpdateResolves = await Promise.all(DBQueries);
+        // console.log('updates', DBUpdateResolves);
+        resolve(DBUpdateResolves);
+
+        // await Promise.all(DBQueries);
         resolve();
       } catch (e) {
         console.log(e);
