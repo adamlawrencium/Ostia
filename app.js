@@ -31,7 +31,7 @@ dotenv.load({ path: '.env.example' });
 /**
  * Controllers (route handlers).
  */
-const tradeController = require('./controllers/trade');
+// const tradeController = require('./controllers/trade');
 const exchangeController = require('./controllers/exchangeData');
 const homeController = require('./controllers/home');
 const userController = require('./controllers/user');
@@ -52,7 +52,7 @@ const app = express();
  * Connect to MongoDB.
  */
 mongoose.Promise = global.Promise;
-mongoose.connect(process.env.MONGODB_URI || process.env.MONGOLAB_URI, {useMongoClient: true});
+mongoose.connect(process.env.MONGODB_URI || process.env.MONGOLAB_URI, { useMongoClient: true });
 mongoose.connection.on('error', (err) => {
   console.error(err);
   console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
@@ -68,7 +68,6 @@ mongoose.connection.on('error', (err) => {
 // })();
 
 
-
 //
 // (async () => {
 //
@@ -82,7 +81,6 @@ mongoose.connection.on('error', (err) => {
     // console.log('error');
 //   }
 // }
-
 
 
 /**
@@ -136,7 +134,7 @@ app.use((req, res, next) => {
       !req.path.match(/\./)) {
     req.session.returnTo = req.path;
   } else if (req.user &&
-      req.path == '/account') {
+      req.path === '/account') {
     req.session.returnTo = req.path;
   }
   next();
@@ -261,16 +259,15 @@ process.on('unhandledRejection', (reason, p) => {
 /**
  * Update MongoDB and start Express server.
  */
-dbScheduler.dbInitializer().then( (DBUpdateResolves) => {
+dbScheduler.dbInitializer().then((DBUpdateResolves) => {
   console.log('DBUpdateResolves:', DBUpdateResolves);
   console.log('### EXITING...');
   // process.exit(0)
   app.listen(app.get('port'), () => {
     // dbScheduler.dbUpdater();
-    console.log('%s App is running at http://localhost:%d in %s mode', chalk.green('✓'), app.get('port'), app.get('env')); 
+    console.log('%s App is running at http://localhost:%d in %s mode', chalk.green('✓'), app.get('port'), app.get('env'));
     console.log('  Press CTRL-C to stop\n');
   });
-})
-
+});
 
 module.exports = app;
