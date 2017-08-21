@@ -34,14 +34,14 @@ function getTickData(currencyA, currencyB) {
       if (err) {
         console.log('### ERROR getting historical tick data for', (`${currencyA}_${currencyB}`));
         console.log('### Trying again to get historical data for', (`${currencyA}_${currencyB}`));
-        polo.returnChartData(currencyA, currencyB, GRANULARITY, 1000000000, 9999999999, (err, data) => {
-          if (err) {
+        polo.returnChartData(currencyA, currencyB, GRANULARITY, 1000000000, 9999999999, (err_, data_) => {
+          if (err_) {
             console.log('### SECOND ERROR getting historical tick data for', (`${currencyA}_${currencyB}`));
-            console.log(err);
-            reject(err);
+            console.log(err_);
+            reject(err_);
           } else {
-            for (let i = 0; i < data.length; i++) {
-              tickData.push(data[i]);
+            for (let i = 0; i < data_.length; i++) {
+              tickData.push(data_[i]);
             }
             resolve(tickData);
           }
@@ -66,7 +66,7 @@ function addNewPairToDBPoloniex(pair, currencyA, currencyB) {
       // console.log('tickData', tickData);
     } catch (e) {
       console.log(e);
-      reject(e); 
+      reject(e);
     }
 
     console.log('### Recieved data for', pair, `[${tickData.length}] points`);
@@ -198,12 +198,16 @@ exports.dbInitializer = async function () {
   // for pairs in snapshot but not in database, add it (this will add new currencies)
   //
   return new Promise(async (resolve, reject) => {
-    if (0) {
+    const choice = 1;
+    if (choice === 0) {
       console.log('### Clearing out database...');
-      DBPoloniex.deleteMany({}).then((data) => {
+      DBPoloniex.deleteMany({})
+      .then((data) => {
         // console.log();
         resolve(`Deleted ${data.deletedCount} elements`);
       });
+    } else if (choice === 1) {
+      resolve('Skipping DB update');
     } else {
       let orderbook;
       try {
@@ -224,7 +228,8 @@ exports.dbInitializer = async function () {
         // Find the most recent document (tick) for a currency
         console.log(`### Querying DB for ${pair}...`);
         const DBQuery = new Promise((resolve_, reject_) => {
-          DBPoloniex.find({ currencyPair: pair }).sort({ date: -1 }).limit(1).then(async (tickDataFromDB) => {
+          DBPoloniex.find({ currencyPair: pair }).sort({ date: -1 }).limit(1)
+          .then(async (tickDataFromDB) => {
           // If currency isn't found, add it. Else, make sure it's up to date.
             if (tickDataFromDB.length !== 0) {
               console.log(`### ${pair} found in DB.`);
@@ -274,9 +279,10 @@ exports.dbInitializer = async function () {
 
 exports.dbUpdater = function () {
   // Job runs at the top of every 5 minutes
-  schedule.scheduleJob('*/1 * * * *', () => {
+  schedule.scheduleJob('* */2 * * *', () => {
     console.log();
-    getCurrentOrderbook().then((orderbook) => {
+    getCurrentOrderbook()
+    .then((orderbook) => {
       console.log(orderbook);
       console.log(new Date(), 'DATABASE UPDATED');
     });

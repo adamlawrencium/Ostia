@@ -32,7 +32,7 @@ dotenv.load({ path: '.env.example' });
  * Controllers (route handlers).
  */
 // const tradeController = require('./controllers/trade');
-const exchangeController = require('./controllers/exchangeData');
+const tickDataController = require('./controllers/tickData');
 const homeController = require('./controllers/home');
 const userController = require('./controllers/user');
 const apiController = require('./controllers/api');
@@ -146,7 +146,7 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }))
  */
 app.get('/', homeController.index);
 
-app.get('/exchangeData', exchangeController.tickerData);
+app.get('/tickData', exchangeController.tickerData);
 app.get('/updateDB', exchangeController.updatePoloniexData);
 
 app.get('/login', userController.getLogin);
@@ -262,7 +262,7 @@ process.on('unhandledRejection', (reason, p) => {
 dbScheduler.dbInitializer().then((DBUpdateResolves) => {
   console.log('### DB UPDATES:', DBUpdateResolves);
   console.log('### EXITING...');
-  process.exit(0);
+  // process.exit(0);
   app.listen(app.get('port'), () => {
     // dbScheduler.dbUpdater();
     console.log('%s App is running at http://localhost:%d in %s mode', chalk.green('✓'), app.get('port'), app.get('env'));
