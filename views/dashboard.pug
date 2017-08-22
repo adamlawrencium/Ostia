@@ -1,0 +1,27 @@
+extends layout
+
+block content
+  script.
+    window.alert('do it, do it now!');
+  .row
+    .col-lg-12
+      h1.page-header Moving Average Crossover
+  .row
+    .col-lg-12
+      // Chart
+      .panel.panel-default
+        .panel-heading
+          i.fa.fa-bar-chart-o.fa-fw
+          |  Trading Signals
+        .panel-body
+          .row
+            .col-lg-4
+              #testchart
+              p something is supposed to be here
+      .panel.panel-default
+        .panel-heading
+          p Data from places 
+        .panel-body
+          .row
+            .col-lg-12
+              #{tickData}

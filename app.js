@@ -58,30 +58,6 @@ mongoose.connection.on('error', (err) => {
   console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
   process.exit();
 });
-// (async () => {
-//     try {
-//       var result = await dbScheduler.dbInitializer();
-//       console.log(result);
-//     } catch(e) {
-//       console.log(e)
-//     }
-// })();
-
-
-//
-// (async () => {
-//
-//   db = await dbScheduler.dbInitializer();
-//   console.log('hi');
-// })();
-// async function() {
-  // try {
-//     db = await dbScheduler.dbInitializer();
-//   } catch (e) {
-    // console.log('error');
-//   }
-// }
-
 
 /**
  * Express configuration.
@@ -144,11 +120,9 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }))
 /**
  * Primary app routes.
  */
+app.get('/dashboard', tickDataController.getTickData);
+
 app.get('/', homeController.index);
-
-app.get('/tickData', exchangeController.tickerData);
-app.get('/updateDB', exchangeController.updatePoloniexData);
-
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
 app.get('/logout', userController.logout);
