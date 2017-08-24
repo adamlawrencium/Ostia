@@ -8,7 +8,7 @@ const Poloniex = require('poloniex.js');
 const DBPoloniex = require('./models/PoloniexData');
 
 const polo = new Poloniex();
-const GRANULARITY = 86400;
+const GRANULARITY = 14400;
 
 // 300, 900, 1800, 7200, 14400, 86400 // 1503014400
 function getTickData(currencyA, currencyB) {
@@ -176,7 +176,7 @@ function updateDoc(mostRecentTick, currencyA, currencyB) {
 
 exports.dbInitializer = async function () {
   return new Promise(async (resolve, reject) => {
-    const choice = 1;
+    const choice = 2;
     if (choice === 0) {
       console.log('### Clearing out database...');
       DBPoloniex.deleteMany({})

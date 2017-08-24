@@ -3,18 +3,76 @@ extends layout
 block content
   .row
     .col-lg-12
-      h1.page-header Price for #{currencyPair}
+      h1.page-header Historical Prices #{currencyPair}
   .row
     .col-lg-12
       form.form-inline#chartForm(action='/tick', method='GET')
         .form-group
-          label(for='baseCurrency') Base Currency
+          label(for='baseCurrency') Base Currency 
           input#baseCurrency.form-control(type='text', placeholder='BTC')
         .form-group
-          label(for='tradeCurrency') Trade Currency
+          label(for='tradeCurrency') Trade Currency    
           input#tradeCurrency.form-control(type='text', placeholder='ETH')
         button.btn.btn-primary#chartButton(type='button') Get Chart!
-      br
+  .row
+    .col-lg-12
+      h3 Markets
+    .col-lg-3
+      b Bitcoin (BTC)
+      <select class="form-control">
+        <option>-</option>
+        <option>2</option>
+        <option>3</option>
+        <option>4</option>
+        <option>5</option>
+      </select>
+    .col-lg-3
+      b Ethereum (ETH)
+      <select class="form-control">
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+        <option>4</option>
+        <option>5</option>
+      </select>
+    .col-lg-3
+      b Ripple (XRP)
+      <select class="form-control">
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+        <option>4</option>
+        <option>5</option>
+      </select>
+    .col-lg-3
+      b Tether (USDT)
+      <select class="form-control">
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+        <option>4</option>
+        <option>5</option>
+      </select>
+  .row
+    .col-lg-12
+      h4 Indicators
+      .checkbox-inline
+        label
+          input(type='checkbox', value='')
+          | Simple Moving Average (SMA)
+      .checkbox-inline
+        label
+          input(type='checkbox', value='')
+          | Exponential Moving Average (EMA)
+      .checkbox-inline
+        label
+          input(type='checkbox', value='')
+          | Relative Strength Index (RSI)
+      .checkbox-inline
+        label
+          input(type='checkbox', value='')
+          | Moving Average Convergence Divergence (MACD)
+
   .row
     .col-lg-12
       //- Chart
@@ -27,10 +85,4 @@ block content
             .col-lg-12
               #hcharts-strategy
               h3 Enter two currencies to get a chart!
-      .panel.panel-default
-        .panel-heading
-          p Data from places 
-        .panel-body
-          .row
-            .col-lg-12
-              #{tickData}
+      
