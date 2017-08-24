@@ -1,30 +1,14 @@
 /*
-Go through every currency pair in the DB.
-  If any is over 5 mins old, query and add to DB
-Find poloniexdata
-find all documents
-  for each document (currency pair)
-    if last elements 'date' is more than five minutes old
-      add currencies to list
-
-DBPoloniex.deleteMany({}).then( (data) => {
-  console.log(data);
-});
+This file does two things:
+1. Initialize the DB with historical Poloniex data.
+2. Update the DB at a certain interval (5 minutes usually)
  */
-
-
-/*
- * Here we get all USDT currencies and add them to our database
- */
-
-
 const schedule = require('node-schedule');
 const Poloniex = require('poloniex.js');
 const DBPoloniex = require('./models/PoloniexData');
-// const exchangeData = require('./controllers/exchangeData');
 
 const polo = new Poloniex();
-const GRANULARITY = 300;
+const GRANULARITY = 86400;
 
 // 300, 900, 1800, 7200, 14400, 86400 // 1503014400
 function getTickData(currencyA, currencyB) {
@@ -63,7 +47,6 @@ function addNewPairToDBPoloniex(pair, currencyA, currencyB) {
     let tickData;
     try {
       tickData = await getTickData(currencyA, currencyB);
-      // console.log('tickData', tickData);
     } catch (e) {
       console.log(e);
       reject(e);
@@ -155,14 +138,12 @@ function updateDoc(mostRecentTick, currencyA, currencyB) {
     polo.returnChartData(currencyA, currencyB, GRANULARITY, startTime, 9999999999, async (err, data) => {
       if (err) {
         console.log('### ERROR getting historical tick data for', (`${currencyA}_${currencyB}`));
-        // console.log(err);
         reject(err);
       } else {
         for (let i = 0; i < data.length; i++) {
           newData.push(data[i]);
         }
       }
-      // console.log(`### NEW DATA ${(currencyA + '_' + currencyB)}`, newData);
       const bulkWriteToDB = [];
       for (let i = 0; i < newData.length; i++) {
         const entry = {
@@ -194,16 +175,14 @@ function updateDoc(mostRecentTick, currencyA, currencyB) {
 }
 
 exports.dbInitializer = async function () {
-  // take an orderbook snapshot
-  // for pairs in snapshot but not in database, add it (this will add new currencies)
-  //
   return new Promise(async (resolve, reject) => {
-    const choice = 0;
+    const choice = 2;
     if (choice === 0) {
       console.log('### Clearing out database...');
       DBPoloniex.deleteMany({})
       .then((data) => {
         resolve(`Deleted ${data.deletedCount} elements`);
+        process.exit(0);
       });
     } else if (choice === 1) {
       resolve('Skipping DB update');
@@ -218,8 +197,7 @@ exports.dbInitializer = async function () {
         reject(e);
       }
 
-      // Findf if each currency exists in our MongoDB
-      // const DBAddNewEntryPromises = [];
+      // Find if each currency exists in our MongoDB
       const DBQueries = [];
       for (let i = 0; i < orderbook.length; i++) {
         const pair = Object.keys(orderbook[i])[0];
@@ -238,34 +216,22 @@ exports.dbInitializer = async function () {
               } else {
                 resolve_(`Data for ${tickDataFromDB[0].currencyPair} is up to date.`);
               }
-          // Currency pair not found in DB
+            // Currency pair not found in DB
             } else {
               console.log(`### ${pair} not found in DB.`);
               resolve_(await addNewPairToDBPoloniex(pair, A, B));
-            // DBAddNewEntryPromises.push(addNewPairToDBPoloniex(pair, A, B));
             }
           })
           .catch((err) => {
             reject_(err);
-            // console.log(err);
           });
         });
-
         DBQueries.push(DBQuery);
-        // console.log(DBQuery);
-        // console.log(tickDataFromDB);
-        // console.log('### Querying most recent tick for',pair);
-        // DBUpdateEntryPromises.push(tickDataFromDB);
       }
-
       let DBUpdateResolves;
       try {
-        // console.log((await Promise.all(DBUpdateEntryPromises)));
         DBUpdateResolves = await Promise.all(DBQueries);
-        // console.log('updates', DBUpdateResolves);
         resolve(DBUpdateResolves);
-
-        // await Promise.all(DBQueries);
         resolve();
       } catch (e) {
         console.log(e);
@@ -277,7 +243,8 @@ exports.dbInitializer = async function () {
 
 exports.dbUpdater = function () {
   // Job runs at the top of every 5 minutes
-  schedule.scheduleJob('*/20 * * * * *', async () => {
+  schedule.scheduleJob('*/5 * * * *', async () => {
+    console.log(`### ${new Date()} Updating DB with new Poloniex data...`);
     let orderbook = null;
     try {
       orderbook = await getCurrentOrderbook();

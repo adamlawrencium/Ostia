@@ -9,10 +9,7 @@ const mongoose = require('mongoose');
 
 const poloniexDataSchema__ = new mongoose.Schema(
   {
-    currencyPair: {
-      type: String,
-      required: true
-    },
+    currencyPair: { type: String, required: true },
     baseCurrency: String,
     tradeCurrency: String,
     tickData: [{
@@ -26,16 +23,13 @@ const poloniexDataSchema__ = new mongoose.Schema(
     }]
   },
   { timestamps: true,
-    collection: "poloniexdata"
+    collection: 'poloniexdata'
   }
 );
 
 const poloniexDataSchema = new mongoose.Schema(
   {
-    currencyPair: {
-      type: String,
-      required: false
-    },
+    currencyPair: { type: String, required: true },
     baseCurrency: String,
     tradeCurrency: String,
     date: Number,
@@ -44,9 +38,9 @@ const poloniexDataSchema = new mongoose.Schema(
     close: Number,
     volume: Number,
     quoteVolume: Number,
-    weightedAverage: Number},
+    weightedAverage: Number },
   { timestamps: true,
-    collection: "poloniexdata"
+    collection: 'poloniexdata'
   }
 );
 
