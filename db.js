@@ -198,7 +198,7 @@ exports.dbInitializer = async function () {
   // for pairs in snapshot but not in database, add it (this will add new currencies)
   //
   return new Promise(async (resolve, reject) => {
-    const choice = 1;
+    const choice = 0;
     if (choice === 0) {
       console.log('### Clearing out database...');
       DBPoloniex.deleteMany({})
@@ -277,8 +277,7 @@ exports.dbInitializer = async function () {
 
 exports.dbUpdater = function () {
   // Job runs at the top of every 5 minutes
-  schedule.scheduleJob('*/10 * * * * *', async () => {
-    console.log(`### ${new Date()} Updating database`);
+  schedule.scheduleJob('*/20 * * * * *', async () => {
     let orderbook = null;
     try {
       orderbook = await getCurrentOrderbook();
