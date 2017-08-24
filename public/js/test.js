@@ -1,9 +1,4 @@
 $(document).ready(function() {
-  console.log('hi');
-});
-/*
-$(document).ready(function () {
-  alert('hi');
   $('#testchart').highcharts('StockChart', {
     rangeSelector: {
       buttons: [{
@@ -1503,5 +1498,5 @@ $(document).ready(function () {
       marker: { enabled: true, radius: 3 },
       tooltip: { valueDecimals: 5 }
     }]
-  })
-})
+  });
+});

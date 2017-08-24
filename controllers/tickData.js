@@ -40,12 +40,27 @@ function getTickDataFromDB(currencyPair) {
  * @param currencyPair
  *
  */
-exports.getTickData = (req, res) => {
-  const currencyPair = `${req.query.currencyA}_${req.query.currencyB}`;
-  getTickDataFromDB(currencyPair).then((tickData) => {
-    res.render('dashboard', {
-      tickData
-    });
+exports.getDashboard = (req, res) => {
+  res.render('dashboard', {
+    title: 'Dashboard'
   });
 };
+
+exports.getTickData = (req, res) => {
+  const currencyPair = `${req.query.currencyA}_${req.query.currencyB}`;
+  if (!currencyPair) {
+    getTickDataFromDB(currencyPair).then((tickData) => {
+      res.render('dashboard', {
+        tickData,
+        currencyPair
+      });
+    });
+  } else {
+    res.render('dashboard', {
+      title: 'Dashboard',
+      currencyPair
+    });
+  }
+};
+
 

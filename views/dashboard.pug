@@ -1,13 +1,22 @@
 extends layout
 
 block content
-  script.
-    window.alert('do it, do it now!');
   .row
-    .col-lg-12
-      h1.page-header Moving Average Crossover
+    .col-md-12
+      h1.page-header Price for #{currencyPair}
   .row
-    .col-lg-12
+    .col-md-12
+      form.form-inline
+        .form-group
+          label(for='baseCurrency') Base Currency
+          input#exampleInputName2.form-control(type='text', placeholder='BTC')
+        .form-group
+          label(for='tradeCurrency') Trade Currency
+          input#exampleInputEmail2.form-control(type='text', placeholder='ETH')
+        button.btn.btn-primary(type='button') Get Chart!
+      br
+  .row
+    .col-md-12
       // Chart
       .panel.panel-default
         .panel-heading

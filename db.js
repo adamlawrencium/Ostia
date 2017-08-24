@@ -24,7 +24,7 @@ const DBPoloniex = require('./models/PoloniexData');
 // const exchangeData = require('./controllers/exchangeData');
 
 const polo = new Poloniex();
-const GRANULARITY = 7200;
+const GRANULARITY = 300;
 
 // 300, 900, 1800, 7200, 14400, 86400 // 1503014400
 function getTickData(currencyA, currencyB) {
@@ -127,7 +127,7 @@ function getCurrentOrderbook() {
  * See's if most recent tick is older than a certain age (GRANULARITY)
  *
  * @param {array} tickData array of all the tick data for a currency
- * @returns asdfas
+ * @returns {asdfas}
  */
 function checkAgeOfTickData(tick) {
   const age = Math.floor((new Date().getTime() / 1000) - tick.date);
@@ -203,7 +203,6 @@ exports.dbInitializer = async function () {
       console.log('### Clearing out database...');
       DBPoloniex.deleteMany({})
       .then((data) => {
-        // console.log();
         resolve(`Deleted ${data.deletedCount} elements`);
       });
     } else if (choice === 1) {
@@ -276,19 +275,37 @@ exports.dbInitializer = async function () {
   });
 };
 
-
 exports.dbUpdater = function () {
   // Job runs at the top of every 5 minutes
-  schedule.scheduleJob('* */2 * * *', () => {
-    console.log();
-    getCurrentOrderbook()
-    .then((orderbook) => {
-      console.log(orderbook);
-      console.log(new Date(), 'DATABASE UPDATED');
-    });
-    // get orderbook
-    // for each currency in book, create new entry with updated price
-
-    console.log();
+  schedule.scheduleJob('*/10 * * * * *', async () => {
+    console.log(`### ${new Date()} Updating database`);
+    let orderbook = null;
+    try {
+      orderbook = await getCurrentOrderbook();
+    } catch (e) {
+      console.log(e);
+    }
+    const DBUpdates = [];
+    for (let i = 0; i < orderbook.length; i++) {
+      const currencyPair = (Object.keys(orderbook[i])[0]);
+      const currencyPairOHLCV = orderbook[i][currencyPair];
+      const entry = {
+        currencyPair,
+        baseCurrency: currencyPair.split('_')[0],
+        tradeCurrency: currencyPair.split('_')[1],
+        date: (Math.floor(new Date() / 1000)),
+        close: parseFloat(currencyPairOHLCV.last),
+        volume: parseFloat(currencyPairOHLCV.baseVolume),
+        quoteVolume: parseFloat(currencyPairOHLCV.quoteVolume)
+      };
+      DBUpdates.push(entry);
+    }
+    try {
+      await DBPoloniex.insertMany(DBUpdates);
+      console.log(`### ${new Date()} Updated ${DBUpdates.length} currencies in DB.`);
+    } catch (e) {
+      console.log('### ERROR: Couldn\'t save data.');
+      console.log(e);
+    }
   });
 };

@@ -19,7 +19,7 @@ const expressValidator = require('express-validator');
 const expressStatusMonitor = require('express-status-monitor');
 const sass = require('node-sass-middleware');
 const multer = require('multer');
-const dbScheduler = require('./dbScheduler');
+const dbScheduler = require('./db');
 
 const upload = multer({ dest: path.join(__dirname, 'uploads') });
 
@@ -120,7 +120,8 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }))
 /**
  * Primary app routes.
  */
-app.get('/dashboard', tickDataController.getTickData);
+app.get('/dashboard', tickDataController.getDashboard);
+app.post('/dashboard', tickDataController.getTickData);
 
 app.get('/', homeController.index);
 app.get('/login', userController.getLogin);
@@ -238,7 +239,7 @@ dbScheduler.dbInitializer().then((DBUpdateResolves) => {
   console.log('### EXITING...');
   // process.exit(0);
   app.listen(app.get('port'), () => {
-    // dbScheduler.dbUpdater();
+    dbScheduler.dbUpdater();
     console.log('%s App is running at http://localhost:%d in %s mode', chalk.green('✓'), app.get('port'), app.get('env'));
     console.log('  Press CTRL-C to stop\n');
   });
