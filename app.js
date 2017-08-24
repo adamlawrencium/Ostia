@@ -121,7 +121,9 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }))
  * Primary app routes.
  */
 app.get('/dashboard', tickDataController.getDashboard);
-app.post('/dashboard', tickDataController.getTickData);
+app.get('/data', tickDataController.getTickData);
+// app.post('/dashboard', tickDataController.getTickData);
+app.get('/tick', tickDataController.getTickData);
 
 app.get('/', homeController.index);
 app.get('/login', userController.getLogin);

@@ -11,23 +11,23 @@ const DBPoloniex = require('../models/PoloniexData');
 function getTickDataFromDB(currencyPair) {
   return new Promise((resolve, reject) => {
     console.log(`Querying DB for ${currencyPair}...`);
-    DBPoloniex.find({ currencyPair }).sort({ date: -1 }).limit(1)
-    .then((tickDataFromDB) => {
-      if (tickDataFromDB.length !== 0) {
-        const ret = [];
-        for (let i = 0; i < tickDataFromDB.length; i++) {
-          ret.push([tickDataFromDB[i].date, tickDataFromDB[i].close]);
+    DBPoloniex.find({ currencyPair }).sort({ date: -1 }).limit(100)
+      .then((tickDataFromDB) => {
+        if (tickDataFromDB.length !== 0) {
+          const ret = [];
+          for (let i = 0; i < tickDataFromDB.length; i++) {
+            ret.push([tickDataFromDB[i].date, tickDataFromDB[i].close]);
+          }
+          resolve(ret);
+          console.log(`### ${currencyPair} found in DB.`);
+        } else {
+          reject(`${currencyPair} not found in DB.`);
+          console.log(`### ${currencyPair} not found in DB.`);
         }
-        resolve(ret);
-        console.log(`### ${currencyPair} found in DB.`);
-      } else {
-        reject(`${currencyPair} not found in DB.`);
-        console.log(`### ${currencyPair} not found in DB.`);
-      }
-    })
-    .catch((err) => {
-      reject(err);
-    });
+      })
+      .catch((err) => {
+        reject(err);
+      });
   });
 }
 
@@ -41,26 +41,33 @@ function getTickDataFromDB(currencyPair) {
  *
  */
 exports.getDashboard = (req, res) => {
+  console.log(req.query);
   res.render('dashboard', {
     title: 'Dashboard'
   });
 };
 
 exports.getTickData = (req, res) => {
-  const currencyPair = `${req.query.currencyA}_${req.query.currencyB}`;
-  if (!currencyPair) {
-    getTickDataFromDB(currencyPair).then((tickData) => {
-      res.render('dashboard', {
-        tickData,
-        currencyPair
-      });
-    });
-  } else {
-    res.render('dashboard', {
-      title: 'Dashboard',
-      currencyPair
-    });
-  }
+  getTickDataFromDB('BTC_ETH').then((data) => {
+    console.log(data);
+    res.json(data);
+  });
+
+
+  // res.render(req.body);
+
+  // const currencyPair = `${req.query.currencyA}_${req.query.currencyB}`;
+  // if (!currencyPair) {
+  //   getTickDataFromDB(currencyPair).then((tickData) => {
+  //     res.render('dashboard', {
+  //       tickData,
+  //       currencyPair
+  //     });
+  //   });
+  // } else {
+  //   res.render('dashboard', {
+  //     title: 'Dashboard',
+  //     currencyPair
+  //   });
+  // }
 };
-
-

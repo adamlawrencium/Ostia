@@ -133,7 +133,7 @@ exports.postUpdateProfile = (req, res, next) => {
     req.flash('errors', errors);
     return res.redirect('/account');
   }
-
+  console.log(req);
   User.findById(req.user.id, (err, user) => {
     if (err) { return next(err); }
     user.email = req.body.email || '';
