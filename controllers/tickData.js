@@ -11,7 +11,7 @@ const DBPoloniex = require('../models/PoloniexData');
 function getTickDataFromDB(currencyPair) {
   return new Promise((resolve, reject) => {
     console.log(`Querying DB for ${currencyPair}...`);
-    DBPoloniex.find({ currencyPair }).sort({ date: -1 }).limit(100)
+    DBPoloniex.find({ currencyPair }).sort({ date: -1 })
       .then((tickDataFromDB) => {
         if (tickDataFromDB.length !== 0) {
           const ret = [];
@@ -48,7 +48,9 @@ exports.getDashboard = (req, res) => {
 };
 
 exports.getTickData = (req, res) => {
-  getTickDataFromDB('BTC_ETH').then((data) => {
+  console.log(req.query);
+  const q = req.query.currencyA + '_' + req.query.currencyB;
+  getTickDataFromDB(q).then((data) => {
     console.log(data);
     res.json(data);
   });

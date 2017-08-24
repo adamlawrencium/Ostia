@@ -2,31 +2,31 @@ extends layout
 
 block content
   .row
-    .col-md-12
+    .col-lg-12
       h1.page-header Price for #{currencyPair}
   .row
-    .col-md-12
-      form.form-inline(action='/tick', method='GET')
+    .col-lg-12
+      form.form-inline#chartForm(action='/tick', method='GET')
         .form-group
           label(for='baseCurrency') Base Currency
-          input#exampleInputName2.form-control(type='text', placeholder='BTC')
+          input#baseCurrency.form-control(type='text', placeholder='BTC')
         .form-group
           label(for='tradeCurrency') Trade Currency
-          input#exampleInputEmail2.form-control(type='text', placeholder='ETH')
-        button.btn.btn-primary#coolbutton(type='button') Get Chart!
+          input#tradeCurrency.form-control(type='text', placeholder='ETH')
+        button.btn.btn-primary#chartButton(type='button') Get Chart!
       br
   .row
-    .col-md-12
+    .col-lg-12
       //- Chart
       .panel.panel-default
         .panel-heading
           i.fa.fa-bar-chart-o.fa-fw
-          |  Trading Signals
+          |  Tick Chart
         .panel-body
           .row
             .col-lg-12
               #hcharts-strategy
-              p something is supposed to be here
+              h3 Enter two currencies to get a chart!
       .panel.panel-default
         .panel-heading
           p Data from places 
