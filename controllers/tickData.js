@@ -48,7 +48,7 @@ exports.getDashboard = (req, res) => {
 };
 
 exports.getTickData = (req, res) => {
-  console.log(req.query);
+  // console.log(req.query);
   const q = `${req.query.currencyA}_${req.query.currencyB}`;
   getTickDataFromDB(q).then((data) => {
     // console.log(data);

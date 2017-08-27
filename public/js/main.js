@@ -1,3 +1,6 @@
+// import highchartsObj from 'chartObj.js';
+// console.log(highchartsObj);
+
 /**
  * Adds a date and price as a tuple to a targetSeries
  * @param {HighChart.series} targetSeries reference
@@ -64,17 +67,20 @@ const loadStrategyTrades = function (highchart, chartData) {
   const targetSeries = highchart.get('Closing Price');
   addTickerDatasetToSeries(targetSeries, tickerData);
   highchart.hideLoading();
+  $('.progress').hide();
   highchart.redraw();
 };
 
 
 $(document).ready(() => {
   const chartData = null;
+  // $('.progress').show();
   $('#chartButton').click(() => {
+    $('.progress').show();
     const A = $('#baseCurrency').val();
     const B = $('#tradeCurrency').val();
+    console.log(`Loading chart for ${A}_${B}...`);
     $.getJSON(`/data?currencyA=${A}&currencyB=${B}`, (data) => {
-      // console.log(data);
       const chartData = data;
       // console.log(chartData);
       $('#hcharts-strategy').highcharts('StockChart', {
@@ -88,9 +94,9 @@ $(document).ready(() => {
         },
         rangeSelector: {
           buttons: [{
-            type: 'month',
+            type: 'day',
             count: 1,
-            text: '1m'
+            text: '1d'
           }, {
             type: 'month',
             count: 3,
@@ -115,10 +121,7 @@ $(document).ready(() => {
         },
 
         title: {
-          text: 'Moving Avg. Crossover Trades'
-        },
-        subtitle: {
-          text: '+ Indicators (BTC/USD)'
+          text: `Historical Prices - ${A}/${B}`
         },
         xAxis: {
           type: 'datetime',

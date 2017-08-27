@@ -13,12 +13,9 @@
       ul.nav.navbar-nav
         li(class=(title == 'Home') ? 'active' : undefined)
           a(href='/') Home
-        li(class=(title == 'API Examples') ? 'active' : undefined)
-          a(href='/api') API Examples
-        li(class=(title == 'Contact') ? 'active' : undefined)
-          a(href='/contact') Contact
         li
-          a(href='/status') Status
+          a(href='/status') Poloniex Status
+
       ul.nav.navbar-nav.navbar-right
         if !user
           li(class=(title == 'Login') ? 'active' : undefined)
@@ -40,3 +37,15 @@
               li.divider
               li
                 a(href='/logout') Logout
+
+.container
+  .row
+    .col-lg-12
+      ul.nav.nav-tabs.nav-justified
+        li(class=(title == 'Dashboard') ? 'active' : undefined)
+          a(href='/dashboard') Portfolio and Strategies
+        li(class=(title == 'Markets') ? 'active' : undefined)
+          a(href='/markets') The Markets
+        li(class=(title == 'Account') ? 'active' : undefined)
+          a(href='/account') Account Info
+  br
