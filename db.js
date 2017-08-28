@@ -8,13 +8,13 @@ const Poloniex = require('poloniex.js');
 const DBPoloniex = require('./models/PoloniexData');
 
 const polo = new Poloniex();
-const GRANULARITY = 1800;
+const GRANULARITY = 86400;
 
-// 300, 900, 1800, 7200, 14400, 86400 // 1503014400 // 1472256000 (1 year ago)
+// 300, 900, 1800, 7200, 14400, 86400 // 1503014400 // 1472256000 (1 year ago) // 1488153600 (6 momths ago)
 function getTickData(currencyA, currencyB) {
   return new Promise((resolve, reject) => {
     const tickData = [];
-    polo.returnChartData(currencyA, currencyB, GRANULARITY, 1472256000, 9999999999, (err, data) => {
+    polo.returnChartData(currencyA, currencyB, GRANULARITY, 1000000000, 9999999999, (err, data) => {
       if (err) {
         console.log('### ERROR getting historical tick data for', (`${currencyA}_${currencyB}`));
         console.log('### Trying again to get historical data for', (`${currencyA}_${currencyB}`));
@@ -167,12 +167,12 @@ function updateDoc(mostRecentTick, currencyA, currencyB) {
         bulkWriteToDB.push(entry);
       }
       try {
-        console.log('### Updating entry to the DB...');
+        console.log(`### [${currencyA}_${currencyB}] Updating entry to the DB...`);
         await DBPoloniex.insertMany(bulkWriteToDB);
         console.log(`### SUCCESS: Data for ${currencyA}_${currencyB} was updated to DB`);
         resolve((`SUCCESS: Data for ${currencyA}_${currencyB} was updated to DB`));
       } catch (e) {
-        console.log('### ERROR: Couldn\'t update data.');
+        console.log(`### [${currencyA}_${currencyB}] ERROR: Couldn\'t update data.`);
         console.log(e);
         reject(e);
       }
@@ -182,7 +182,7 @@ function updateDoc(mostRecentTick, currencyA, currencyB) {
 
 exports.dbInitializer = async function () {
   return new Promise(async (resolve, reject) => {
-    const choice = 9;
+    const choice = 1;
     if (choice === 0) {
       console.log('### Clearing out database...');
       DBPoloniex.deleteMany({})
@@ -206,7 +206,7 @@ exports.dbInitializer = async function () {
       // Find if each currency exists in our MongoDB
       const DBQueries = [];
       for (let i = 0; i < orderbook.length; i++) {
-        pause(1000);
+        // pause(1000);
         const pair = Object.keys(orderbook[i])[0];
         const AB = pair.split('_'); const A = AB[0]; const B = AB[1];
         // Find the most recent document (tick) for a currency
@@ -250,7 +250,7 @@ exports.dbInitializer = async function () {
 
 exports.dbUpdater = function () {
   // Job runs at the top of every 5 minutes
-  schedule.scheduleJob('*/5 * * * *', async () => {
+  schedule.scheduleJob('* */6 * * *', async () => {
     console.log(`### ${new Date()} Updating DB with new Poloniex data...`);
     let orderbook = null;
     try {

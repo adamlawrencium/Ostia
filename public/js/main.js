@@ -88,7 +88,7 @@ $(document).ready(() => {
           series: {
             dataGrouping: {
               enabled: true,
-              groupPixelWidth: 5
+              groupPixelWidth: 4
             }
           }
         },
