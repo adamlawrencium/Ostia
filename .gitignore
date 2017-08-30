@@ -30,3 +30,6 @@ bower_components
 # OS metadata
 .DS_Store
 Thumbs.db
+
+#VSCode set up
+./vscode
