@@ -1,0 +1,56 @@
+extends layout
+
+block content
+  .row
+    .col-lg-12
+      p.lead Explore current cryptocurrency prices
+
+  .row
+    .col-md-9
+      form.form-inline#chartForm(action='/tick', method='GET')
+        .form-group
+          label(for='baseCurrency') Base Currency 
+          input#baseCurrency.form-control(type='text', placeholder='BTC', value='BTC')
+        .form-group
+          label(for='tradeCurrency') Trade Currency    
+          input#tradeCurrency.form-control(type='text', placeholder='ETH', value='ETH')
+          button.btn.btn-primary#chartButton(type='button') Get Chart!
+    .col-md-3
+      h5 Enter two currencies to get a chart! 
+  .row
+    .progress
+      .progress-bar.progress-bar-striped.active(role='progressbar', aria-valuenow='100', aria-valuemin='0', aria-valuemax='100', style='width:100%')
+        | Querying tick database...
+    br
+  .row
+    .col-lg-12
+      //- Chart
+      .panel.panel-default
+        .panel-heading
+          i.fa.fa-bar-chart-o.fa-fw
+          |  Tick Chart
+        .panel-body
+          .row
+            .col-lg-12
+              #hcharts-strategy          
+          .row
+            .col-lg-6
+              h4 Indicators
+              .checkbox
+                label
+                  input(type='checkbox', value='')
+                  | Simple Moving Average (SMA)
+              .checkbox
+                label
+                  input(type='checkbox', value='')
+                  | Exponential Moving Average (EMA)
+              .checkbox
+                label
+                  input(type='checkbox', value='')
+                  | Relative Strength Index (RSI)
+              .checkbox
+                label
+                  input(type='checkbox', value='')
+                  | Moving Average Convergence Divergence (MACD)
+            .col-lg-6
+              button.btn Calculate indicators

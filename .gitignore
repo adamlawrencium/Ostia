@@ -1,10 +1,35 @@
-# Node
-node_modules/
-
-# Vim
+lib-cov
+*.seed
+*.log
+*.csv
+*.dat
+*.out
+*.pid
+*.gz
 *.swp
-*~
 
-# Temp files
+pids
+logs
+results
+tmp
+
+#Build
+public/css/main.css
+
+# API keys and secrets
+.env
+
+# Dependency directory
+node_modules
+bower_components
+
+# Editors
+.idea
+*.iml
+
+# OS metadata
 .DS_Store
-npm-debug.log
+Thumbs.db
+
+#VSCode set up
+./vscode
