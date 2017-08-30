@@ -13,8 +13,12 @@
       ul.nav.navbar-nav
         li(class=(title == 'Home') ? 'active' : undefined)
           a(href='/') Home
-        li
+        li(class=(title == 'Status') ? 'active' : undefined)
           a(href='/status') Poloniex Status
+        li(class=(title == 'Dashboard') ? 'active' : undefined)
+          a(href='/dashboard') The Markets
+        li(class=(title == 'Markets') ? 'active' : undefined)
+          a(href='/markets') Portfolio and Strategies
 
       ul.nav.navbar-nav.navbar-right
         if !user
@@ -38,14 +42,14 @@
               li
                 a(href='/logout') Logout
 
-.container
-  .row
-    .col-lg-12
-      ul.nav.nav-tabs.nav-justified
-        li(class=(title == 'Dashboard') ? 'active' : undefined)
-          a(href='/dashboard') Portfolio and Strategies
-        li(class=(title == 'Markets') ? 'active' : undefined)
-          a(href='/markets') The Markets
-        li(class=(title == 'Account') ? 'active' : undefined)
-          a(href='/account') Account Info
-  br
+//- .container
+//-   .row
+//-     .col-lg-12
+//-       ul.nav.nav-tabs.nav-justified
+//-         li(class=(title == 'Dashboard') ? 'active' : undefined)
+//-           a(href='/dashboard') Portfolio and Strategies
+//-         li(class=(title == 'Markets') ? 'active' : undefined)
+//-           a(href='/markets') The Markets
+//-         li(class=(title == 'Account') ? 'active' : undefined)
+//-           a(href='/account') Account Info
+//-   br

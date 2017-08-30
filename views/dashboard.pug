@@ -2,6 +2,10 @@ extends layout
 
 block content
   .row
+    .col-lg-12
+      p.lead Explore current cryptocurrency prices
+
+  .row
     .col-md-9
       form.form-inline#chartForm(action='/tick', method='GET')
         .form-group
@@ -10,7 +14,7 @@ block content
         .form-group
           label(for='tradeCurrency') Trade Currency    
           input#tradeCurrency.form-control(type='text', placeholder='ETH', value='ETH')
-        button.btn.btn-primary#chartButton(type='button') Get Chart!
+          button.btn.btn-primary#chartButton(type='button') Get Chart!
     .col-md-3
       h5 Enter two currencies to get a chart! 
   .row
@@ -30,21 +34,23 @@ block content
             .col-lg-12
               #hcharts-strategy          
           .row
-          .col-lg-12
-            h4 Indicators
-            .checkbox-inline
-              label
-                input(type='checkbox', value='')
-                | Simple Moving Average (SMA)
-            .checkbox-inline
-              label
-                input(type='checkbox', value='')
-                | Exponential Moving Average (EMA)
-            .checkbox-inline
-              label
-                input(type='checkbox', value='')
-                | Relative Strength Index (RSI)
-            .checkbox-inline
-              label
-                input(type='checkbox', value='')
-                | Moving Average Convergence Divergence (MACD)
+            .col-lg-6
+              h4 Indicators
+              .checkbox
+                label
+                  input(type='checkbox', value='')
+                  | Simple Moving Average (SMA)
+              .checkbox
+                label
+                  input(type='checkbox', value='')
+                  | Exponential Moving Average (EMA)
+              .checkbox
+                label
+                  input(type='checkbox', value='')
+                  | Relative Strength Index (RSI)
+              .checkbox
+                label
+                  input(type='checkbox', value='')
+                  | Moving Average Convergence Divergence (MACD)
+            .col-lg-6
+              button.btn Calculate indicators

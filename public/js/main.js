@@ -54,6 +54,7 @@ const createCandlestickSeries = function (highchart, name) {
  * @param {HighChart} highchart self reference
  */
 const loadStrategyTrades = function (highchart, chartData) {
+  if (!chartData) { return; }
   highchart.showLoading('<img src="../favicon.png">');
 
   // // INITALIZE CHART WITH HISTORICAL DATA
@@ -71,8 +72,84 @@ const loadStrategyTrades = function (highchart, chartData) {
   highchart.redraw();
 };
 
+function createHighChartsObj(ops) {
+  let chartTitle; let A; let B; let data;
+  console.log(ops);
+  chartTitle = 'Select to cryptocurrencies to view their chart!';
+  if (ops) {   
+    A = ops.A;
+    B = ops.B;
+    chartTitle = `Historical Prices - ${A}/${B}`;
+    data = ops.data;
+  }
+  return {
+    plotOptions: {
+      series: {
+        dataGrouping: {
+          enabled: true,
+          groupPixelWidth: 4
+        }
+      }
+    },
+    rangeSelector: {
+      buttons: [{
+        type: 'day',
+        count: 1,
+        text: '1d'
+      }, {
+        type: 'month',
+        count: 3,
+        text: '3m'
+      }, {
+        type: 'month',
+        count: 6,
+        text: '6m'
+      }, {
+        type: 'ytd',
+        text: 'YTD'
+      }, {
+        type: 'year',
+        count: 1,
+        text: '1y'
+      }, {
+        type: 'all',
+        text: 'All'
+      }],
+      inputEnabled: false,
+      selected: 1
+    },
+    lang: {
+      noData: 'No data to display mann'
+    },
+    noData: {
+      style: {
+        fontWeight: 'bold',
+        fontSize: '15px',
+        color: '#303030'
+      }
+    },
+    title: {
+      text: chartTitle
+    },
+    xAxis: {
+      type: 'datetime',
+      ordinal: false
+    },
+    chart: {
+      events: {
+        load() {
+          const self = this;
+          loadStrategyTrades(self, data);
+        }
+      },
+    },
+    series: []
+  };
+}
+
 
 $(document).ready(() => {
+  $('#hcharts-strategy').highcharts('StockChart', createHighChartsObj());
   const chartData = null;
   // $('.progress').show();
   $('#chartButton').click(() => {
@@ -81,62 +158,10 @@ $(document).ready(() => {
     const B = $('#tradeCurrency').val();
     console.log(`Loading chart for ${A}_${B}...`);
     $.getJSON(`/data?currencyA=${A}&currencyB=${B}`, (data) => {
-      const chartData = data;
-      // console.log(chartData);
-      $('#hcharts-strategy').highcharts('StockChart', {
-        plotOptions: {
-          series: {
-            dataGrouping: {
-              enabled: true,
-              groupPixelWidth: 4
-            }
-          }
-        },
-        rangeSelector: {
-          buttons: [{
-            type: 'day',
-            count: 1,
-            text: '1d'
-          }, {
-            type: 'month',
-            count: 3,
-            text: '3m'
-          }, {
-            type: 'month',
-            count: 6,
-            text: '6m'
-          }, {
-            type: 'ytd',
-            text: 'YTD'
-          }, {
-            type: 'year',
-            count: 1,
-            text: '1y'
-          }, {
-            type: 'all',
-            text: 'All'
-          }],
-          inputEnabled: false,
-          selected: 1
-        },
-
-        title: {
-          text: `Historical Prices - ${A}/${B}`
-        },
-        xAxis: {
-          type: 'datetime',
-          ordinal: false
-        },
-        chart: {
-          events: {
-            load() {
-              const self = this;
-              loadStrategyTrades(self, chartData);
-            }
-          },
-        },
-        series: []
-      });
+      const ops = {};
+      ops.A = A; ops.B = B; ops.data = data;
+      console.log(ops);
+      $('#hcharts-strategy').highcharts('StockChart', createHighChartsObj(ops));
     });
   });
 });

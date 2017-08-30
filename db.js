@@ -6,6 +6,7 @@ This file does two things:
 const schedule = require('node-schedule');
 const Poloniex = require('poloniex.js');
 const DBPoloniex = require('./models/PoloniexData');
+const fs = require('fs');
 
 const polo = new Poloniex();
 const GRANULARITY = 86400;
@@ -36,7 +37,6 @@ function getTickData(currencyA, currencyB) {
         for (let i = 0; i < data.length; i++) {
           tickData.push(data[i]);
         }
-        // console.log(tickData);
         return resolve(tickData);
       }
     });
@@ -181,6 +181,9 @@ function updateDoc(mostRecentTick, currencyA, currencyB) {
 }
 
 exports.dbInitializer = async function () {
+  fs.readFile('ostia-ascii.txt', 'utf8', (error, data) => {
+    console.log(data);
+  });
   return new Promise(async (resolve, reject) => {
     const choice = 1;
     if (choice === 0) {
@@ -213,25 +216,25 @@ exports.dbInitializer = async function () {
         console.log(`### Querying DB for ${pair}...`);
         const DBQuery = new Promise((resolve_, reject_) => {
           DBPoloniex.find({ currencyPair: pair }).sort({ date: -1 }).limit(1)
-          .then(async (tickDataFromDB) => {
-            // If currency isn't found, add it. Else, make sure it's up to date.
-            if (tickDataFromDB.length !== 0) {
-              console.log(`### ${pair} found in DB.`);
-              if (checkAgeOfTickData(tickDataFromDB[0]) !== true) {
-                // Update collection by adding missing ticks
-                resolve_(updateDoc(tickDataFromDB[0].date, A, B));
+            .then(async (tickDataFromDB) => {
+              // If currency isn't found, add it. Else, make sure it's up to date.
+              if (tickDataFromDB.length !== 0) {
+                console.log(`### ${pair} found in DB.`);
+                if (checkAgeOfTickData(tickDataFromDB[0]) !== true) {
+                  // Update collection by adding missing ticks
+                  resolve_(updateDoc(tickDataFromDB[0].date, A, B));
+                } else {
+                  resolve_(`Data for ${tickDataFromDB[0].currencyPair} is up to date.`);
+                }
+                // Currency pair not found in DB
               } else {
-                resolve_(`Data for ${tickDataFromDB[0].currencyPair} is up to date.`);
+                console.log(`### ${pair} not found in DB.`);
+                resolve_(await addNewPairToDBPoloniex(pair, A, B));
               }
-              // Currency pair not found in DB
-            } else {
-              console.log(`### ${pair} not found in DB.`);
-              resolve_(await addNewPairToDBPoloniex(pair, A, B));
-            }
-          })
-          .catch((err) => {
-            reject_(err);
-          });
+            })
+            .catch((err) => {
+              reject_(err);
+            });
         });
         DBQueries.push(DBQuery);
       }

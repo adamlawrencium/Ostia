@@ -20,6 +20,7 @@ const expressStatusMonitor = require('express-status-monitor');
 const sass = require('node-sass-middleware');
 const multer = require('multer');
 const dbScheduler = require('./db');
+const fs = require('fs');
 
 const upload = multer({ dest: path.join(__dirname, 'uploads') });
 
@@ -236,6 +237,9 @@ process.on('unhandledRejection', (reason, p) => {
 /**
  * Update MongoDB and start Express server.
  */
+// fs.readFile('./ascii-logo.txt', 'utf8', (error, data) => {
+//   console.log(data);
+// });
 dbScheduler.dbInitializer().then((DBUpdateResolves) => {
   console.log('### DB UPDATES:', DBUpdateResolves);
   console.log('### EXITING...');
