@@ -32,8 +32,9 @@ dotenv.load({ path: '.env.example' });
 /**
  * Controllers (route handlers).
  */
-// const tradeController = require('./controllers/trade');
-const tickDataController = require('./controllers/tickData');
+const marketsController = require('./controllers/markets');
+const portfolioController = require('./controllers/portfolio');
+const strategyController = require('./controllers/strategies');
 const homeController = require('./controllers/home');
 const userController = require('./controllers/user');
 const apiController = require('./controllers/api');
@@ -121,10 +122,11 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }))
 /**
  * Primary app routes.
  */
-app.get('/dashboard', tickDataController.getDashboard);
-app.get('/data', tickDataController.getTickData);
-// app.post('/dashboard', tickDataController.getTickData);
-app.get('/tick', tickDataController.getTickData);
+app.get('/markets', marketsController.getMarkets);
+app.get('/data', marketsController.getTickData);
+app.get('/tick', marketsController.getTickData);
+app.get('/portfolio', portfolioController.getPortfolio);
+app.get('/strategies', strategyController.getStrategies);
 
 app.get('/', homeController.index);
 app.get('/login', userController.getLogin);

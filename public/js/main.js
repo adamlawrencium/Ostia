@@ -76,7 +76,7 @@ function createHighChartsObj(ops) {
   let chartTitle; let A; let B; let data;
   console.log(ops);
   chartTitle = 'Select to cryptocurrencies to view their chart!';
-  if (ops) {   
+  if (ops) {
     A = ops.A;
     B = ops.B;
     chartTitle = `Historical Prices - ${A}/${B}`;
@@ -94,8 +94,8 @@ function createHighChartsObj(ops) {
     rangeSelector: {
       buttons: [{
         type: 'day',
-        count: 1,
-        text: '1d'
+        count: 14,
+        text: '14d'
       }, {
         type: 'month',
         count: 3,
@@ -160,8 +160,9 @@ $(document).ready(() => {
     $.getJSON(`/data?currencyA=${A}&currencyB=${B}`, (data) => {
       const ops = {};
       ops.A = A; ops.B = B; ops.data = data;
-      console.log(ops);
       $('#hcharts-strategy').highcharts('StockChart', createHighChartsObj(ops));
     });
   });
+
+  
 });

@@ -40,10 +40,10 @@ function getTickDataFromDB(currencyPair) {
  * @param currencyPair
  *
  */
-exports.getDashboard = (req, res) => {
+exports.getMarkets = (req, res) => {
   console.log(req.query);
-  res.render('dashboard', {
-    title: 'Dashboard'
+  res.render('markets', {
+    title: 'Markets'
   });
 };
 

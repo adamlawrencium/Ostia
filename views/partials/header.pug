@@ -13,12 +13,14 @@
       ul.nav.navbar-nav
         li(class=(title == 'Home') ? 'active' : undefined)
           a(href='/') Home
+        li(class=(title == 'Portfolio') ? 'active' : undefined)
+          a(href='/portfolio') Portfolio
+        li(class=(title == 'Strategies') ? 'active' : undefined)
+          a(href='/strategies') Strategies  
+        li(class=(title == 'Markets') ? 'active' : undefined)
+          a(href='/markets') The Markets
         li(class=(title == 'Status') ? 'active' : undefined)
           a(href='/status') Poloniex Status
-        li(class=(title == 'Dashboard') ? 'active' : undefined)
-          a(href='/dashboard') The Markets
-        li(class=(title == 'Markets') ? 'active' : undefined)
-          a(href='/markets') Portfolio and Strategies
 
       ul.nav.navbar-nav.navbar-right
         if !user
