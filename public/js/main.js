@@ -4,7 +4,7 @@
 window.SMA = function (candleStickData, MAWindowSize) {
   console.log('Calculating SMA for chart with', MAWindowSize, 'window size.');
   // Calcuating interval between the dates, and the amount of values needed each day
-  var interval = candleStickData[1][0] - candleStickData[0][0];
+  var interval = candleStickData[0][0] - candleStickData[1][0];
   var entryPerDay = 86400 / interval;
   var MATimeSeries = [];
   var prev = null;
@@ -30,6 +30,32 @@ window.SMA = function (candleStickData, MAWindowSize) {
   }
   return MATimeSeries;
 };
+
+/**
+ * Creates object literal, given paramaters, and adds it to highchart
+ * @param {HighChart} highchart self reference
+ * @param {object} params parameters to add to series
+ */
+var createIndicatorSeries = function (name, data, spline) {
+  var seriesObj = {};
+  seriesObj.name = name;
+  seriesObj.id = name;
+  seriesObj.data = data;
+  seriesObj.marker = {
+    enabled: false,
+    radius: 3
+  };
+  if (spline == true) {
+    seriesObj.type = 'spline';
+  }
+  seriesObj.tooltip = {
+    valueDecimals: 5
+  };
+  return seriesObj;
+  // highchart.addSeries(seriesObj, true);
+};
+
+
 /**
  * Adds a date and price as a tuple to a targetSeries
  * @param {HighChart.series} targetSeries reference
@@ -72,6 +98,7 @@ const createCandlestickSeries = function (highchart, name) {
   seriesObj.tooltip = {
     valueDecimals: 5
   };
+
   highchart.addSeries(seriesObj, true);
 };
 
@@ -179,7 +206,8 @@ function createHighChartsObj(ops) {
 
 $(document).ready(() => {
   let chartData = null;
-  $('#hcharts-strategy').highcharts('StockChart', createHighChartsObj());
+  var mainChart = Highcharts.stockChart('hcharts-strategy', createHighChartsObj());
+  // var mainChart = $('#hcharts-strategy').highcharts('StockChart', createHighChartsObj());
   // const chartData = null;
   // $('.progress').show();
   $('#chartButton').click(() => {
@@ -194,28 +222,24 @@ $(document).ready(() => {
     });
   });
   $('#addIndicatorBtn_SMA').click(() => {
-    // PARAM see which indicator to add
-    // PARAM what indicator parameter to use
     console.log('### Inside addIndicator_SMA');
     const SMAParam = $('#addIndicator_SMA').val();
     console.log(SMAParam);
     console.log(chartData[0]);
-    let SMA = window.SMA(chartData, SMAParam);
+    const SMA = window.SMA(chartData, SMAParam);
     console.log(SMA);
-    // const B = $('#tradeCurrency').val();
-    // console.log(indicator);
-    // console.log(indicParam);
-    // read time series data
-    // create new indicator time series
-    // add new time series to highcharts graph
-    // redraw chart
+
+    const newIndObj = createIndicatorSeries('SMA', SMA, true);
+    console.log(newIndObj);
+    console.log(mainChart);
+    mainChart.addSeries(newIndObj);
     
   });
   $('#removeIndicator').click(() => {
     // PARAM see which indicator to add
     // PARAM what indicator parameter to use
-    let indicator = 'blah';
-    let indicParam = 23;
+    const indicator = 'blah';
+    const indicParam = 23;
     console.log('hi');
     // console.log(indicator);
     // console.log(indicParam);
