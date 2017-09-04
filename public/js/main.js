@@ -1,6 +1,35 @@
 // import highchartsObj from 'chartObj.js';
 // console.log(highchartsObj);
 
+window.SMA = function (candleStickData, MAWindowSize) {
+  console.log('Calculating SMA for chart with', MAWindowSize, 'window size.');
+  // Calcuating interval between the dates, and the amount of values needed each day
+  var interval = candleStickData[1][0] - candleStickData[0][0];
+  var entryPerDay = 86400 / interval;
+  var MATimeSeries = [];
+  var prev = null;
+  var avg = 0;
+  // Looping through each entry in the candleStickData object
+  for (var i = 0; i < candleStickData.length; i++) {
+    console.log(candleStickData[i], i);
+    // Initial set-up of the first SMA average that can be calculated
+    if (i == MAWindowSize * entryPerDay - 1) {
+      for (var j = 0; j < MAWindowSize * entryPerDay; j++) {
+        avg += candleStickData[j][1];
+      }
+      avg = avg / (MAWindowSize * entryPerDay);
+      MATimeSeries.push([candleStickData[i][0], avg]);
+      prev = candleStickData[0][1];
+    }
+    // Each time after the initial set-up, the avg is subtracted by the prev, and is added to the newest value
+    if (i > MAWindowSize * entryPerDay - 1) {
+      avg = avg - prev / (MAWindowSize * entryPerDay) + candleStickData[i][1] / (MAWindowSize * entryPerDay);
+      MATimeSeries.push([candleStickData[i][0], avg]);
+      prev = candleStickData[i - (MAWindowSize * entryPerDay - 1)][1];
+    }
+  }
+  return MATimeSeries;
+};
 /**
  * Adds a date and price as a tuple to a targetSeries
  * @param {HighChart.series} targetSeries reference
@@ -74,7 +103,7 @@ const loadStrategyTrades = function (highchart, chartData) {
 
 function createHighChartsObj(ops) {
   let chartTitle; let A; let B; let data;
-  console.log(ops);
+  // console.log(ops);
   chartTitle = 'Select to cryptocurrencies to view their chart!';
   if (ops) {
     A = ops.A;
@@ -149,8 +178,9 @@ function createHighChartsObj(ops) {
 
 
 $(document).ready(() => {
+  let chartData = null;
   $('#hcharts-strategy').highcharts('StockChart', createHighChartsObj());
-  const chartData = null;
+  // const chartData = null;
   // $('.progress').show();
   $('#chartButton').click(() => {
     $('.progress').show();
@@ -159,13 +189,36 @@ $(document).ready(() => {
     console.log(`Loading chart for ${A}_${B}...`);
     $.getJSON(`/data?currencyA=${A}&currencyB=${B}`, (data) => {
       const ops = {};
-      ops.A = A; ops.B = B; ops.data = data;
+      ops.A = A; ops.B = B; ops.data = data; chartData = data;
       $('#hcharts-strategy').highcharts('StockChart', createHighChartsObj(ops));
     });
   });
-  $('#addIndicator').click(() => {
+  $('#addIndicatorBtn_SMA').click(() => {
     // PARAM see which indicator to add
     // PARAM what indicator parameter to use
+    console.log('### Inside addIndicator_SMA');
+    const SMAParam = $('#addIndicator_SMA').val();
+    console.log(SMAParam);
+    console.log(chartData[0]);
+    let SMA = window.SMA(chartData, SMAParam);
+    console.log(SMA);
+    // const B = $('#tradeCurrency').val();
+    // console.log(indicator);
+    // console.log(indicParam);
+    // read time series data
+    // create new indicator time series
+    // add new time series to highcharts graph
+    // redraw chart
+    
+  });
+  $('#removeIndicator').click(() => {
+    // PARAM see which indicator to add
+    // PARAM what indicator parameter to use
+    let indicator = 'blah';
+    let indicParam = 23;
+    console.log('hi');
+    // console.log(indicator);
+    // console.log(indicParam);
     // read time series data
     // create new indicator time series
     // add new time series to highcharts graph

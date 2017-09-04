@@ -1,10 +1,10 @@
-mixin addIndicator(indicator)
-  form.form-inline()
+mixin addIndicator(indicator, id_)
+  form.form-inline(id=id_)
     //- .checkbox
     //-   label
     //-     input(type='checkbox')
     .form-group
       label(for='inputEmail')= indicator
-      input.form-control(type='number', placeholder='Param', required='')
-    button.btn(type='button', id='addIndicator') Add
+      input.form-control(type='number', placeholder='Param', required='', id=`addIndicator_${id_}`)
+    button.btn(type='button', id=`addIndicatorBtn_${id_}`) Add
     button.btn(type='button', id='removeIndicator') X
