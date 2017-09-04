@@ -163,6 +163,14 @@ $(document).ready(() => {
       $('#hcharts-strategy').highcharts('StockChart', createHighChartsObj(ops));
     });
   });
-
+  $('#addIndicator').click(() => {
+    // PARAM see which indicator to add
+    // PARAM what indicator parameter to use
+    // read time series data
+    // create new indicator time series
+    // add new time series to highcharts graph
+    // redraw chart
+    
+  });
   
 });
