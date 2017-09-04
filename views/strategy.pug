@@ -1,10 +1,18 @@
 extends layout
 
-block content
-  .row
-    .col-lg-12
-      p.lead Explore current cryptocurrency prices and trends.
+include partials/currencyChart
+include partials/addIndicator
 
+block content
+  p.lead Create a trading strategy.
+
+  ol 
+    li Select a currency pair
+    li Select indicators
+    li Define your algorithm
+    li Back test your algorithm
+
+  
   .row
     .col-md-9
       form.form-inline#chartForm(action='/tick', method='GET')
@@ -14,7 +22,7 @@ block content
         .form-group
           label(for='tradeCurrency') Trade Currency    
           input#tradeCurrency.form-control(type='text', placeholder='ETH', value='ETH')
-          button.btn.btn-primary#chartButton(type='button') Get Chart!
+          button.btn.btn-primary#chartButton(type='button') Select Pair
     .col-md-3
       h5 Enter two currencies to get a chart! 
   .row
@@ -34,23 +42,10 @@ block content
             .col-lg-12
               #hcharts-strategy          
           .row
-            .col-lg-6
+            .col-lg-12
               h4 Indicators
-              .checkbox
-                label
-                  input(type='checkbox', value='')
-                  | Simple Moving Average (SMA)
-              .checkbox
-                label
-                  input(type='checkbox', value='')
-                  | Exponential Moving Average (EMA)
-              .checkbox
-                label
-                  input(type='checkbox', value='')
-                  | Relative Strength Index (RSI)
-              .checkbox
-                label
-                  input(type='checkbox', value='')
-                  | Moving Average Convergence Divergence (MACD)
-            .col-lg-6
-              button.btn Calculate indicators
+              +addIndicator("Simple Moving Average")
+              +addIndicator("Exponential Moving Average")
+              +addIndicator("Relative Strength Index")
+              +addIndicator("Moving Average Convergence Divergence")
+        

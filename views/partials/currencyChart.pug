@@ -1,10 +1,4 @@
-extends layout
-
-block content
-  .row
-    .col-lg-12
-      p.lead Explore current cryptocurrency prices and trends.
-
+mixin currencyChart()
   .row
     .col-md-9
       form.form-inline#chartForm(action='/tick', method='GET')
@@ -33,24 +27,3 @@ block content
           .row
             .col-lg-12
               #hcharts-strategy          
-          .row
-            .col-lg-6
-              h4 Indicators
-              .checkbox
-                label
-                  input(type='checkbox', value='')
-                  | Simple Moving Average (SMA)
-              .checkbox
-                label
-                  input(type='checkbox', value='')
-                  | Exponential Moving Average (EMA)
-              .checkbox
-                label
-                  input(type='checkbox', value='')
-                  | Relative Strength Index (RSI)
-              .checkbox
-                label
-                  input(type='checkbox', value='')
-                  | Moving Average Convergence Divergence (MACD)
-            .col-lg-6
-              button.btn Calculate indicators

@@ -3,7 +3,7 @@
  * Strategies
  */
 exports.getStrategies = (req, res) => {
-  res.render('portfolio', {
-    title: 'Portfolio'
+  res.render('strategy', {
+    title: 'Strategies'
   });
 };
