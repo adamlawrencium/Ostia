@@ -4,14 +4,14 @@
 window.SMA = function (candleStickData, MAWindowSize) {
   console.log('Calculating SMA for chart with', MAWindowSize, 'window size.');
   // Calcuating interval between the dates, and the amount of values needed each day
-  var interval = candleStickData[1][0] - candleStickData[0][0];
+  var interval = candleStickData[0][0] - candleStickData[1][0];
   var entryPerDay = 86400 / interval;
   var MATimeSeries = [];
   var prev = null;
   var avg = 0;
   // Looping through each entry in the candleStickData object
   for (var i = 0; i < candleStickData.length; i++) {
-    //console.log(candleStickData[i], i);
+    console.log(candleStickData[i], i);
     // Initial set-up of the first SMA average that can be calculated
     if (i == MAWindowSize * entryPerDay - 1) {
       for (var j = 0; j < MAWindowSize * entryPerDay; j++) {
@@ -36,11 +36,11 @@ window.SMA = function (candleStickData, MAWindowSize) {
  * @param {HighChart} highchart self reference
  * @param {object} params parameters to add to series
  */
-var createIndicatorSeries = function (highchart, name, spline) {
+var createIndicatorSeries = function (name, data, spline) {
   var seriesObj = {};
   seriesObj.name = name;
   seriesObj.id = name;
-  //seriesObj.data = data;
+  seriesObj.data = data;
   seriesObj.marker = {
     enabled: false,
     radius: 3
@@ -51,8 +51,7 @@ var createIndicatorSeries = function (highchart, name, spline) {
   seriesObj.tooltip = {
     valueDecimals: 5
   };
-  //return seriesObj;
-  highchart.addSeries(seriesObj, true);
+  return seriesObj;
   // highchart.addSeries(seriesObj, true);
 };
 
@@ -217,45 +216,24 @@ $(document).ready(() => {
     const B = $('#tradeCurrency').val();
     console.log(`Loading chart for ${A}_${B}...`);
     $.getJSON(`/data?currencyA=${A}&currencyB=${B}`, (data) => {
-      console.log(data);
       const ops = {};
       ops.A = A; ops.B = B; ops.data = data; chartData = data;
-      mainChart = Highcharts.stockChart('hcharts-strategy', createHighChartsObj(ops));
-      //$('#hcharts-strategy').highcharts('StockChart', createHighChartsObj(ops));
+      $('#hcharts-strategy').highcharts('StockChart', createHighChartsObj(ops));
     });
   });
   $('#addIndicatorBtn_SMA').click(() => {
     console.log('### Inside addIndicator_SMA');
     const SMAParam = $('#addIndicator_SMA').val();
-
-    // Parsing pattern for csv SMA values
-    var pattern = /\s*,\s*/;
-    var nameList = SMAParam.split(pattern);
-
-    // Looping through each entered value and adding a SMA series
-    for (let i=0; i < nameList.length; i++){
-      var SMA = window.SMA(chartData, nameList[i]);
-      // Creating a unique id for this indicator
-      var id = "SMA - "+ nameList[i]
-
-      // Creating indicator series for selected indicator
-      createIndicatorSeries(mainChart, id, true);
-      const targetSeries = mainChart.get(id);
-
-      // Adding indicator series to the chart
-      addTickerDatasetToSeries(targetSeries, SMA);
-    }
-
     console.log(SMAParam);
-    console.log(chartData);
+    console.log(chartData[0]);
+    const SMA = window.SMA(chartData, SMAParam);
+    console.log(SMA);
 
-    // Redrawing chart after adding indicators
-    mainChart.redraw();
-
-    //console.log(newIndObj);
-    //console.log(mainChart);
-    //mainChart.addSeries(newIndObj);
-
+    const newIndObj = createIndicatorSeries('SMA', SMA, true);
+    console.log(newIndObj);
+    console.log(mainChart);
+    mainChart.addSeries(newIndObj);
+    
   });
   $('#removeIndicator').click(() => {
     // PARAM see which indicator to add
@@ -269,7 +247,7 @@ $(document).ready(() => {
     // create new indicator time series
     // add new time series to highcharts graph
     // redraw chart
-
+    
   });
-
+  
 });
