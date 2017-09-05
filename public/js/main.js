@@ -40,6 +40,7 @@ var createIndicatorSeries = function (highchart, name, spline) {
   var seriesObj = {};
   seriesObj.name = name;
   seriesObj.id = name;
+  seriesObj.lineWidth = 1.25;
   //seriesObj.data = data;
   seriesObj.marker = {
     enabled: false,
