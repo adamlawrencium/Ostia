@@ -11,7 +11,6 @@ window.SMA = function (candleStickData, MAWindowSize) {
   var avg = 0;
   // Looping through each entry in the candleStickData object
   for (var i = 0; i < candleStickData.length; i++) {
-    //console.log(candleStickData[i], i);
     // Initial set-up of the first SMA average that can be calculated
     if (i == MAWindowSize * entryPerDay - 1) {
       for (var j = 0; j < MAWindowSize * entryPerDay; j++) {
@@ -40,7 +39,6 @@ var createIndicatorSeries = function (highchart, name, spline) {
   var seriesObj = {};
   seriesObj.name = name;
   seriesObj.id = name;
-  //seriesObj.data = data;
   seriesObj.marker = {
     enabled: false,
     radius: 3
@@ -51,9 +49,7 @@ var createIndicatorSeries = function (highchart, name, spline) {
   seriesObj.tooltip = {
     valueDecimals: 5
   };
-  //return seriesObj;
   highchart.addSeries(seriesObj, true);
-  // highchart.addSeries(seriesObj, true);
 };
 
 
@@ -221,7 +217,6 @@ $(document).ready(() => {
       const ops = {};
       ops.A = A; ops.B = B; ops.data = data; chartData = data;
       mainChart = Highcharts.stockChart('hcharts-strategy', createHighChartsObj(ops));
-      //$('#hcharts-strategy').highcharts('StockChart', createHighChartsObj(ops));
     });
   });
   $('#addIndicatorBtn_SMA').click(() => {
@@ -229,14 +224,14 @@ $(document).ready(() => {
     const SMAParam = $('#addIndicator_SMA').val();
 
     // Parsing pattern for csv SMA values
-    var pattern = /\s*,\s*/;
-    var nameList = SMAParam.split(pattern);
+    const pattern = /\s*,\s*/;
+    const nameList = SMAParam.split(pattern);
 
     // Looping through each entered value and adding a SMA series
     for (let i=0; i < nameList.length; i++){
-      var SMA = window.SMA(chartData, nameList[i]);
+      let SMA = window.SMA(chartData, nameList[i]);
       // Creating a unique id for this indicator
-      var id = "SMA - "+ nameList[i]
+      let id = "SMA - "+ nameList[i]
 
       // Creating indicator series for selected indicator
       createIndicatorSeries(mainChart, id, true);
@@ -246,16 +241,8 @@ $(document).ready(() => {
       addTickerDatasetToSeries(targetSeries, SMA);
     }
 
-    console.log(SMAParam);
-    console.log(chartData);
-
     // Redrawing chart after adding indicators
     mainChart.redraw();
-
-    //console.log(newIndObj);
-    //console.log(mainChart);
-    //mainChart.addSeries(newIndObj);
-
   });
   $('#removeIndicator').click(() => {
     // PARAM see which indicator to add
