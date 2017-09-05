@@ -44,7 +44,7 @@ var createIndicatorSeries = function (highchart, name, spline) {
     enabled: false,
     radius: 3
   };
-  if (spline == true) {
+  if (spline === true) {
     seriesObj.type = 'spline';
   }
   seriesObj.tooltip = {
