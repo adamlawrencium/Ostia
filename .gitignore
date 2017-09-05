@@ -33,3 +33,7 @@ Thumbs.db
 
 #VSCode set up
 ./vscode
+
+#linter set up
+.eslintrc
+package-lock.json
