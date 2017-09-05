@@ -227,20 +227,29 @@ $(document).ready(() => {
   $('#addIndicatorBtn_SMA').click(() => {
     console.log('### Inside addIndicator_SMA');
     const SMAParam = $('#addIndicator_SMA').val();
+
+    // Parsing pattern for csv SMA values
+    var pattern = /\s*,\s*/;
+    var nameList = SMAParam.split(pattern);
+
+    // Looping through each entered value and adding a SMA series
+    for (let i=0; i < nameList.length; i++){
+      var SMA = window.SMA(chartData, nameList[i]);
+      // Creating a unique id for this indicator
+      var id = "SMA - "+ nameList[i]
+
+      // Creating indicator series for selected indicator
+      createIndicatorSeries(mainChart, id, true);
+      const targetSeries = mainChart.get(id);
+
+      // Adding indicator series to the chart
+      addTickerDatasetToSeries(targetSeries, SMA);
+    }
+
     console.log(SMAParam);
     console.log(chartData);
-    const SMA = window.SMA(chartData, SMAParam);
-    // console.log(SMA);
-    // Creating a unique id for this indicator
-    var id = "SMA - "+ SMAParam
-    //console.log(id);
 
-    // Creating indicator series for selected indicator
-    createIndicatorSeries(mainChart, id, true);
-    const targetSeries = mainChart.get(id);
-
-    // Adding indicator series to the chart
-    addTickerDatasetToSeries(targetSeries, SMA);
+    // Redrawing chart after adding indicators
     mainChart.redraw();
 
     //console.log(newIndObj);
