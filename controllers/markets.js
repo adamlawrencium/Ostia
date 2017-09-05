@@ -11,7 +11,7 @@ const DBPoloniex = require('../models/PoloniexData');
 function getTickDataFromDB(currencyPair) {
   return new Promise((resolve, reject) => {
     console.log(`Querying DB for ${currencyPair}...`);
-    DBPoloniex.find({ currencyPair }).sort({ date: -1 })
+    DBPoloniex.find({ currencyPair }).sort({ date: 1 })
       .then((tickDataFromDB) => {
         if (tickDataFromDB.length !== 0) {
           const ret = [];
