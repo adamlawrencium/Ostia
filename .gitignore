@@ -37,3 +37,6 @@ Thumbs.db
 #linter set up
 .eslintrc
 package-lock.json
+
+# CSS
+main.css
