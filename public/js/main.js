@@ -4,19 +4,19 @@
 window.SMA = function (candleStickData, MAWindowSize) {
   console.log('Calculating SMA for chart with', MAWindowSize, 'window size.');
   // Calcuating interval between the dates, and the amount of values needed each day
-  var interval = candleStickData[1][0] - candleStickData[0][0];
-  var entryPerDay = 86400 / interval;
-  var MATimeSeries = [];
-  var prev = null;
-  var avg = 0;
+  const interval = candleStickData[1][0] - candleStickData[0][0];
+  const entryPerDay = 86400 / interval;
+  const MATimeSeries = [];
+  let prev = null;
+  let avg = 0;
   // Looping through each entry in the candleStickData object
-  for (var i = 0; i < candleStickData.length; i++) {
+  for (let i = 0; i < candleStickData.length; i++) {
     // Initial set-up of the first SMA average that can be calculated
-    if (i == MAWindowSize * entryPerDay - 1) {
-      for (var j = 0; j < MAWindowSize * entryPerDay; j++) {
+    if (i === (MAWindowSize * entryPerDay) - 1) {
+      for (let j = 0; j < MAWindowSize * entryPerDay; j++) {
         avg += candleStickData[j][1];
       }
-      avg = avg / (MAWindowSize * entryPerDay);
+      avg /= (MAWindowSize * entryPerDay);
       MATimeSeries.push([candleStickData[i][0], avg]);
       prev = candleStickData[0][1];
     }
@@ -35,15 +35,16 @@ window.SMA = function (candleStickData, MAWindowSize) {
  * @param {HighChart} highchart self reference
  * @param {object} params parameters to add to series
  */
-var createIndicatorSeries = function (highchart, name, spline) {
-  var seriesObj = {};
+const createIndicatorSeries = function (highchart, name, spline) {
+  const seriesObj = {};
   seriesObj.name = name;
   seriesObj.id = name;
+  seriesObj.lineWidth = 1.25;
   seriesObj.marker = {
     enabled: false,
     radius: 3
   };
-  if (spline == true) {
+  if (spline === true) {
     seriesObj.type = 'spline';
   }
   seriesObj.tooltip = {
@@ -203,7 +204,7 @@ function createHighChartsObj(ops) {
 
 $(document).ready(() => {
   let chartData = null;
-  var mainChart = Highcharts.stockChart('hcharts-strategy', createHighChartsObj());
+  let mainChart = Highcharts.stockChart('hcharts-strategy', createHighChartsObj());
   // var mainChart = $('#hcharts-strategy').highcharts('StockChart', createHighChartsObj());
   // const chartData = null;
   // $('.progress').show();
@@ -229,9 +230,9 @@ $(document).ready(() => {
 
     // Looping through each entered value and adding a SMA series
     for (let i=0; i < nameList.length; i++){
-      let SMA = window.SMA(chartData, nameList[i]);
+      const SMA = window.SMA(chartData, nameList[i]);
       // Creating a unique id for this indicator
-      let id = "SMA - "+ nameList[i]
+      const id = "SMA - "+ nameList[i]
 
       // Creating indicator series for selected indicator
       createIndicatorSeries(mainChart, id, true);

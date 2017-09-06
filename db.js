@@ -9,7 +9,7 @@ const DBPoloniex = require('./models/PoloniexData');
 const fs = require('fs');
 
 const polo = new Poloniex();
-const GRANULARITY = 86400;
+const GRANULARITY = 14400;
 
 // 300, 900, 1800, 7200, 14400, 86400 // 1503014400 // 1472256000 (1 year ago) // 1488153600 (6 momths ago)
 function getTickData(currencyA, currencyB) {
