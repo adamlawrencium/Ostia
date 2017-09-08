@@ -236,10 +236,13 @@ $(document).ready(() => {
       chartList.push(mainChart.series[i].name);
     }
 
-    // Removing any series not specified in userInputChartList (the array of
-    //  indicators to be displayed) and adding new series
+    // This set of functions manages multiple entries of csv inputs, and updates
+    //  the chart to the newest input. For example, if 5, 10 is entered first,
+    //  5 and 10 indicators are added. If 10, 15 is entered next, 5 is removed,
+    //  10 remains, and 15 is added.
 
-    // Removing step
+    // Removing any series not specified in userInputChartList (the array of
+    //  indicators to be displayed)
     for (let i = 0; i !== chartList.length; i += 1) {
       let shouldExist = false;
       for (let j = 0; j !== userInputChartList.length; j += 1) {
@@ -255,7 +258,7 @@ $(document).ready(() => {
       }
     }
 
-    // Adding new series step
+    // Adding new series from the user inputted list
     for (let i = 0; i !== userInputChartList.length; i += 1) {
       let exists = false;
       for (let j = 0; j !== chartList.length; j += 1) {
