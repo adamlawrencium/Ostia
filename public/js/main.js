@@ -226,22 +226,62 @@ $(document).ready(() => {
 
     // Parsing pattern for csv SMA values
     const pattern = /\s*,\s*/;
-    const nameList = SMAParam.split(pattern);
+    const userInputChartList = SMAParam.split(pattern);
 
-    // Looping through each entered value and adding a SMA series
-    for (let i=0; i < nameList.length; i++){
-      const SMA = window.SMA(chartData, nameList[i]);
-      // Creating a unique id for this indicator
-      const id = "SMA - "+ nameList[i]
-
-      // Creating indicator series for selected indicator
-      createIndicatorSeries(mainChart, id, true);
-      const targetSeries = mainChart.get(id);
-
-      // Adding indicator series to the chart
-      addTickerDatasetToSeries(targetSeries, SMA);
+    // Transferring list of current charts to seperate array, ignoring i = 0
+    //  and i = mainChart.series.length - 1, as those are occupied by the
+    //  candlestick data and the series info display respectively
+    const chartList = [];
+    for (let i = 1; i !== mainChart.series.length - 1; i += 1) {
+      chartList.push(mainChart.series[i].name);
     }
 
+    // This set of functions manages multiple entries of csv inputs, and updates
+    //  the chart to the newest input. For example, if 5, 10 is entered first,
+    //  5 and 10 indicators are added. If 10, 15 is entered next, 5 is removed,
+    //  10 remains, and 15 is added.
+
+    // Removing any series not specified in userInputChartList (the array of
+    //  indicators to be displayed)
+    for (let i = 0; i !== chartList.length; i += 1) {
+      let shouldExist = false;
+      for (let j = 0; j !== userInputChartList.length; j += 1) {
+        let tmpUICL = "SMA - " + userInputChartList[j];
+        if (chartList[i] === tmpUICL) {
+          shouldExist = true;
+        }
+      }
+      // If a currently existing series does not appear anywhere in the user
+      //  inputted list of indicators, remove it
+      if (!shouldExist) {
+        mainChart.get(chartList[i]).remove();
+      }
+    }
+
+    // Adding new series from the user inputted list
+    for (let i = 0; i !== userInputChartList.length; i += 1) {
+      let exists = false;
+      for (let j = 0; j !== chartList.length; j += 1) {
+        let tmpUICL = "SMA - " + userInputChartList[i];
+        if (chartList[j] === tmpUICL) {
+          exists = true;
+        }
+      }
+      // If a user inputted indicator appears nowhere in the the current chart
+      //  add it
+      if (!exists) {
+        let SMA = window.SMA(chartData, userInputChartList[i]);
+        // Creating a unique id for this indicator
+        let id = 'SMA - ' + userInputChartList[i];
+
+        // Creating indicator series for selected indicator
+        createIndicatorSeries(mainChart, id, true);
+        const targetSeries = mainChart.get(id);
+
+        // Adding indicator series to the chart
+        addTickerDatasetToSeries(targetSeries, SMA);
+      }
+    }
     // Redrawing chart after adding indicators
     mainChart.redraw();
   });
