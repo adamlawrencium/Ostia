@@ -19,7 +19,8 @@ function getTickData(currencyA, currencyB) {
       if (err) {
         console.log('### ERROR getting historical tick data for', (`${currencyA}_${currencyB}`));
         console.log('### Trying again to get historical data for', (`${currencyA}_${currencyB}`));
-        pause(1000);
+        // pause(1000);
+        // RETRYING TO GET DATA ON ERROR
         polo.returnChartData(currencyA, currencyB, GRANULARITY, 1000000000, 9999999999, (err_, data_) => {
           if (err_) {
             console.log('### SECOND ERROR getting historical tick data for', (`${currencyA}_${currencyB}`));
@@ -33,17 +34,16 @@ function getTickData(currencyA, currencyB) {
           }
         });
         return reject(err);
-      } else {
-        for (let i = 0; i < data.length; i++) {
-          tickData.push(data[i]);
-        }
-        return resolve(tickData);
+      } 
+      for (let i = 0; i < data.length; i++) {
+        tickData.push(data[i]);
       }
+      return resolve(tickData);
     });
   });
 }
 function pause(milliseconds) {
-  var dt = new Date();
+  let dt = new Date();
   while ((new Date()) - dt <= milliseconds) { /* Do nothing */ }
 }
 
