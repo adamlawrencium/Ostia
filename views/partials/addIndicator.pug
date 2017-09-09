@@ -6,5 +6,6 @@ mixin addIndicator(indicator, id_)
     .form-group
       label(for='inputEmail')= indicator
       input.form-control(type='text', placeholder='Param', required='', id=`addIndicator_${id_}`)
-    button.btn(type='button', id=`addIndicatorBtn_${id_}`) Add
-    button.btn(type='button', id='removeIndicator') X
+      //- .btn-toolbar
+      button.btn.indcbtn(type='button', id=`addIndicatorBtn_${id_}`) Update
+      //- button.btn.indcbtn(type='button', id='removeIndicator') X

@@ -36,7 +36,7 @@ block content
       .panel.panel-default
         .panel-heading
           i.fa.fa-bar-chart-o.fa-fw
-          |  Tick Chart
+          | 1. Select Currency Pair 
         .panel-body
           .row
             .col-lg-12
@@ -48,4 +48,31 @@ block content
               +addIndicator("Exponential Moving Average", "EMA")
               +addIndicator("Relative Strength Index", "RSI")
               +addIndicator("Moving Average Convergence Divergence", "MACD")
-        
+    //- Rule creation panel
+  .row
+    .col-lg-12
+      .panel.panel-default
+        .panel-heading
+          i.fa.fa-bar-chart-o.fa-fw
+          | 2. Algorithm Design
+        .panel-body
+          .row
+            .col-lg-12
+              p.lead Build your algorithmic rules here
+
+  //- Strategy backtest panel
+  .row
+    .col-lg-12
+      .panel.panel-default
+        .panel-heading
+          i.fa.fa-bar-chart-o.fa-fw
+          | 2. Strategy Backtesting
+        .panel-body
+          .row
+            .col-lg-12
+              p.lead Backtest your strategy here
+  .row
+    .col-lg-12
+      .btn-toolbar
+        button.pull-right.btn.btn-primary(type='button') Deploy Strategy
+        button.pull-right.btn(type='button') Save Strategy
