@@ -26,15 +26,14 @@ function getTickData(currencyA, currencyB) {
             console.log('### SECOND ERROR getting historical tick data for', (`${currencyA}_${currencyB}`));
             console.log(err_);
             return reject(err_);
-          } else {
-            for (let i = 0; i < data_.length; i++) {
-              tickData.push(data_[i]);
-            }
-            return resolve(tickData);
           }
+          for (let i = 0; i < data_.length; i++) {
+            tickData.push(data_[i]);
+          }
+          return resolve(tickData);
         });
         return reject(err);
-      } 
+      }
       for (let i = 0; i < data.length; i++) {
         tickData.push(data[i]);
       }
@@ -43,7 +42,7 @@ function getTickData(currencyA, currencyB) {
   });
 }
 function pause(milliseconds) {
-  let dt = new Date();
+  const dt = new Date();
   while ((new Date()) - dt <= milliseconds) { /* Do nothing */ }
 }
 
@@ -172,7 +171,7 @@ function updateDoc(mostRecentTick, currencyA, currencyB) {
         console.log(`### SUCCESS: Data for ${currencyA}_${currencyB} was updated to DB`);
         resolve((`SUCCESS: Data for ${currencyA}_${currencyB} was updated to DB`));
       } catch (e) {
-        console.log(`### [${currencyA}_${currencyB}] ERROR: Couldn\'t update data.`);
+        console.log(`### [${currencyA}_${currencyB}] ERROR: Couldn't update data.`);
         console.log(e);
         reject(e);
       }
