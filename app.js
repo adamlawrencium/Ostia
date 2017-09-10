@@ -254,3 +254,9 @@ dbScheduler.dbInitializer().then((DBUpdateResolves) => {
 });
 
 module.exports = app;
+
+const http = require('http');
+
+setInterval(() => {
+  http.get('http://ostiatrading.herokuapp.com');
+}, 300000); // every 5 minutes (300000)
