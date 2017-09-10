@@ -1,4 +1,4 @@
-// const passport = require('passport');
+const passport = require('passport');
 // const request = require('request');
 // const InstagramStrategy = require('passport-instagram').Strategy;
 // const LocalStrategy = require('passport-local').Strategy;
@@ -11,17 +11,17 @@
 // const OAuthStrategy = require('passport-oauth').OAuthStrategy;
 // const OAuth2Strategy = require('passport-oauth').OAuth2Strategy;
 
-// const User = require('../models/User');
+const User = require('../models/User');
 
-// passport.serializeUser((user, done) => {
-//   done(null, user.id);
-// });
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
 
-// passport.deserializeUser((id, done) => {
-//   User.findById(id, (err, user) => {
-//     done(err, user);
-//   });
-// });
+passport.deserializeUser((id, done) => {
+  User.findById(id, (err, user) => {
+    done(err, user);
+  });
+});
 
 // /**
 //  * Sign in using Email and Password.
