@@ -10,7 +10,7 @@ The easiest way to run Ostia is to deploy it to Heroku -- or you can clone the a
 ### Deploy to Heruoku 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
-Or just go to an already deployed version here: http://ostrade.herokuapp.com/ (might take a second for the Heroku dyno to spin up)
+Or just go to an already deployed version here: https://ostiatrading.herokuapp.com/ (old version here: https://ostrade.herokuapp.com, might take a second for the Heroku dyno to spin up)
 
 
 ### Install and run locally on your machine
