@@ -1,27 +1,33 @@
 extends layout
 
 block content
-  h1 Ostia Trading Platform
-  p.lead A cryptocurrency trading platform built over Poloniex.
-  hr
+  .row(style="margin-top: 20px;")
+    .col-sm-2
+      //- span.helper
+      img(src="assets/Ostia-ship-blue.png" style='height: 100%; width: 100%; object-fit: contain')
+    .col-sm-10
+      h1 Ostia Trading Platform
+      p.lead Navigate the seas of cryptocurrency trading with a powerful platform built over Poloniex.
+      hr
   .row
     .col-sm-6
-      h2 Manage Your Portfolios
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+      h3 Trade Bitcoin, Ethereum, Ripple, and more
+      p 
+      p Ostia currently supports Poloniex, the largest and most popular cryptocurrency exchange. With that you have access to all 90+ cryptocurrency markets. Make a Poloniex account to get started with Ostia!
       p
         a.btn.btn-default(href='#', role='button') View details »
+
     .col-sm-6
-      h2 Design Algorithmic Strategies
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+      h3 Design Algorithmic Strategies
+      p 
+      p You can design a trading strategy from scratch using our set of industry standard techincal indicators. Select your currency pair and indicators, design your algorithm, backtest and deploy. It's that simple.
       p
         a.btn.btn-default(href='#', role='button') View details »
+
     .col-sm-6
-      h2 Prevent Drawdowns
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+      h3 Manage Your Portfolios (coming soon...)
+      p 
+      p The current major exchanges don't provide an interface to manage your portfolios. Ostia gives you a set of expressive portfolio management tools so you're always on top of your accounts' performance.
       p
         a.btn.btn-default(href='#', role='button') View details »
-    .col-sm-6
-      h2 Account Aggregation
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-default(href='#', role='button') View details »
+    
