@@ -1,23 +1,23 @@
-mixin relationRow()
-  tr
+mixin relationRow(relationRow)
+  tr(id='rr' + '-' + relationRow)
     td 
-      select.form-control
+      select(id='iA' + '-' + relationRow).form-control
         option SMA
         option EMA
         option RSI
         option MACD
     td
-      input.form-control(type='number')
+      input(id='pA' + '-' + relationRow).form-control(type='number')
     td
-      select.form-control
+      select(id='r' + '-' + relationRow).form-control
         option <
         option >
         option =
     td
-      select.form-control
+      select(id='iB' + '-' + relationRow).form-control
         option SMA
         option EMA
         option RSI
         option MACD
     td
-      input.form-control(type='number')
+      input(id='pB' + '-' + relationRow).form-control(type='number')

@@ -168,7 +168,7 @@ const csvToAddData = function (chartData, mainChart, inputParam, indKey) {
       } else if (indKey === 'EMA') {
         indCreator = window.EMA(chartData, userInputChartList[i]);
       }
-      console.log(indCreator);
+      // console.log(indCreator);
       // Creating a unique id for this indicator
       let id = indKey + userInputChartList[i];
 
@@ -309,21 +309,20 @@ function createHighChartsObj(ops) {
 $(document).ready(() => {
   let chartData = null;
   let mainChart = Highcharts.stockChart('hcharts-strategy', createHighChartsObj());
-  // var mainChart = $('#hcharts-strategy').highcharts('StockChart', createHighChartsObj());
-  // const chartData = null;
-  // $('.progress').show();
+
   $('#chartButton').click(() => {
     $('.progress').show();
     const A = $('#baseCurrency').val();
     const B = $('#tradeCurrency').val();
     console.log(`Loading chart for ${A}_${B}...`);
     $.getJSON(`/data?currencyA=${A}&currencyB=${B}`, (data) => {
-      console.log(data);
+      // console.log(data);
       const ops = {};
       ops.A = A; ops.B = B; ops.data = data; chartData = data;
       mainChart = Highcharts.stockChart('hcharts-strategy', createHighChartsObj(ops));
     });
   });
+
   $('#addIndicatorBtn_SMA').click(() => {
     console.log('### Inside addIndicator_SMA');
 
@@ -333,6 +332,7 @@ $(document).ready(() => {
     // Redrawing chart after adding indicators
     mainChart.redraw();
   });
+  
   $('#addIndicatorBtn_EMA').click(() => {
     console.log('### Inside addIndicator_EMA');
 
@@ -342,6 +342,7 @@ $(document).ready(() => {
     // Redrawing chart after adding indicators
     mainChart.redraw();
   });
+  
   $('#removeIndicator').click(() => {
     // PARAM see which indicator to add
     // PARAM what indicator parameter to use
@@ -354,7 +355,37 @@ $(document).ready(() => {
     // create new indicator time series
     // add new time series to highcharts graph
     // redraw chart
+  });
 
+  // THIS ONLY PARSES ONE ROW OF RELATION FOR MVP PURPOSES
+  $('#backteststrategy').click(function() {
+    $('#backteststrategy').text('👇 Backtest Strategy 👇');
+    let iA_Buy = $('#iA-1Buy').val();
+    let pA_Buy = $('#pA-1Buy').val();
+    let r_Buy = $('#r-1Buy').val();
+    let iB_Buy = $('#iB-1Buy').val();
+    let pB_Buy = $('#pB-1Buy').val();
+    // let iA_Sell = $('#iA-1Sell').val();
+    // let pA_Sell = $('#pA-1Sell').val();
+    // let r_Sell = $('#r-1Sell').val();
+    // let iB_Sell = $('#iB-1Sell').val();
+    // let pB_Sell = $('#pB-1Sell').val();
+
+    let stratObj = {
+      iA_Buy,
+      pA_Buy,
+      r_Buy,
+      iB_Buy,
+      pB_Buy
+    };
+
+    const A = $('#baseCurrency').val();
+    const B = $('#tradeCurrency').val();
+    console.log(chartData);
+    
+
+    console.log(iA_Buy, pA_Buy, r_Buy, iB_Buy, pB_Buy);
+    // Parse relation from first row
   });
 
 });

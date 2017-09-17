@@ -127,6 +127,7 @@ app.get('/data', marketsController.getTickData);
 app.get('/tick', marketsController.getTickData);
 app.get('/portfolio', portfolioController.getPortfolio);
 app.get('/strategies', strategyController.getStrategies);
+app.post('strategies/create', strategyController.deployStrategy);
 
 app.get('/', homeController.index);
 app.get('/login', userController.getLogin);

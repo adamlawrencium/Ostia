@@ -7,3 +7,8 @@ exports.getStrategies = (req, res) => {
     title: 'Strategies'
   });
 };
+
+// TODO
+exports.deployStrategy = (req, res) => {
+  res.send('boop');
+};
