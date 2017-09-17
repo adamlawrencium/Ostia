@@ -2,6 +2,7 @@ extends layout
 
 include partials/currencyChart
 include partials/addIndicator
+include partials/relationRow
 
 block content
   p.lead Create a trading strategy.
@@ -61,15 +62,38 @@ block content
             //- .col-lg-12
             .col-lg-6
               p.lead Buy Triggers
-              .form-group
-                label(for='buyrules') Rules:
-                textarea#comment.form-control(rows='5')
+              table.table
+                thead
+                  tr
+                    th Indicator
+                    th Param
+                    th Relation
+                    th Indicator
+                    th Param
+                tbody
+                  +relationRow()
+                  +relationRow()
+                  +relationRow()
+                  
 
             .col-lg-6
               p.lead Sell Triggers
-              .form-group
-                label(for='sellrules') Rules:
-                textarea#comment.form-control(rows='5')
+              table.table
+                thead
+                  tr
+                    th Indicator
+                    th Param
+                    th Relation
+                    th Indicator
+                    th Param
+                tbody
+                  +relationRow()
+                  +relationRow()
+                  +relationRow()
+          .row
+            .col-lg-12
+              button.pull-left.btn.btn-success(type='button') Add Relation
+              button.pull-right.btn.btn-primary(type='button') Backtest Strategy
 
  
   //- Strategy backtest panel
