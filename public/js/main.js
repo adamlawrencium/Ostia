@@ -64,6 +64,14 @@ window.EMA = function (candleStickData, MAWindowSize) {
   return MATimeSeries;
 };
 
+const deteremineStrategyState = function (timeIndex, indicatorATicks, indicatorBTicks) {
+  if (indicatorATicks[timeIndex][1] < indicatorBTicks[timeIndex][1]) {
+    return 'BUY';
+  } else {
+    return 'SELL';
+  }
+};
+
 /**
  * Creates object literal, given paramaters, and adds it to highchart
  * @param {HighChart} highchart self reference
@@ -168,7 +176,7 @@ const csvToAddData = function (chartData, mainChart, inputParam, indKey) {
       } else if (indKey === 'EMA') {
         indCreator = window.EMA(chartData, userInputChartList[i]);
       }
-      console.log(indCreator);
+      // console.log(indCreator);
       // Creating a unique id for this indicator
       let id = indKey + userInputChartList[i];
 
@@ -205,33 +213,75 @@ const createCandlestickSeries = function (highchart, name) {
 };
 
 
+let createFlagSeries = function (highchart) {
+  const seriesObj = {};
+  seriesObj.id = 'flags';
+  seriesObj.type = 'flags';
+  seriesObj.data = [];
+  seriesObj.onSeries = 'Closing Price';
+  seriesObj.shape = 'circlepin';
+  seriesObj.width = 30;
+  highchart.addSeries(seriesObj);
+};
+
+/**
+ * Every flag consists of x, title and text. The attribute "x" must be set to
+ * the point where the flag should appear. The attribute "title" is the text
+ * which is displayed inside the flag on the chart. The attribute "text" contains
+ * the text which will appear when the mouse hover above the flag.
+ */
+var addFlagToSeries = function (highchart, timeStamp, order) {
+  var flagObj = {};
+  console.log('inside addFlagToSeries:', timeStamp, order);
+  flagObj.x = timeStamp;
+  flagObj.title = order;
+  flagObj.text = 'Make a trade here.';
+
+  highchart.get('flags').addPoint(flagObj);
+};
+
 /**
  * Connects and listens on two sockets to initialize and then update a chart.
  *     initializedChartData creates a series and adds historical data to it.
  *     updatedChartData listens for live data and adds it to a targetSeries
  * @param {HighChart} highchart self reference
  */
-const loadStrategyTrades = function (highchart, chartData) {
+const loadStrategyTrades = function (highchart, chartData, flags) {
   if (!chartData) { return; }
-  highchart.showLoading('<img src="../favicon.png">');
+  var loc = window.location.pathname;
+  // var dir = loc.substring(0, loc.lastIndexOf('/'));
+  console.log(loc);
+  highchart.showLoading('<img src="favicon.png">');
 
   // // INITALIZE CHART WITH HISTORICAL DATA
   console.log('### initializedChartData received...');
   console.log('### creating series...');
 
-  createCandlestickSeries(highchart, 'Closing Price');
   /* Creating tickerData chart lines */
+  createCandlestickSeries(highchart, 'Closing Price');
   const tickerData = chartData;
   console.log(tickerData);
   const targetSeries = highchart.get('Closing Price');
   addTickerDatasetToSeries(targetSeries, tickerData);
+
+  if (flags) {
+    /* Adding order flags */
+    createFlagSeries(highchart);
+    for (var i = 0; i < flags.length; i++) {
+      // console.log('flag added');
+      var timeStamp = flags[i][0] * 1000;
+      var orderLongShort = flags[i][1];
+      addFlagToSeries(highchart, timeStamp, orderLongShort);
+    }
+  }
+
   highchart.hideLoading();
   $('.progress').hide();
   highchart.redraw();
 };
 
 function createHighChartsObj(ops) {
-  let chartTitle; let A; let B; let data;
+  let chartTitle; let A; let B; let data; let flags;
   // console.log(ops);
   chartTitle = 'Select to cryptocurrencies to view their chart!';
   if (ops) {
@@ -239,6 +289,7 @@ function createHighChartsObj(ops) {
     B = ops.B;
     chartTitle = `Historical Prices - ${A}/${B}`;
     data = ops.data;
+    flags = ops.flags;
   }
   return {
     plotOptions: {
@@ -297,7 +348,7 @@ function createHighChartsObj(ops) {
       events: {
         load() {
           const self = this;
-          loadStrategyTrades(self, data);
+          loadStrategyTrades(self, data, flags);
         }
       },
     },
@@ -309,21 +360,20 @@ function createHighChartsObj(ops) {
 $(document).ready(() => {
   let chartData = null;
   let mainChart = Highcharts.stockChart('hcharts-strategy', createHighChartsObj());
-  // var mainChart = $('#hcharts-strategy').highcharts('StockChart', createHighChartsObj());
-  // const chartData = null;
-  // $('.progress').show();
+
   $('#chartButton').click(() => {
     $('.progress').show();
     const A = $('#baseCurrency').val();
     const B = $('#tradeCurrency').val();
     console.log(`Loading chart for ${A}_${B}...`);
     $.getJSON(`/data?currencyA=${A}&currencyB=${B}`, (data) => {
-      console.log(data);
+      // console.log(data);
       const ops = {};
       ops.A = A; ops.B = B; ops.data = data; chartData = data;
       mainChart = Highcharts.stockChart('hcharts-strategy', createHighChartsObj(ops));
     });
   });
+
   $('#addIndicatorBtn_SMA').click(() => {
     console.log('### Inside addIndicator_SMA');
 
@@ -333,6 +383,7 @@ $(document).ready(() => {
     // Redrawing chart after adding indicators
     mainChart.redraw();
   });
+
   $('#addIndicatorBtn_EMA').click(() => {
     console.log('### Inside addIndicator_EMA');
 
@@ -342,6 +393,7 @@ $(document).ready(() => {
     // Redrawing chart after adding indicators
     mainChart.redraw();
   });
+
   $('#removeIndicator').click(() => {
     // PARAM see which indicator to add
     // PARAM what indicator parameter to use
@@ -354,7 +406,77 @@ $(document).ready(() => {
     // create new indicator time series
     // add new time series to highcharts graph
     // redraw chart
-
   });
 
+  // THIS ONLY PARSES ONE ROW OF RELATION FOR MVP PURPOSES
+  $('#backteststrategy').click(function () {
+    $('#backteststrategy').text('👇 Backtest Strategy 👇');
+    let iA_Buy = $('#iA-1Buy').val();
+    let pA_Buy = $('#pA-1Buy').val();
+    let r_Buy = $('#r-1Buy').val();
+    let iB_Buy = $('#iB-1Buy').val();
+    let pB_Buy = $('#pB-1Buy').val();
+    // let iA_Sell = $('#iA-1Sell').val();
+    // let pA_Sell = $('#pA-1Sell').val();
+    // let r_Sell = $('#r-1Sell').val();
+    // let iB_Sell = $('#iB-1Sell').val();
+    // let pB_Sell = $('#pB-1Sell').val();
+
+    // let stratObj = {
+    //   iA_Buy,
+    //   pA_Buy,
+    //   r_Buy,
+    //   iB_Buy,
+    //   pB_Buy
+    // };
+
+    const A = $('#baseCurrency').val();
+    const B = $('#tradeCurrency').val();
+
+    // Choose indicators based on user input
+    let indicatorATicks; let indicatorBTicks;
+    console.log(iA_Buy, iB_Buy);
+    if (iA_Buy == 'SMA') { indicatorATicks = window.SMA(chartData, pA_Buy); }
+    else { indicatorATicks = window.EMA(chartData, pA_Buy); }
+    if (iB_Buy == 'SMA') { indicatorBTicks = window.SMA(chartData, pB_Buy); }
+    else { indicatorBTicks = window.EMA(chartData, pB_Buy); }
+
+    // let indicatorATicks = window.SMA(chartData, pA_Buy);
+    // let indicatorBTicks = window.SMA(chartData, pB_Buy);
+
+    // Trim arrays to same length
+    if (indicatorATicks.length < indicatorBTicks.length) {
+      indicatorBTicks = indicatorBTicks.slice(indicatorBTicks.length - indicatorATicks.length);
+    } else {
+      indicatorATicks = indicatorATicks.slice(indicatorATicks.length - indicatorBTicks.length);
+    }
+
+    console.log(indicatorATicks);
+    console.log(indicatorBTicks);
+
+    // Getting starting state
+    // let higher; let lower;
+    // if (indicatorATicks[0][1] < indicatorBTicks[0][1]) {
+    //   lower = indicatorATicks; higher = indicatorBTicks;
+    // } else {
+    //   lower = indicatorBTicks; higher = indicatorATicks;
+    // }
+
+    // TODO: Use derivatives for this instead?
+    const flags = [];
+    let previousState = null;
+    for (let i = 0; i < indicatorATicks.length; i++) {
+      const currentState = deteremineStrategyState(i, indicatorATicks, indicatorBTicks);
+      if (currentState !== previousState) {
+        // create order from the state
+        flags.push([indicatorATicks[i][0], currentState]);
+      }
+      previousState = currentState;
+    }
+    console.log(flags);
+
+    const ops = {};
+    ops.A = A; ops.B = B; ops.data = chartData; ops.flags = flags;
+    const backtestChart = Highcharts.stockChart('hcharts-backtest', createHighChartsObj(ops));
+  });
 });

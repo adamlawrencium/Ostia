@@ -71,9 +71,9 @@ block content
                     th Indicator
                     th Param
                 tbody
-                  +relationRow()
-                  +relationRow()
-                  +relationRow()
+                  +relationRow('1Buy')
+                  +relationRow(2)
+                  +relationRow(3)
                   
             .col-lg-6
               p.lead Sell Triggers
@@ -86,15 +86,15 @@ block content
                     th Indicator
                     th Param
                 tbody
-                  +relationRow()
-                  +relationRow()
-                  +relationRow()
+                  +relationRow('1Sell')
+                  +relationRow(2)
+                  +relationRow(3)
           .row
             .col-lg-12
               .btn-toolbar
                 button.pull-left.btn.btn-success.btn-sm(type='button') Add Relation
                 button.pull-left.btn.btn-danger.btn-sm(type='button') Remove Last Relation
-                button.pull-right.btn.btn-primary(type='button' style="margin:3px;") 👇 Backtest Strategy 👇
+                button#backteststrategy.pull-right.btn.btn-primary(type='button' style="margin:3px;") Backtest Strategy
 
  
   //- Strategy backtest panel
@@ -108,7 +108,9 @@ block content
           .row
             .col-lg-12
               p.lead Backtest your strategy here
-                .row
+          .row
+            .col-lg-12
+              #hcharts-backtest
 
   //- Buttons        
   .row
