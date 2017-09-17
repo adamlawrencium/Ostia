@@ -8,8 +8,7 @@ block content
   p.lead Create a trading strategy.
 
   ol 
-    li Select a currency pair
-    li Select indicators
+    li Select a currency pair & indicators
     li Define your algorithm
     li Back test your algorithm
 
@@ -37,7 +36,7 @@ block content
       .panel.panel-default
         .panel-heading
           i.fa.fa-bar-chart-o.fa-fw
-          | 1. Select Currency Pair (& Indicators?)
+          | 1. Select Currency Pair & Indicators
         .panel-body
           .row
             .col-lg-12
@@ -45,6 +44,7 @@ block content
           .row
             .col-lg-12
               h4 Indicators
+              p You can add multiple comma-separated parameters to each indicator (e.g. 10, 15, 30)
               +addIndicator("Simple Moving Average", "SMA")
               +addIndicator("Exponential Moving Average", "EMA")
               +addIndicator("Relative Strength Index", "RSI")
