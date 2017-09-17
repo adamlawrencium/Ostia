@@ -64,6 +64,14 @@ window.EMA = function (candleStickData, MAWindowSize) {
   return MATimeSeries;
 };
 
+const deteremineStrategyState = function(timeIndex, indicatorATicks, indicatorBTicks) {
+  if (indicatorATicks[timeIndex][1] < indicatorBTicks[timeIndex][1]) {
+    return 'SHORT_ZONE';
+  } else {
+    return 'LONG_ZONE';
+  }
+};
+
 /**
  * Creates object literal, given paramaters, and adds it to highchart
  * @param {HighChart} highchart self reference
@@ -205,13 +213,40 @@ const createCandlestickSeries = function (highchart, name) {
 };
 
 
+let createFlagSeries = function (highchart) {
+  const seriesObj = {};
+  seriesObj.id = 'flags';
+  seriesObj.type = 'flags';
+  seriesObj.data = [];
+  seriesObj.onSeries = 'Closing Price';
+  seriesObj.shape = 'circlepin';
+  seriesObj.width = 20;
+  highchart.addSeries(seriesObj);
+};
+
+/**
+ * Every flag consists of x, title and text. The attribute "x" must be set to
+ * the point where the flag should appear. The attribute "title" is the text
+ * which is displayed inside the flag on the chart. The attribute "text" contains
+ * the text which will appear when the mouse hover above the flag.
+ */
+var addFlagToSeries = function (highchart, timeStamp, order) {
+  var flagObj = {};
+  console.log('inside addFlagToSeries:', timeStamp, order);
+  flagObj.x = timeStamp;
+  flagObj.title = order;
+  flagObj.text = 'Make a trade here.';
+
+  highchart.get('flags').addPoint(flagObj);
+};
+
 /**
  * Connects and listens on two sockets to initialize and then update a chart.
  *     initializedChartData creates a series and adds historical data to it.
  *     updatedChartData listens for live data and adds it to a targetSeries
  * @param {HighChart} highchart self reference
  */
-const loadStrategyTrades = function (highchart, chartData) {
+const loadStrategyTrades = function (highchart, chartData, flags) {
   if (!chartData) { return; }
   highchart.showLoading('<img src="../favicon.png">');
 
@@ -219,19 +254,31 @@ const loadStrategyTrades = function (highchart, chartData) {
   console.log('### initializedChartData received...');
   console.log('### creating series...');
 
-  createCandlestickSeries(highchart, 'Closing Price');
   /* Creating tickerData chart lines */
+  createCandlestickSeries(highchart, 'Closing Price');
   const tickerData = chartData;
   console.log(tickerData);
   const targetSeries = highchart.get('Closing Price');
   addTickerDatasetToSeries(targetSeries, tickerData);
+
+  if (flags) {
+    /* Adding order flags */
+    createFlagSeries(highchart);
+    for (var i = 0; i < flags.length; i++) {
+      console.log('flag added');
+      var timeStamp = flags[i][0] * 1000;
+      var orderLongShort = flags[i][1];
+      addFlagToSeries(highchart, timeStamp, orderLongShort);
+    }
+  }
+
   highchart.hideLoading();
   $('.progress').hide();
   highchart.redraw();
 };
 
 function createHighChartsObj(ops) {
-  let chartTitle; let A; let B; let data;
+  let chartTitle; let A; let B; let data; let flags;
   // console.log(ops);
   chartTitle = 'Select to cryptocurrencies to view their chart!';
   if (ops) {
@@ -239,6 +286,7 @@ function createHighChartsObj(ops) {
     B = ops.B;
     chartTitle = `Historical Prices - ${A}/${B}`;
     data = ops.data;
+    flags = ops.flags;
   }
   return {
     plotOptions: {
@@ -297,7 +345,7 @@ function createHighChartsObj(ops) {
       events: {
         load() {
           const self = this;
-          loadStrategyTrades(self, data);
+          loadStrategyTrades(self, data, flags);
         }
       },
     },
@@ -332,7 +380,7 @@ $(document).ready(() => {
     // Redrawing chart after adding indicators
     mainChart.redraw();
   });
-  
+
   $('#addIndicatorBtn_EMA').click(() => {
     console.log('### Inside addIndicator_EMA');
 
@@ -342,7 +390,7 @@ $(document).ready(() => {
     // Redrawing chart after adding indicators
     mainChart.redraw();
   });
-  
+
   $('#removeIndicator').click(() => {
     // PARAM see which indicator to add
     // PARAM what indicator parameter to use
@@ -371,21 +419,54 @@ $(document).ready(() => {
     // let iB_Sell = $('#iB-1Sell').val();
     // let pB_Sell = $('#pB-1Sell').val();
 
-    let stratObj = {
-      iA_Buy,
-      pA_Buy,
-      r_Buy,
-      iB_Buy,
-      pB_Buy
-    };
+    // let stratObj = {
+    //   iA_Buy,
+    //   pA_Buy,
+    //   r_Buy,
+    //   iB_Buy,
+    //   pB_Buy
+    // };
 
     const A = $('#baseCurrency').val();
     const B = $('#tradeCurrency').val();
-    console.log(chartData);
-    
 
-    console.log(iA_Buy, pA_Buy, r_Buy, iB_Buy, pB_Buy);
-    // Parse relation from first row
+    let indicatorATicks = window.SMA(chartData, pA_Buy);
+    let indicatorBTicks = window.SMA(chartData, pB_Buy);
+
+    // Trim arrays to same length
+    if (indicatorATicks.length < indicatorBTicks.length) {
+      indicatorBTicks = indicatorBTicks.slice(indicatorBTicks.length - indicatorATicks.length);
+    } else {
+      indicatorATicks = indicatorATicks.slice(indicatorATicks.length - indicatorBTicks.length);
+    }
+
+    console.log(indicatorATicks);
+    console.log(indicatorBTicks);
+
+
+    // Getting starting state
+    let higher; let lower;
+    if (indicatorATicks[0][1] < indicatorBTicks[0][1]) {
+      lower = indicatorATicks; higher = indicatorBTicks;
+    } else {
+      lower = indicatorBTicks; higher = indicatorATicks;
+    }
+
+    // TODO: Use derivatives for this instead?
+    const flags = [];
+    let previousState = null;
+    for (let i = 0; i < indicatorATicks.length; i++) {
+      let currentState = deteremineStrategyState(i, indicatorATicks, indicatorBTicks);
+      if (currentState !== previousState) {
+        // create order from the state
+        flags.push([indicatorATicks[i][0], currentState]);
+      }
+      previousState = currentState;
+    }
+    console.log(flags);
+
+    const ops = {};
+    ops.A = A; ops.B = B; ops.data = chartData; ops.flags = flags;
+    let backtestChart = Highcharts.stockChart('hcharts-backtest', createHighChartsObj(ops));
   });
-
 });
