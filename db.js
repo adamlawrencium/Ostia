@@ -184,11 +184,12 @@ exports.dbInitializer = async function () {
     console.log(data);
   });
   return new Promise(async (resolve, reject) => {
-    const choice = 1;
+    const choice = 2;
     if (choice === 0) {
       console.log('### Clearing out database...');
       DBPoloniex.deleteMany({})
         .then((data) => {
+          console.log('### Cleared out database.')
           resolve(`Deleted ${data.deletedCount} elements`);
           process.exit(0);
         });
