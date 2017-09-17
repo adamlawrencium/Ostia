@@ -66,9 +66,9 @@ window.EMA = function (candleStickData, MAWindowSize) {
 
 const deteremineStrategyState = function (timeIndex, indicatorATicks, indicatorBTicks) {
   if (indicatorATicks[timeIndex][1] < indicatorBTicks[timeIndex][1]) {
-    return 'SHORT_ZONE';
+    return 'BUY';
   } else {
-    return 'LONG_ZONE';
+    return 'SELL';
   }
 };
 
@@ -220,7 +220,7 @@ let createFlagSeries = function (highchart) {
   seriesObj.data = [];
   seriesObj.onSeries = 'Closing Price';
   seriesObj.shape = 'circlepin';
-  seriesObj.width = 20;
+  seriesObj.width = 30;
   highchart.addSeries(seriesObj);
 };
 
@@ -248,7 +248,10 @@ var addFlagToSeries = function (highchart, timeStamp, order) {
  */
 const loadStrategyTrades = function (highchart, chartData, flags) {
   if (!chartData) { return; }
-  highchart.showLoading('<img src="../favicon.png">');
+  var loc = window.location.pathname;
+  // var dir = loc.substring(0, loc.lastIndexOf('/'));
+  console.log(loc);
+  highchart.showLoading('<img src="favicon.png">');
 
   // // INITALIZE CHART WITH HISTORICAL DATA
   console.log('### initializedChartData received...');
@@ -265,7 +268,7 @@ const loadStrategyTrades = function (highchart, chartData, flags) {
     /* Adding order flags */
     createFlagSeries(highchart);
     for (var i = 0; i < flags.length; i++) {
-      console.log('flag added');
+      // console.log('flag added');
       var timeStamp = flags[i][0] * 1000;
       var orderLongShort = flags[i][1];
       addFlagToSeries(highchart, timeStamp, orderLongShort);
@@ -432,10 +435,14 @@ $(document).ready(() => {
 
     // Choose indicators based on user input
     let indicatorATicks; let indicatorBTicks;
-    if (iA_Buy === 'SMA') { indicatorATicks = window.SMA(chartData, pA_Buy); }
+    console.log(iA_Buy, iB_Buy);
+    if (iA_Buy == 'SMA') { indicatorATicks = window.SMA(chartData, pA_Buy); }
     else { indicatorATicks = window.EMA(chartData, pA_Buy); }
-    if (iB_Buy === 'SMA') { indicatorBTicks = window.SMA(chartData, pA_Buy); }
-    else { indicatorBTicks = window.EMA(chartData, pA_Buy); }
+    if (iB_Buy == 'SMA') { indicatorBTicks = window.SMA(chartData, pB_Buy); }
+    else { indicatorBTicks = window.EMA(chartData, pB_Buy); }
+
+    // let indicatorATicks = window.SMA(chartData, pA_Buy);
+    // let indicatorBTicks = window.SMA(chartData, pB_Buy);
 
     // Trim arrays to same length
     if (indicatorATicks.length < indicatorBTicks.length) {
