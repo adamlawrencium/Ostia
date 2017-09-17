@@ -64,7 +64,7 @@ window.EMA = function (candleStickData, MAWindowSize) {
   return MATimeSeries;
 };
 
-const deteremineStrategyState = function(timeIndex, indicatorATicks, indicatorBTicks) {
+const deteremineStrategyState = function (timeIndex, indicatorATicks, indicatorBTicks) {
   if (indicatorATicks[timeIndex][1] < indicatorBTicks[timeIndex][1]) {
     return 'SHORT_ZONE';
   } else {
@@ -406,7 +406,7 @@ $(document).ready(() => {
   });
 
   // THIS ONLY PARSES ONE ROW OF RELATION FOR MVP PURPOSES
-  $('#backteststrategy').click(function() {
+  $('#backteststrategy').click(function () {
     $('#backteststrategy').text('👇 Backtest Strategy 👇');
     let iA_Buy = $('#iA-1Buy').val();
     let pA_Buy = $('#pA-1Buy').val();
@@ -430,8 +430,12 @@ $(document).ready(() => {
     const A = $('#baseCurrency').val();
     const B = $('#tradeCurrency').val();
 
-    let indicatorATicks = window.SMA(chartData, pA_Buy);
-    let indicatorBTicks = window.SMA(chartData, pB_Buy);
+    // Choose indicators based on user input
+    let indicatorATicks; let indicatorBTicks;
+    if (iA_Buy === 'SMA') { indicatorATicks = window.SMA(chartData, pA_Buy); }
+    else { indicatorATicks = window.EMA(chartData, pA_Buy); }
+    if (iB_Buy === 'SMA') { indicatorBTicks = window.SMA(chartData, pA_Buy); }
+    else { indicatorBTicks = window.EMA(chartData, pA_Buy); }
 
     // Trim arrays to same length
     if (indicatorATicks.length < indicatorBTicks.length) {
@@ -443,20 +447,19 @@ $(document).ready(() => {
     console.log(indicatorATicks);
     console.log(indicatorBTicks);
 
-
     // Getting starting state
-    let higher; let lower;
-    if (indicatorATicks[0][1] < indicatorBTicks[0][1]) {
-      lower = indicatorATicks; higher = indicatorBTicks;
-    } else {
-      lower = indicatorBTicks; higher = indicatorATicks;
-    }
+    // let higher; let lower;
+    // if (indicatorATicks[0][1] < indicatorBTicks[0][1]) {
+    //   lower = indicatorATicks; higher = indicatorBTicks;
+    // } else {
+    //   lower = indicatorBTicks; higher = indicatorATicks;
+    // }
 
     // TODO: Use derivatives for this instead?
     const flags = [];
     let previousState = null;
     for (let i = 0; i < indicatorATicks.length; i++) {
-      let currentState = deteremineStrategyState(i, indicatorATicks, indicatorBTicks);
+      const currentState = deteremineStrategyState(i, indicatorATicks, indicatorBTicks);
       if (currentState !== previousState) {
         // create order from the state
         flags.push([indicatorATicks[i][0], currentState]);
@@ -467,6 +470,6 @@ $(document).ready(() => {
 
     const ops = {};
     ops.A = A; ops.B = B; ops.data = chartData; ops.flags = flags;
-    let backtestChart = Highcharts.stockChart('hcharts-backtest', createHighChartsObj(ops));
+    const backtestChart = Highcharts.stockChart('hcharts-backtest', createHighChartsObj(ops));
   });
 });
