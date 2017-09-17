@@ -75,7 +75,6 @@ block content
                   +relationRow()
                   +relationRow()
                   
-
             .col-lg-6
               p.lead Sell Triggers
               table.table
@@ -92,8 +91,10 @@ block content
                   +relationRow()
           .row
             .col-lg-12
-              button.pull-left.btn.btn-success(type='button') Add Relation
-              button.pull-right.btn.btn-primary(type='button') Backtest Strategy
+              .btn-toolbar
+                button.pull-left.btn.btn-success.btn-sm(type='button') Add Relation
+                button.pull-left.btn.btn-danger.btn-sm(type='button') Remove Last Relation
+                button.pull-right.btn.btn-primary(type='button') Backtest Strategy
 
  
   //- Strategy backtest panel
