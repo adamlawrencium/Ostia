@@ -184,7 +184,8 @@ exports.dbInitializer = async function () {
     console.log(data);
   });
   return new Promise(async (resolve, reject) => {
-    const choice = 1;
+    // abstract this to config file...
+    const choice = 2;
     if (choice === 0) {
       console.log('### Clearing out database...');
       DBPoloniex.deleteMany({})
