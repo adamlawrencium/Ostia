@@ -30,5 +30,3 @@ npm start
 ```
 localhost:3000/
 ```
-
-Note: you may have to refresh the page once or twice for it to properly load
