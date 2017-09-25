@@ -1,4 +1,4 @@
-mixin relationRow(relationRow)
+mixin relationRow(relationRow, param1, param2)
   tr(id='rr' + '-' + relationRow)
     td 
       select(id='iA' + '-' + relationRow).form-control
@@ -7,7 +7,7 @@ mixin relationRow(relationRow)
         option RSI
         option MACD
     td
-      input(id='pA' + '-' + relationRow).form-control(type='number')
+      input(id='pA' + '-' + relationRow).form-control(type='number', value=param1)
     td
       select(id='r' + '-' + relationRow).form-control
         option <
@@ -20,4 +20,4 @@ mixin relationRow(relationRow)
         option RSI
         option MACD
     td
-      input(id='pB' + '-' + relationRow).form-control(type='number')
+      input(id='pB' + '-' + relationRow).form-control(type='number', value=param2)

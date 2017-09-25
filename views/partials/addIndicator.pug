@@ -1,6 +1,6 @@
-mixin addIndicator(indicator, id_)
+mixin addIndicator(indicator, id_, params)
   form.form-inline(id=id_)
     .form-group
       label(for='inputEmail')= indicator
-      input.form-control(type='text', placeholder='e.g. "10, 15, 30"', required='', id=`addIndicator_${id_}`)
+      input.form-control(type='text', placeholder='e.g. "10, 15, 30"', required='', id=`addIndicator_${id_}` value=params)
       button.btn.indcbtn(type='button', id=`addIndicatorBtn_${id_}`) Update

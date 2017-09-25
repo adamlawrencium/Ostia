@@ -45,8 +45,8 @@ block content
             .col-lg-12
               h4 Indicators
               p You can add multiple comma-separated parameters to each indicator (e.g. 10, 15, 30)
-              +addIndicator("Simple Moving Average", "SMA")
-              +addIndicator("Exponential Moving Average", "EMA")
+              +addIndicator("Simple Moving Average", "SMA", "10, 15")
+              +addIndicator("Exponential Moving Average", "EMA", "28")
               +addIndicator("Relative Strength Index", "RSI")
               +addIndicator("Moving Average Convergence Divergence", "MACD")
  
@@ -56,7 +56,7 @@ block content
       .panel.panel-default
         .panel-heading
           i.fa.fa-bar-chart-o.fa-fw
-          | 2. Algorithm Design (not functional yet)
+          | 2. Algorithm Design
         .panel-body
           .row
             //- .col-lg-12
@@ -71,7 +71,7 @@ block content
                     th Indicator
                     th Param
                 tbody
-                  +relationRow('1Buy')
+                  +relationRow('1Buy', 15, 30)
                   +relationRow(2)
                   +relationRow(3)
                   
