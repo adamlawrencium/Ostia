@@ -283,7 +283,7 @@ const loadStrategyTrades = function (highchart, chartData, flags) {
 function createHighChartsObj(ops) {
   let chartTitle; let A; let B; let data; let flags;
   // console.log(ops);
-  chartTitle = 'Select to cryptocurrencies to view their chart!';
+  chartTitle = 'Select two cryptocurrencies to view their chart!';
   if (ops) {
     A = ops.A;
     B = ops.B;
